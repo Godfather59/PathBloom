@@ -22,6 +22,17 @@ allprojects {
         google()
         mavenCentral()
     }
+
+    // AndroidX pulls the unified Kotlin stdlib while Cordova still references
+    // legacy jdk7/jdk8 artifacts. Keep all variants aligned to avoid duplicate
+    // classes when assembling instrumentation-test APKs.
+    configurations.configureEach {
+        resolutionStrategy.force(
+            'org.jetbrains.kotlin:kotlin-stdlib:1.8.22',
+            'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22',
+            'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22'
+        )
+    }
 }
 
 task clean(type: Delete) {

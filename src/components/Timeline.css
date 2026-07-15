@@ -1,0 +1,144 @@
+.timeline-modal {
+  max-width: 520px !important;
+}
+
+.event-history-filters {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.decade-header {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: bold;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 4px;
+}
+
+.timeline-track {
+  position: relative;
+  margin: 20px 0;
+  padding-left: 30px;
+}
+
+.timeline-year {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 2px;
+  opacity: 0.4;
+  position: relative;
+}
+
+.timeline-year.milestone {
+  margin-bottom: 12px;
+  opacity: 0.95;
+}
+
+.timeline-year.current {
+  opacity: 1;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -22px;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--text-muted);
+  border: none;
+}
+
+.timeline-dot.milestone {
+  background-color: var(--accent-primary);
+}
+
+.timeline-dot.current {
+  border: 2px solid var(--accent-secondary);
+}
+
+.timeline-age {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  min-width: 28px;
+  font-weight: normal;
+}
+
+.timeline-age.current {
+  font-weight: bold;
+}
+
+.timeline-card {
+  flex: 1;
+  margin-left: 8px;
+}
+
+.timeline-event-card {
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.timeline-event-card.type-education {
+  background: rgba(33, 150, 243, 0.12);
+  border: 1px solid rgba(33, 150, 243, 0.2);
+}
+
+.timeline-event-card.type-relationship {
+  background: rgba(233, 30, 99, 0.12);
+  border: 1px solid rgba(233, 30, 99, 0.2);
+}
+
+.timeline-event-card.type-family {
+  background: rgba(76, 175, 80, 0.12);
+  border: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+.timeline-event-card.type-career {
+  background: rgba(255, 152, 0, 0.12);
+  border: 1px solid rgba(255, 152, 0, 0.2);
+}
+
+.timeline-event-card.type-asset {
+  background: rgba(0, 200, 83, 0.12);
+  border: 1px solid rgba(0, 200, 83, 0.2);
+}
+
+.timeline-event-card.type-crime {
+  background: rgba(244, 67, 54, 0.12);
+  border: 1px solid rgba(244, 67, 54, 0.2);
+}
+
+.timeline-event-card.type-politics {
+  background: rgba(156, 39, 176, 0.12);
+  border: 1px solid rgba(156, 39, 176, 0.2);
+}
+
+.timeline-summary {
+  margin-top: 16px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 12px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .timeline-track {
+    padding-left: 24px;
+  }
+
+  .timeline-dot {
+    left: -18px;
+    width: 8px;
+    height: 8px;
+  }
+
+  .timeline-age {
+    font-size: 0.65rem;
+    min-width: 22px;
+  }
+}

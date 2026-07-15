@@ -2,178 +2,325 @@ import React from 'react';
 import { ACTIVITIES } from '../logic/Activities';
 import './Modal.css';
 
-export function ActivitiesMenu({ person, onDoActivity, onClose }) {
-    return (
-        <div className="modal-overlay">
-            <div className="modal-content" style={{ maxWidth: '500px' }}>
-                <div className="modal-header">
-                    <h2 className="modal-title">Activities</h2>
-                    <button className="close-btn" onClick={onClose}>&times;</button>
-                </div>
+const FEATURE_CARDS = [
+  {
+    key: 'royalty',
+    title: 'Royalty',
+    emoji: '👑',
+    color: 'gold',
+    when: person => Boolean(person.royalty),
+    payload: { isRoyalty: true },
+  },
+  {
+    key: 'social',
+    title: 'Social Media',
+    emoji: '📱',
+    color: '#03a9f4',
+    minAge: 13,
+    payload: { isSocial: true },
+  },
+  {
+    key: 'love',
+    title: 'Love',
+    emoji: '💘',
+    color: '#e91e63',
+    minAge: 18,
+    payload: { isLove: true },
+  },
+  {
+    key: 'music',
+    title: 'Instruments',
+    emoji: '🎵',
+    color: '#9c27b0',
+    minAge: 6,
+    payload: { isMusic: true },
+  },
+  { key: 'doctor', title: 'Doctor', emoji: '🏥', color: '#00e676', payload: { isDoctor: true } },
+  {
+    key: 'politics',
+    title: 'Politics',
+    emoji: '🗳️',
+    color: '#1e88e5',
+    minAge: 18,
+    payload: { isPolitics: true },
+  },
+  {
+    key: 'crime',
+    title: 'Crime',
+    emoji: '🕵️',
+    color: '#777',
+    minAge: 12,
+    payload: { isCrimeHub: true },
+  },
+  {
+    key: 'business',
+    title: 'Business',
+    emoji: '🏢',
+    color: '#43a047',
+    minAge: 18,
+    payload: { isBusiness: true },
+  },
+  {
+    key: 'immigration',
+    title: 'Immigration',
+    emoji: '🌍',
+    color: '#26c6da',
+    minAge: 18,
+    payload: { isImmigration: true },
+  },
+  {
+    key: 'casino',
+    title: 'Casino',
+    emoji: '🎰',
+    color: '#ffb300',
+    minAge: 18,
+    payload: { isGambling: true },
+  },
+  {
+    key: 'hobbies',
+    title: 'Hobbies',
+    emoji: '🎨',
+    color: '#8d6e63',
+    minAge: 6,
+    payload: { isHobbies: true },
+  },
+  {
+    key: 'fitness',
+    title: 'Fitness',
+    emoji: '💪',
+    color: '#4caf50',
+    minAge: 13,
+    payload: { isFitness: true },
+  },
+  {
+    key: 'addiction',
+    title: 'Substances',
+    emoji: '⚠️',
+    color: '#ff1744',
+    minAge: 18,
+    payload: { isAddiction: true },
+  },
+  {
+    key: 'insurance',
+    title: 'Insurance',
+    emoji: '🛡️',
+    color: '#7c4dff',
+    minAge: 18,
+    payload: { isInsurance: true },
+  },
+  {
+    key: 'retirement',
+    title: 'Retirement',
+    emoji: '🏖️',
+    color: '#ffab00',
+    minAge: 18,
+    payload: { isRetirement: true },
+  },
+  {
+    key: 'sports',
+    title: 'College Sports',
+    emoji: '🏀',
+    color: '#1a237e',
+    minAge: 14,
+    payload: { isSports: true },
+  },
+  {
+    key: 'space',
+    title: 'Space Program',
+    emoji: '🚀',
+    color: '#0d47a1',
+    minAge: 22,
+    payload: { isSpace: true },
+  },
+  {
+    key: 'philanthropy',
+    title: 'Philanthropy',
+    emoji: '🎁',
+    color: '#2e7d32',
+    minAge: 18,
+    payload: { isPhilanthropy: true },
+  },
+  {
+    key: 'clubs',
+    title: 'Clubs & Societies',
+    emoji: '🎓',
+    color: '#6a1b9a',
+    minAge: 6,
+    payload: { isClubs: true },
+  },
+  {
+    key: 'lawsuits',
+    title: 'Lawsuits',
+    emoji: '⚖️',
+    color: '#bf360c',
+    minAge: 18,
+    payload: { isLawsuits: true },
+  },
+  {
+    key: 'memories',
+    title: 'Memories',
+    emoji: '📸',
+    color: '#f06292',
+    minAge: 6,
+    payload: { isMemories: true },
+  },
+];
 
-                <div className="modal-body">
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '12px' }}>
+const ACTIVITY_EMOJIS = {
+  gym: '💪',
+  meditate: '🧘',
+  library: '📚',
+  club: '🪩',
+  plastic_surgery: '✨',
+  find_date: '💌',
+  commit_crime_burglary: '🏚️',
+  commit_crime_robbery: '🏦',
+  gamble_lottery: '🎟️',
+  gamble_horse: '🏇',
+  adopt_pet_dog: '🐶',
+  adopt_pet_cat: '🐱',
+  travel_budget: '🎒',
+  travel_luxury: '🛳️',
+  busk: '🎸',
+  estate_planning: '📜',
+  pickpocket_activity: '🖐️',
+  court_case_activity: '⚖️',
+};
 
-                        {/* Royalty */}
-                        {person.royalty && (
-                            <div
-                                className="list-item"
-                                onClick={() => onDoActivity({ isRoyalty: true })}
-                                style={{
-                                    cursor: 'pointer',
-                                    borderLeft: '3px solid gold',
-                                    background: 'linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(0,0,0,0.2) 100%)',
-                                    display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center'
-                                }}
-                            >
-                                <span style={{ fontSize: '1.5em', marginBottom: '8px' }}>👑</span>
-                                <span className="list-item-title">Royalty</span>
-                            </div>
-                        )}
+const isBasicActivity = activity => {
+  return (
+    !activity.isDating &&
+    !activity.isSocial &&
+    !activity.isMusic &&
+    !activity.isMafia &&
+    !activity.isPolitics &&
+    !activity.isGambling &&
+    !activity.isDoctor &&
+    !activity.isCrime
+  );
+};
 
-                        {/* Social Media */}
-                        <div
-                            className="list-item"
-                            onClick={() => onDoActivity({ isSocial: true })}
-                            style={{
-                                cursor: 'pointer',
-                                borderLeft: '3px solid #03a9f4',
-                                display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center'
-                            }}
-                        >
-                            <span style={{ fontSize: '1.5em', marginBottom: '8px' }}>📱</span>
-                            <span className="list-item-title">Social Media</span>
-                        </div>
+const EFFECT_ICONS = {
+  happiness: '😊',
+  health: '❤️',
+  smarts: '🧠',
+  looks: '✨',
+  stress: '😵',
+  karma: '⚖️',
+  fame: '🌟',
+  notoriety: '🕶️',
+};
 
-                        {/* Love */}
-                        <div
-                            className="list-item"
-                            onClick={() => onDoActivity({ isLove: true })}
-                            style={{
-                                cursor: 'pointer',
-                                borderLeft: '3px solid #e91e63',
-                                display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center'
-                            }}
-                        >
-                            <span style={{ fontSize: '1.5em', marginBottom: '8px' }}>💘</span>
-                            <span className="list-item-title">Love</span>
-                        </div>
+const getEffectSummary = (activity, t) =>
+  Object.entries(activity.effects || {})
+    .filter(([, value]) => Number(value) !== 0)
+    .slice(0, 4)
+    .map(
+      ([key, value]) =>
+        `${EFFECT_ICONS[key] || '•'} ${t(`stat.${key}`, key)} ${Number(value) > 0 ? '+' : ''}${value}`
+    )
+    .join(' · ');
 
-                        {/* Music */}
-                        <div
-                            className="list-item"
-                            onClick={() => onDoActivity({ isMusic: true })}
-                            style={{
-                                cursor: 'pointer',
-                                borderLeft: '3px solid #9c27b0',
-                                display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center'
-                            }}
-                        >
-                            <span style={{ fontSize: '1.5em', marginBottom: '8px' }}>🎵</span>
-                            <span className="list-item-title">Instruments</span>
-                        </div>
+export function ActivitiesMenu({
+  person,
+  onDoActivity,
+  onClose,
+  language = 'en',
+  t = (key, fallback) => fallback || key,
+}) {
+  const visibleCards = FEATURE_CARDS.filter(card => !card.when || card.when(person));
+  const isRtl = language === 'ar';
 
-                        {/* Doctor */}
-                        <div
-                            className="list-item"
-                            onClick={() => onDoActivity({ isDoctor: true })}
-                            style={{
-                                cursor: 'pointer',
-                                borderLeft: '3px solid #00e676',
-                                display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center'
-                            }}
-                        >
-                            <span style={{ fontSize: '1.5em', marginBottom: '8px' }}>🩺</span>
-                            <span className="list-item-title">Doctor</span>
-                        </div>
+  return (
+    <div className="modal-overlay">
+      <div className="modal-content" style={{ maxWidth: '520px' }} dir={isRtl ? 'rtl' : 'ltr'}>
+        <div className="modal-header">
+          <h2 className="modal-title">🎯 {t('activities.title', 'Activities')}</h2>
+          <button className="close-btn" onClick={onClose}>
+            &times;
+          </button>
+        </div>
 
-                        {/* Politics */}
-                        <div
-                            className="list-item"
-                            onClick={() => onDoActivity({ isPolitics: true })}
-                            style={{
-                                cursor: 'pointer',
-                                borderLeft: '3px solid #1e88e5',
-                                display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center'
-                            }}
-                        >
-                            <span style={{ fontSize: '1.5em', marginBottom: '8px' }}>🗳️</span>
-                            <span className="list-item-title">Politics</span>
-                        </div>
+        <div className="modal-body">
+          <div className="activity-grid">
+            {visibleCards.map(card => {
+              const locked = Number.isFinite(card.minAge) && person.age < card.minAge;
+              return (
+                <button
+                  key={card.key}
+                  className="list-item activity-card"
+                  onClick={() =>
+                    onDoActivity({ ...card.payload, minAge: card.minAge, title: card.title })
+                  }
+                  disabled={locked}
+                  style={{
+                    ...(isRtl ? { borderRightColor: card.color } : { borderLeftColor: card.color }),
+                    opacity: locked ? 0.5 : 1,
+                  }}
+                >
+                  <span className="activity-token" aria-hidden="true">
+                    {card.emoji}
+                  </span>
+                  <span className="list-item-title">{t(`activities.${card.key}`, card.title)}</span>
+                  <span className="activity-hint">
+                    {locked
+                      ? `${t('activities.unlocksAt', 'Unlocks at')} ${card.minAge}`
+                      : t(`activities.${card.key}Hint`, '')}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
 
-                        {/* Mafia */}
-                        <div
-                            className="list-item"
-                            onClick={() => onDoActivity({ isMafia: true })}
-                            style={{
-                                cursor: 'pointer',
-                                borderLeft: '3px solid #333',
-                                display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center'
-                            }}
-                        >
-                            <span style={{ fontSize: '1.5em', marginBottom: '8px' }}>🕵️‍♂️</span>
-                            <span className="list-item-title">Crime</span>
-                        </div>
+          <h3 className="section-heading">✨ {t('activities.more', 'More Activities')}</h3>
 
-                        {/* Casino */}
-                        <div
-                            className="list-item"
-                            onClick={() => onDoActivity({ isGambling: true })}
-                            style={{
-                                cursor: 'pointer',
-                                borderLeft: '3px solid #ffb300',
-                                display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center'
-                            }}
-                        >
-                            <span style={{ fontSize: '1.5em', marginBottom: '8px' }}>🎰</span>
-                            <span className="list-item-title">Casino</span>
-                        </div>
-
-                        {/* Hobbies */}
-                        <div
-                            className="list-item"
-                            onClick={() => onDoActivity({ isHobbies: true })}
-                            style={{
-                                cursor: 'pointer',
-                                borderLeft: '3px solid #795548',
-                                display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center'
-                            }}
-                        >
-                            <span style={{ fontSize: '1.5em', marginBottom: '8px' }}>🎨</span>
-                            <span className="list-item-title">Hobbies</span>
-                        </div>
-                    </div>
-
-                    <h3 style={{ fontSize: '0.8rem', color: '#666', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '20px', marginBottom: '10px' }}>
-                        More Activities
-                    </h3>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px' }}>
-                        {ACTIVITIES.map((act, idx) => (
-                            !act.isDating && !act.isSocial && !act.isMusic && !act.isMafia && !act.isPolitics && !act.isGambling && !act.isDoctor && (
-                                <div
-                                    key={idx}
-                                    className="list-item"
-                                    onClick={() => onDoActivity(act)}
-                                    style={{
-                                        cursor: 'pointer',
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        padding: '12px 16px',
-                                        marginBottom: 0
-                                    }}
-                                >
-                                    <span className="list-item-title" style={{ margin: 0 }}>{act.title}</span>
-                                    <span style={{ color: act.cost > 0 ? '#ffb74d' : '#81c784', fontSize: '0.9em', background: 'rgba(0,0,0,0.2)', padding: '4px 8px', borderRadius: '4px' }}>
-                                        {act.cost > 0 ? `$${act.cost}` : 'Free'}
-                                    </span>
-                                </div>
-                            )
-                        ))}
-                    </div>
-                </div>
-            </div>
-        </div >
-    );
+          <div className="stack-list">
+            {ACTIVITIES.filter(isBasicActivity).map(act => (
+              <button
+                key={act.id}
+                className="list-item activity-row"
+                onClick={() => onDoActivity(act)}
+                disabled={Number.isFinite(act.minAge) && person.age < act.minAge}
+                style={{
+                  opacity: Number.isFinite(act.minAge) && person.age < act.minAge ? 0.5 : 1,
+                }}
+              >
+                <span className="activity-row-copy">
+                  <span className="activity-row-main">
+                    <span className="activity-row-emoji" aria-hidden="true">
+                      {ACTIVITY_EMOJIS[act.id] || '✨'}
+                    </span>
+                    <span className="list-item-title" style={{ margin: 0 }}>
+                      {t(`activity.${act.id}`, act.title)}
+                    </span>
+                  </span>
+                  {getEffectSummary(act, t) && (
+                    <small className="activity-effect-summary">{getEffectSummary(act, t)}</small>
+                  )}
+                </span>
+                <span className="activity-meta-stack">
+                  <span className={`cost-pill ${act.cost > 0 ? 'paid' : 'free'}`}>
+                    {act.cost > 0
+                      ? `$${Number(act.cost).toLocaleString()}`
+                      : t('common.free', 'Free')}
+                  </span>
+                  <span className="activity-meta-pill energy">
+                    ⚡ {Number(act.energyCost) || 0}
+                  </span>
+                  {Number.isFinite(act.minAge) && (
+                    <span className="activity-meta-pill age">🎂 {act.minAge}+</span>
+                  )}
+                  {act.risk && (
+                    <span className={`activity-meta-pill risk-${act.risk}`}>
+                      ⚠️ {t(`risk.${act.risk}`, act.risk)}
+                    </span>
+                  )}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

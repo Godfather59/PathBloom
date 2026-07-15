@@ -1,84 +1,115 @@
 .event-log {
-    /* Absolute Positioning to fill the screen behind HUD/Menu */
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-
-    /* Scroll Behavior */
-    overflow-y: scroll;
-    /* Force scroll capability */
-    -webkit-overflow-scrolling: touch;
-    /* Smooth scroll on iOS */
-
-    /* Spacing for Fixed Elements */
-    padding-top: 260px;
-    padding-bottom: 380px;
-    padding-left: 16px;
-    padding-right: 16px;
-
-    /* Box Model Safety */
-    width: 100%;
-    box-sizing: border-box;
-    z-index: 1;
-    /* Below HUD (50) and Menu (50) */
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 16px;
+  width: 100%;
+  box-sizing: border-box;
+  z-index: 1;
 }
 
 .event-card {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    padding: 12px;
-    margin-bottom: 10px;
-    border-left: 4px solid #888;
-    position: relative;
-    text-align: left;
-    animation: slideIn 0.3s ease-out;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #888;
+  position: relative;
+  text-align: left;
+  animation: slideIn 0.3s ease-out;
+}
+
+.event-log[dir='rtl'] .event-card {
+  text-align: right;
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+  border-right: 4px solid #888;
 }
 
 @keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-10px);
-    }
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.event-log[dir='rtl'] .event-card {
+  animation: slideInRTL 0.3s ease-out;
+}
+
+@keyframes slideInRTL {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .event-age-badge {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    font-size: 0.7rem;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 2px 6px;
-    border-radius: 4px;
-    color: var(--text-secondary);
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 0.7rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--text-secondary);
+}
+
+.event-log[dir='rtl'] .event-age-badge {
+  right: auto;
+  left: 8px;
 }
 
 .event-text {
-    font-size: 0.95rem;
-    line-height: 1.4;
-    padding-right: 30px;
-    /* Ensure text doesn't hit the age badge */
-    word-break: break-word;
-    /* Prevent long words from overflowing */
+  font-size: 0.95rem;
+  line-height: 1.4;
+  padding-right: 30px;
+  /* Ensure text doesn't hit the age badge */
+  word-break: break-word;
+  /* Prevent long words from overflowing */
+}
+
+.event-log[dir='rtl'] .event-text {
+  padding-right: 0;
+  padding-left: 30px;
 }
 
 /* Event Types */
 .type-good {
-    border-left-color: var(--success-color);
-    background: linear-gradient(90deg, rgba(0, 176, 155, 0.1), transparent);
+  border-left-color: var(--success-color);
+  background: linear-gradient(90deg, rgba(0, 176, 155, 0.1), transparent);
+}
+
+.event-log[dir='rtl'] .type-good {
+  border-right-color: var(--success-color);
 }
 
 .type-bad {
-    border-left-color: var(--danger-color);
-    background: linear-gradient(90deg, rgba(255, 65, 108, 0.1), transparent);
+  border-left-color: var(--danger-color);
+  background: linear-gradient(90deg, rgba(255, 65, 108, 0.1), transparent);
+}
+
+.event-log[dir='rtl'] .type-bad {
+  border-right-color: var(--danger-color);
 }
 
 .type-neutral {
-    border-left-color: var(--text-secondary);
+  border-left-color: var(--text-secondary);
+}
+
+.event-log[dir='rtl'] .type-neutral {
+  border-right-color: var(--text-secondary);
 }

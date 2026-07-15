@@ -1,0 +1,320 @@
+/* Game Over Screen */
+.game-over-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.97);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 24px;
+  z-index: 300;
+  text-align: center;
+  overflow-y: auto;
+}
+
+.game-over-heading {
+  font-size: 3em;
+  color: #ff5252;
+  margin-bottom: 10px;
+}
+
+.game-over-name {
+  font-size: 1.5em;
+  margin: 5px 0;
+}
+
+.game-over-sub {
+  color: #aaa;
+}
+
+.game-over-card {
+  background-color: #2a2a3a;
+  padding: 20px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 25px;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+.game-over-legacy-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.game-over-legacy-icon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.game-over-legacy-icon-main {
+  font-size: 1.8em;
+}
+
+.game-over-legacy-label {
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.game-over-legacy-value {
+  color: #ffe7a1;
+  font-weight: 900;
+  font-size: 1.2em;
+}
+
+.game-over-stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.game-over-stat {
+  background: rgba(255,255,255,0.03);
+  padding: 12px;
+  border-radius: 10px;
+  text-align: left;
+}
+
+.game-over-stat-value {
+  font-weight: 700;
+  font-size: 1.3em;
+}
+
+.game-over-stat-label {
+  color: #888;
+  font-size: 0.85em;
+}
+
+.game-over-stat-value-green {
+  color: #4caf50;
+}
+
+.game-over-stat-value-gold {
+  color: #ffd700;
+}
+
+.game-over-stat-value-red {
+  color: #ff5252;
+}
+
+.game-over-stat-value-blue {
+  color: #2196f3;
+}
+
+.game-over-stat-value-orange {
+  color: #ff9800;
+}
+
+.game-over-section {
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 16px;
+  margin-bottom: 18px;
+}
+
+.game-over-section-title {
+  font-weight: 700;
+  margin-bottom: 12px;
+  font-size: 1.05em;
+}
+
+.game-over-section-title-gold {
+  color: #ffd700;
+}
+
+.game-over-info-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95em;
+  margin-bottom: 10px;
+}
+
+.game-over-info-value {
+  color: #ccc;
+}
+
+.game-over-goal-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.goal-pill {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75em;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.goal-pill-done {
+  background: linear-gradient(135deg, #4caf50, #8bc34a);
+  color: #fff;
+  border: none;
+}
+
+.goal-pill-pending {
+  background: rgba(255,255,255,0.08);
+  color: #aaa;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+.achievement-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.achievement-pill {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.7em;
+  font-weight: 600;
+  background: linear-gradient(135deg, #ffd700, #ffaa00);
+  color: #1a1a1a;
+  border: none;
+}
+
+.game-over-sub-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  font-size: 0.85em;
+}
+
+.game-over-sub-stat {
+  background: rgba(255,255,255,0.03);
+  padding: 10px;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.game-over-sub-stat-value {
+  font-weight: 700;
+}
+
+.game-over-sub-stat-label {
+  color: #888;
+  font-size: 0.75em;
+}
+
+.game-over-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+}
+
+.game-over-btn {
+  width: 100%;
+  padding: 16px 32px;
+  font-size: 1.2em;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 6px;
+  min-height: 48px;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.game-over-btn:active {
+  transform: scale(0.97);
+}
+
+.game-over-btn-restart {
+  background: linear-gradient(135deg, #4caf50, #66bb6a);
+  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+}
+
+.game-over-btn-restart:hover {
+  box-shadow: 0 8px 25px rgba(76, 175, 80, 0.6);
+}
+
+.child-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.child-section-title {
+  margin: 0 0 16px;
+  color: #ffd700;
+}
+
+.child-btn-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.child-btn {
+  padding: 12px 20px;
+  font-size: 1em;
+  background: linear-gradient(135deg, #2196f3, #42a5f5);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  min-width: 140px;
+  flex: 1;
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+  transition: transform 0.15s, box-shadow 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 4px;
+}
+
+.child-btn:hover {
+  box-shadow: 0 6px 20px rgba(33, 150, 243, 0.5);
+  transform: translateY(-2px);
+}
+
+.child-btn:active {
+  transform: scale(0.97);
+}
+
+.child-btn-name {
+  font-weight: 700;
+}
+
+.child-btn-traits {
+  font-size: 0.8em;
+  color: #ffeb3b;
+}
+
+/* Game Over RTL overrides */
+[dir="rtl"] .game-over-stat {
+  text-align: right;
+}
+
+[dir="rtl"] .game-over-sub-stat {
+  text-align: right;
+}

@@ -1,16 +1,15 @@
 /* Main App Container */
 #root {
-  /* We handle root dimensions in index.css global, but here we can add specific desktop refinements */
-  border-radius: 30px;
-  /* Phone-like corners */
+  border-radius: 0;
 }
 
-/* Desktop Polish: If screen is large, make it look like a floating device */
+/* Desktop Polish */
 @media (min-width: 600px) {
   #root {
-    margin-top: 2rem;
-    margin-bottom: 2rem;
-    border: 8px solid #000;
+    height: calc(100dvh - 2rem);
+    margin: 1rem 0;
+    border: 6px solid #000;
+    border-radius: 30px;
   }
 }
 
@@ -19,7 +18,149 @@
   flex-direction: column;
   height: 100%;
   padding: 0;
-  color: #fff;
+  color: var(--text-primary);
   overflow: hidden;
-  /* Ensure nothing breaks out */
+  animation: fadeIn 0.2s ease;
+}
+
+/* Loading spinner */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  gap: 12px;
+}
+
+.loading::before {
+  content: '';
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top: 3px solid var(--accent-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Ripple button effect */
+.btn-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-ripple::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  transform: scale(0);
+  opacity: 1;
+}
+
+.btn-ripple:active::after {
+  animation: ripple 0.6s ease-out;
+}
+
+/* Smooth scrollable panels */
+.scroll-panel {
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+.scroll-panel::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scroll-panel::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+/* Fade transition wrapper for screen changes */
+.screen-fade-enter {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.screen-fade-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: all 0.25s ease;
+}
+
+.screen-fade-exit {
+  opacity: 1;
+}
+
+.screen-fade-exit-active {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+/* Mobile tap highlight */
+.tap-highlight {
+  -webkit-tap-highlight-color: rgba(112, 0, 255, 0.2);
+}
+
+/* Badge notification */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--danger-color);
+  border-radius: 10px;
+}
+
+/* Card hover effect */
+.card-hover {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.card-hover:active {
+  transform: scale(0.98);
+}
+
+/* Gradient text */
+.text-gradient {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.error-boundary {
+  display: grid;
+  place-content: center;
+  gap: 12px;
+  min-height: 100%;
+  padding: 32px;
+  text-align: center;
+  color: var(--text-primary);
+  background: var(--bg-surface);
+}
+
+.error-boundary pre {
+  max-width: 100%;
+  overflow: auto;
+  color: var(--danger-color);
+  white-space: pre-wrap;
+  user-select: text;
 }

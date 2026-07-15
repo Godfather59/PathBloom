@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { Person } from './logic/Person';
 import { GameEngine } from './logic/GameEngine';
 import { INITIAL_EVENTS } from './logic/Events';
@@ -10,6 +10,7 @@ import { ActivitiesMenu } from './components/ActivitiesMenu';
 import { DecisionModal } from './components/DecisionModal';
 import { AssetsMenu } from './components/AssetsMenu';
 import { RelationshipsMenu } from './components/RelationshipsMenu';
+import { RelationshipDashboard } from './components/RelationshipDashboard';
 import { EducationMenu } from './components/EducationMenu';
 import { GameOver } from './components/GameOver';
 import { AchievementsMenu } from './components/AchievementsMenu';
@@ -17,6 +18,7 @@ import { MainMenu } from './components/MainMenu';
 import { MiniGameModal } from './components/MiniGameModal';
 import { Toast } from './components/Toast';
 import { SystemMenu } from './components/SystemMenu';
+import { WorldNewsFeed } from './components/WorldNewsFeed';
 import { LoveMenu } from './components/LoveMenu';
 import { CareerModal } from './components/CareerModal';
 import { MafiaMenu } from './components/MafiaMenu';
@@ -25,19 +27,76 @@ import { PoliticsMenu } from './components/PoliticsMenu';
 import { GamblingMenu } from './components/GamblingMenu';
 import { SocialMenu } from './components/SocialMenu';
 import { GodModeMenu } from './components/GodModeMenu';
-import { Minesweeper } from './components/Minesweeper';
-import { DoctorMenu } from './components/DoctorMenu';
-import { SaveSlotMenu } from './components/SaveSlotMenu';
-import { HobbiesMenu } from './components/HobbiesMenu';
-import { PetsMenu } from './components/PetsMenu';
+import { DebugMenu } from './components/DebugMenu';
 import { PrisonMenu } from './components/PrisonMenu';
-import { WillMenu } from './components/WillMenu';
-import { StatsMenu } from './components/StatsMenu';
-import { FamilyTreeMenu } from './components/FamilyTreeMenu';
+import { SaveSlotMenu } from './components/SaveSlotMenu';
 import { ACHIEVEMENTS, checkAchievements } from './logic/Achievements';
 import { applyTheme, getStoredTheme } from './logic/themes';
+import { getStoredLanguage, setStoredLanguage, translate } from './logic/i18n';
 import { lifetimeStats } from './logic/LifetimeStats';
 import { familyTree } from './logic/DynastyMode';
+import { HAPTICS } from './logic/Haptics';
+import { setAudioEnabled as setAudioEngineEnabled, setSfxVolume, setMusicVolume, getSfxVolume, getMusicVolume, isAudioEnabled } from './logic/Audio';
+import { treatDisease } from './logic/Disease';
+import { recordDailyPlay, getDailyLifeConfig } from './logic/DailyStreak';
+import { ChallengeMenu } from './components/ChallengeMenu';
+import { OnboardingOverlay } from './components/OnboardingOverlay';
+import LazyModalLoader from './components/ModalLoader';
+
+const lazyNamed = (importFn, name) => lazy(() => importFn().then(m => ({ default: m[name] })));
+
+const LazySystemMenu = lazyNamed(() => import('./components/SystemMenu'), 'SystemMenu');
+const LazyGodModeMenu = lazyNamed(() => import('./components/GodModeMenu'), 'GodModeMenu');
+const LazyOccupationMenu = lazyNamed(() => import('./components/OccupationMenu'), 'OccupationMenu');
+const LazyActivitiesMenu = lazyNamed(() => import('./components/ActivitiesMenu'), 'ActivitiesMenu');
+const LazyLoveMenu = lazyNamed(() => import('./components/LoveMenu'), 'LoveMenu');
+const LazyCareerModal = lazyNamed(() => import('./components/CareerModal'), 'CareerModal');
+const LazyBandMenu = lazyNamed(() => import('./components/BandMenu'), 'BandMenu');
+const LazySocialMenu = lazyNamed(() => import('./components/SocialMenu'), 'SocialMenu');
+const LazyRelationshipsMenu = lazyNamed(
+  () => import('./components/RelationshipsMenu'),
+  'RelationshipsMenu'
+);
+const LazyMafiaMenu = lazyNamed(() => import('./components/MafiaMenu'), 'MafiaMenu');
+const LazyRoyaltyMenu = lazyNamed(() => import('./components/RoyaltyMenu'), 'RoyaltyMenu');
+const LazyPoliticsMenu = lazyNamed(() => import('./components/PoliticsMenu'), 'PoliticsMenu');
+const LazyGeopoliticsModal = lazyNamed(() => import('./components/GeopoliticsModal'), 'GeopoliticsModal');
+const LazyGamblingMenu = lazyNamed(() => import('./components/GamblingMenu'), 'GamblingMenu');
+const LazyEducationMenu = lazyNamed(() => import('./components/EducationMenu'), 'EducationMenu');
+const LazyAssetsMenu = lazyNamed(() => import('./components/AssetsMenu'), 'AssetsMenu');
+const LazyAchievementsMenu = lazyNamed(
+  () => import('./components/AchievementsMenu'),
+  'AchievementsMenu'
+);
+const LazyMiniGameModal = lazyNamed(() => import('./components/MiniGameModal'), 'MiniGameModal');
+const LazyMinesweeper = lazyNamed(() => import('./components/Minesweeper'), 'Minesweeper');
+const LazyDoctorMenu = lazyNamed(() => import('./components/DoctorMenu'), 'DoctorMenu');
+const LazyWillMenu = lazyNamed(() => import('./components/WillMenu'), 'WillMenu');
+const LazyHobbiesMenu = lazyNamed(() => import('./components/HobbiesMenu'), 'HobbiesMenu');
+const LazyPetsMenu = lazyNamed(() => import('./components/PetsMenu'), 'PetsMenu');
+const LazyStatsMenu = lazyNamed(() => import('./components/StatsMenu'), 'StatsMenu');
+const LazyFamilyTreeMenu = lazyNamed(() => import('./components/FamilyTreeMenu'), 'FamilyTreeMenu');
+const LazyWorldOverview = lazyNamed(() => import('./components/WorldOverview'), 'WorldOverview');
+const LazyCountryProfile = lazyNamed(() => import('./components/CountryProfile'), 'CountryProfile');
+const LazyLifeTimeline = lazyNamed(() => import('./components/LifeTimeline'), 'LifeTimeline');
+const LazyEventHistoryModal = lazyNamed(() => import('./components/EventHistoryModal'), 'EventHistoryModal');
+const LazyTravelMap = lazyNamed(() => import('./components/TravelMap'), 'TravelMap');
+
+function ModalLoader() {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100%',
+        color: 'var(--text-secondary)',
+      }}
+    >
+      <div className="loading-spinner" />
+    </div>
+  );
+}
 
 function App() {
   const [person, setPerson] = useState(null);
@@ -50,68 +109,212 @@ function App() {
   // Theme State
   const [currentTheme, setCurrentTheme] = useState(getStoredTheme());
 
+  // Language State
+  const [language, setLanguage] = useState(getStoredLanguage());
+  const t = (key, fallback) => translate(language, key, fallback);
+  const handleLanguageChange = langId => {
+    setLanguage(langId);
+    setStoredLanguage(langId);
+  };
+
+  // Audio State
+  const [audioEnabled, setAudioEnabledState] = useState(isAudioEnabled());
+  const [sfxVolume, setSfxVolumeState] = useState(getSfxVolume());
+  const [musicVolume, setMusicVolumeState] = useState(getMusicVolume());
+  const [hapticsEnabled, setHapticsEnabled] = useState(true);
+
+  const handleAudioToggle = enabled => {
+    setAudioEnabledState(enabled);
+    setAudioEngineEnabled(enabled);
+  };
+
+  const handleSfxVolume = val => {
+    setSfxVolumeState(val);
+    setSfxVolume(val);
+    // Preview the volume
+    const { playTap } = require('./logic/Audio');
+    playTap();
+  };
+
+  const handleMusicVolume = val => {
+    setMusicVolumeState(val);
+    setMusicVolume(val);
+  };
+
+  // Onboarding / Tutorial
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const TUTORIAL_DONE_KEY = 'pathbloom_tutorial_done';
+
   // Save Slots State
   const [currentSlotId, setCurrentSlotId] = useState(null);
 
   // Initialize Logic
-  const initNewGame = (config) => {
+  const initNewGame = config => {
+    const isDaily = config.isDaily || false;
     const newPerson = new Person(config.firstName, config.lastName, config.gender, config.country);
 
+    if (isDaily) {
+      const dailyConfig = getDailyLifeConfig();
+      newPerson.dailySeed = dailyConfig.seed;
+      newPerson.dailyDate = dailyConfig.date;
+      recordDailyPlay();
+    }
+
     // Create new slot ID
-    const slotId = `slot_${Date.now()}`;
+    const slotId = `slot_${Date.now()}`; // eslint-disable-line react-hooks/purity
     setCurrentSlotId(slotId);
 
     INITIAL_EVENTS.forEach(eventGen => {
-      newPerson.logEvent(eventGen(newPerson), "neutral");
+      newPerson.logEvent(eventGen(newPerson), 'neutral');
     });
-    newPerson.logEvent(`You were born in ${newPerson.country}.`, "neutral");
+    newPerson.logEvent(t('app.bornIn', `You were born in ${newPerson.country}.`), 'neutral');
 
     GameEngine.initializeFamily(newPerson);
     setPerson(newPerson);
 
     // Save Initial State
     saveGameData(newPerson, slotId);
+
+    if (!localStorage.getItem(TUTORIAL_DONE_KEY)) {
+      setShowOnboarding(true);
+    }
   };
 
+const SAVE_VERSION = 3;
+
   const saveGameData = (personObj, slotId) => {
-    if (!slotId) return;
+    if (!slotId) {
+      return;
+    }
+    try {
+      const save = {
+        version: SAVE_VERSION,
+        person: personObj,
+        createdAt: personObj._createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      const serialized = JSON.stringify(save);
+      localStorage.setItem(`bitlife_save_${slotId}`, serialized);
+    } catch (e) {
+      console.error('Failed to serialize or save person:', e);
+      return;
+    }
 
-    // Save Person Data
-    localStorage.setItem(`bitlife_save_${slotId}`, JSON.stringify(personObj));
-
-    // Update Meta
     let meta = [];
     try {
       const existing = localStorage.getItem('bitlife_save_meta');
-      if (existing) meta = JSON.parse(existing);
-    } catch (e) { meta = []; }
+      if (existing) {
+        meta = JSON.parse(existing);
+      }
+    } catch (e) {
+      meta = [];
+    }
 
-    // Remove existing entry for this slot if generic check
     meta = meta.filter(m => m.id !== slotId);
 
-    // Add updated entry
     meta.unshift({
       id: slotId,
-      name: personObj.getFullName(),
-      age: personObj.age,
-      job: personObj.job ? personObj.job.title : 'Unemployed',
-      lastPlayed: Date.now()
+      name:
+        typeof personObj.getFullName === 'function'
+          ? personObj.getFullName()
+          : `${String(personObj.name?.first || '')} ${String(personObj.name?.last || '')}`,
+      age: personObj.age ?? 0,
+      job: personObj.job?.title ?? 'Unemployed',
+      lastPlayed: Date.now(),
     });
 
-    localStorage.setItem('bitlife_save_meta', JSON.stringify(meta));
+    try {
+      localStorage.setItem('bitlife_save_meta', JSON.stringify(meta));
+    } catch (e) {
+      console.error('Failed to save meta:', e);
+    }
   };
 
-  const loadGameData = (slotId) => {
+  const migrateSave = (save) => {
+    if (!save || typeof save !== 'object') return save;
+    // Old format: raw person object (no version field)
+    if (!save.version) {
+      const person = save;
+      applySaveDefaults(person);
+      return person;
+    }
+    // Version 2: { version, person, ... }
+    if (save.version === 2) {
+      const p = save.person;
+      applySaveDefaults(p);
+      return p;
+    }
+    return save.person || save;
+  };
+
+  const applySaveDefaults = (p) => {
+    p.traits ??= [];
+    p.assets ??= [];
+    p.relationships ??= [];
+    p.history ??= [];
+    p.worldNews ??= [];
+    p.geopoliticalState ??= null;
+    p.portfolio ??= [];
+    p.pets ??= [];
+    p.languages ??= ['English'];
+    p.lifeStats ??= { totalMoneyEarned: 0, totalTaxes: 0 };
+    p.milestones ??= [];
+    p.completedChallenges ??= [];
+    p.educationHistory ??= [];
+    p.degrees ??= [];
+    p.wars ??= {};
+    p.countryRelations ??= {};
+    p.unResolutions ??= [];
+    p.diplomaticHistory ??= [];
+    p.cabinet ??= null;
+    p.policies ??= {
+      taxRate: 30, militarySpending: 30, educationSpending: 50, healthcareSpending: 50,
+      infrastructureSpending: 40, diplomacyBudget: 30, environmentalRegs: 40,
+      tradeOpenness: 50, immigrationPolicy: 50,
+    };
+    p.pendingGeopoliticalEvent ??= null;
+    p.unlockedFeatures ??= [];
+    p.warReactionChosen ??= false;
+  };
+
+  const loadGameData = slotId => {
     try {
       const data = localStorage.getItem(`bitlife_save_${slotId}`);
-      if (!data) throw new Error("Save not found");
+      if (!data) {
+        showToast(t('app.failedLoad', 'Failed to load save.'), 'bad');
+        return;
+      }
 
-      const loadedPerson = Person.load(JSON.parse(data));
+      let parsed;
+      try {
+        parsed = JSON.parse(data);
+      } catch {
+        showToast(t('app.failedLoad', 'Failed to load save.'), 'bad');
+        return;
+      }
+
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        showToast(t('app.failedLoad', 'Failed to load save.'), 'bad');
+        return;
+      }
+
+      const migrated = migrateSave(parsed);
+      const loadedPerson = Person.load(migrated);
+
+      if (!loadedPerson || typeof loadedPerson.name !== 'object') {
+        showToast(t('app.failedLoad', 'Failed to load save.'), 'bad');
+        return;
+      }
+
       setPerson(loadedPerson);
       setCurrentSlotId(slotId);
-      showToast(`Welcome back, ${loadedPerson.name.first}!`, "good");
+      showToast(
+        t('app.welcomeBack', `Welcome back, ${loadedPerson.name?.first || 'Stranger'}!`),
+        'good'
+      );
     } catch (e) {
-      showToast("Failed to load save.", "bad");
+      console.error('loadGameData error:', e);
+      showToast(t('app.failedLoad', 'Failed to load save.'), 'bad');
     }
   };
 
@@ -127,7 +330,11 @@ function App() {
     // Load Achievements
     const savedAch = localStorage.getItem('bitlife_achievements');
     if (savedAch) {
-      setAchievements(JSON.parse(savedAch));
+      try {
+        setAchievements(JSON.parse(savedAch));
+      } catch {
+        setAchievements([]);
+      }
     }
 
     // Check for Game Saves (Meta)
@@ -135,7 +342,7 @@ function App() {
     // Migration check: if no meta but old save exists
     const oldSave = localStorage.getItem('bitlife_save');
     if (!metaStr && oldSave) {
-      // Migrate Logic could go here, or just ignore. 
+      // Migrate Logic could go here, or just ignore.
       // Let's keep it simple: if meta exists, use it.
     }
 
@@ -147,26 +354,29 @@ function App() {
           const recent = meta.sort((a, b) => b.lastPlayed - a.lastPlayed)[0];
           setSaveSummary(recent);
         }
-      } catch (e) { console.error(e); }
+      } catch (e) {
+        console.error(e);
+      }
     }
   }, []);
 
-
-
   const handleContinue = () => {
     // Continue most recent save
-    const meta = JSON.parse(localStorage.getItem('bitlife_save_meta') || '[]');
-    if (meta.length > 0) {
-      const recent = meta.sort((a, b) => b.lastPlayed - a.lastPlayed)[0];
-      loadGameData(recent.id);
+    try {
+      const meta = JSON.parse(localStorage.getItem('bitlife_save_meta') || '[]');
+      if (meta.length > 0) {
+        const recent = meta.sort((a, b) => b.lastPlayed - a.lastPlayed)[0];
+        loadGameData(recent.id);
+      }
+    } catch {
+      showToast(t('app.failedLoad', 'Failed to load save.'), 'bad');
     }
   };
 
-  const handleLoadSlot = (slotId) => {
+  const _handleLoadSlot = slotId => {
     loadGameData(slotId);
     setModal(null);
   };
-
 
   const handleExitToMenu = () => {
     // Save before exiting just in case
@@ -177,66 +387,96 @@ function App() {
     setCurrentSlotId(null);
 
     // Refresh Meta for Main Menu
-    const meta = JSON.parse(localStorage.getItem('bitlife_save_meta') || '[]');
-    if (meta.length > 0) {
-      setHasSave(true);
-      // Find most recent
-      const recent = meta.sort((a, b) => b.lastPlayed - a.lastPlayed)[0];
-      setSaveSummary(recent);
-    } else {
+    try {
+      const meta = JSON.parse(localStorage.getItem('bitlife_save_meta') || '[]');
+      if (meta.length > 0) {
+        setHasSave(true);
+        // Find most recent
+        const recent = meta.sort((a, b) => b.lastPlayed - a.lastPlayed)[0];
+        setSaveSummary(recent);
+      } else {
+        setHasSave(false);
+        setSaveSummary(null);
+      }
+    } catch {
       setHasSave(false);
       setSaveSummary(null);
     }
   };
 
-  // Auto-save whenever person changes
-  useEffect(() => {
-    if (person && currentSlotId) {
-      saveGameData(person, currentSlotId);
-
-      // Check for new achievements
-      const newUnlocks = checkAchievements(person, achievements);
-      if (newUnlocks.length > 0) {
-        const updatedAch = [...achievements, ...newUnlocks];
-        setAchievements(updatedAch);
-        localStorage.setItem('bitlife_achievements', JSON.stringify(updatedAch));
-
-        // Notify user
-        newUnlocks.forEach(id => {
-          const ach = ACHIEVEMENTS.find(a => a.id === id);
-          person.logEvent(`🏆 Achievement Unlocked: ${ach.title}!`, "good");
-        });
-        updatePerson(person);
-      }
-    }
-  }, [person, achievements, currentSlotId]);
-
   // Helper to safely update person state
-  const runAction = (actionFn) => {
+  const pendingNewsRef = useRef([]);
+  const runAction = actionFn => {
     setPerson(prevPerson => {
       const newPerson = prevPerson.clone();
       actionFn(newPerson);
+      if (newPerson._breakingNews?.length > 0) {
+        pendingNewsRef.current = pendingNewsRef.current.concat(newPerson._breakingNews);
+        newPerson._breakingNews = [];
+      }
       return newPerson;
     });
   };
 
-  // Deprecated: updatePerson was causing issues, replacing usages
-  // Keeping it temporarily if needed but runAction is preferred
-  const updatePerson = (newPerson) => {
+  useEffect(() => {
+    if (pendingNewsRef.current.length > 0) {
+      const news = pendingNewsRef.current.splice(0);
+      news.forEach(n => showToast(n.text, n.type));
+    }
+  });
+
+  const updatePerson = newPerson => {
     setPerson(newPerson.clone());
   };
 
+  // Auto-save whenever person changes
+  useEffect(() => {
+    try {
+      if (person && currentSlotId) {
+        saveGameData(person, currentSlotId);
+
+        const newUnlocks = checkAchievements(person, achievements);
+        if (newUnlocks.length > 0) {
+          if (hapticsEnabled) HAPTICS.achievement();
+          const updatedAch = [...achievements, ...newUnlocks];
+          setAchievements(updatedAch);
+          try {
+            localStorage.setItem('bitlife_achievements', JSON.stringify(updatedAch));
+          } catch (e) {
+            console.error('Failed to save achievements:', e);
+          }
+
+          newUnlocks.forEach(id => {
+            const ach = ACHIEVEMENTS.find(a => a.id === id);
+            if (ach) {
+              person.logEvent(
+                t('app.achievementUnlocked', `🏆 Achievement Unlocked: ${ach.title}!`),
+                'good'
+              );
+            }
+          });
+          updatePerson(person);
+        }
+      }
+    } catch (e) {
+      console.error('Auto-save effect error:', e);
+    }
+  }, [person, achievements, currentSlotId]);
+
   const handleAgeUp = () => {
-    if (!person.isAlive) return;
+    if (!person.isAlive) {
+      return;
+    }
+    if (hapticsEnabled) HAPTICS.ageUp();
     runAction(p => GameEngine.ageUp(p));
   };
 
-  const handleAgeSkip = (years) => {
-    if (!person.isAlive) return;
-    for (let i = 0; i < years; i++) {
-      if (!person.isAlive) break;
-      runAction(p => GameEngine.ageUp(p));
+  const handleAgeSkip = years => {
+    if (!person.isAlive) {
+      return;
     }
+    if (hapticsEnabled) HAPTICS.ageUp();
+    runAction(p => GameEngine.ageUp(p, years));
   };
 
   // Toast State
@@ -246,12 +486,14 @@ function App() {
     setToast({ message, type });
   };
 
-  const handleAction = (type) => {
-    if (!person.isAlive) return;
+  const handleAction = type => {
+    if (!person.isAlive) {
+      return;
+    }
 
     if (type === 'occupation') {
       if (person.age < 18) {
-        showToast("You are too young to work full-time!", "bad");
+        showToast(t('app.tooYoungWork', 'You are too young to work full-time!'), 'bad');
         return;
       }
       setModal('occupation');
@@ -264,14 +506,14 @@ function App() {
     }
     if (type === 'assets') {
       if (person.age < 18) {
-        showToast("You must be 18 to manage assets!", "bad");
+        showToast(t('app.tooYoungAssets', 'You must be 18 to manage assets!'), 'bad');
         return;
       }
       setModal('assets');
       return;
     }
     if (type === 'relationships') {
-      setModal('relationships');
+      setModal('relationships_dashboard');
       return;
     }
     if (type === 'pets') {
@@ -286,30 +528,38 @@ function App() {
       setModal('achievements');
       return;
     }
+    if (type === 'travel') {
+      setModal('travel');
+      return;
+    }
 
-    showToast(`You opened ${type}. (Feature coming soon)`, "neutral");
+    showToast(t('app.featureComing', `You opened ${type}. (Feature coming soon)`), 'neutral');
   };
 
-  const handleJobApplication = (job) => {
+  const handleJobApplication = job => {
     runAction(p => {
       if (job.isMilitary) {
         const success = p.joinMilitary(job.branch, job.isOfficer);
-        if (success) setModal(null);
+        if (success) {
+          setModal(null);
+        }
       } else {
         const hired = p.setJob(job);
-        if (hired) setModal(null);
+        if (hired) {
+          setModal(null);
+        }
       }
     });
   };
 
-  const handleActivity = (activity) => {
+  const handleActivity = activity => {
     if (activity.isSocial) {
       setModal('social');
       return;
     }
     if (activity.isLove) {
       if (person.age < 14) {
-        showToast("You are too young to date!", "bad");
+        showToast(t('app.tooYoungDate', 'You are too young to date!'), 'bad');
         return;
       }
       setModal('love');
@@ -328,10 +578,6 @@ function App() {
       setModalData({ difficulty: Math.floor(Math.random() * 3) + 1 });
       return;
     }
-    if (activity.isMafia) {
-      setModal('mafia');
-      return;
-    }
     if (activity.isRoyalty) {
       setModal('royalty');
       return;
@@ -348,20 +594,95 @@ function App() {
       setModal('doctor');
       return;
     }
-    if (activity.isDoctor) {
-      setModal('doctor');
-      return;
-    }
     if (activity.isHobbies) {
       setModal('hobbies');
       return;
     }
     if (activity.isWill) {
       if (person.age < 18) {
-        showToast("You must be 18 to create a will!", "bad");
+        showToast(t('app.tooYoungWill', 'You must be 18 to create a will!'), 'bad');
         return;
       }
       setModal('will');
+      return;
+    }
+    if (activity.isImmigration) {
+      if (person.age < 18) {
+        showToast(t('app.tooYoung', 'You must be 18 for immigration!'), 'bad');
+        return;
+      }
+      setModal('immigration');
+      setModalData({
+        onEmigrate: (countryName) => {
+          runAction(p => {
+            const { ImmigrationManager } = require('./logic/ImmigrationSystem');
+            const mgr = new ImmigrationManager(p);
+            const result = mgr.attemptEmigration(countryName);
+            if (result.success) {
+              showToast(result.message, 'good');
+              setModal(null);
+            } else {
+              showToast(result.message, 'bad');
+            }
+          });
+        },
+        onCitizenship: () => {
+          runAction(p => {
+            const { ImmigrationManager } = require('./logic/ImmigrationSystem');
+            const mgr = new ImmigrationManager(p);
+            const result = mgr.applyForCitizenship();
+            showToast(result.message, result.success ? 'good' : 'bad');
+          });
+        },
+      });
+      return;
+    }
+    if (activity.isCrimeHub) {
+      setModal('crime');
+      return;
+    }
+    if (activity.isBusiness) {
+      setModal('business');
+      return;
+    }
+    if (activity.isFitness) {
+      setModal('fitness');
+      return;
+    }
+    if (activity.isAddiction) {
+      setModal('addiction');
+      return;
+    }
+    if (activity.isInsurance) {
+      setModal('insurance');
+      return;
+    }
+    if (activity.isRetirement) {
+      setModal('retirement');
+      return;
+    }
+    if (activity.isSports) {
+      setModal('sports');
+      return;
+    }
+    if (activity.isSpace) {
+      setModal('space');
+      return;
+    }
+    if (activity.isPhilanthropy) {
+      setModal('philanthropy');
+      return;
+    }
+    if (activity.isClubs) {
+      setModal('clubs');
+      return;
+    }
+    if (activity.isLawsuits) {
+      setModal('lawsuit');
+      return;
+    }
+    if (activity.isMemories) {
+      setModal('timeCapsule');
       return;
     }
     runAction(p => p.performActivity(activity));
@@ -374,7 +695,7 @@ function App() {
     if (showLoadMenu) {
       return (
         <SaveSlotMenu
-          onSelectSlot={(slotId) => {
+          onSelectSlot={slotId => {
             loadGameData(slotId);
             setShowLoadMenu(false);
           }}
@@ -386,380 +707,688 @@ function App() {
     return (
       <MainMenu
         onStartGame={initNewGame}
+        onStartDailyLife={initNewGame}
         onContinue={handleContinue}
         onLoad={() => setShowLoadMenu(true)}
         hasSave={hasSave}
         saveSummary={saveSummary}
+        language={language}
+        onLanguageChange={handleLanguageChange}
+        t={t}
       />
     );
   }
 
   return (
-    <div className="app-container">
-      <Hud person={person} onOpenMenu={() => setModal('system')} />
-      <EventLog history={person.history} />
+    <div className="app-container" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+      <Hud
+        person={person}
+        onOpenMenu={() => setModal('system')}
+        onWorldNews={() => setModal('world_news')}
+        language={language}
+        t={t}
+      />
+      <EventLog history={person.history} language={language} t={t} />
       {person.isInPrison ? (
         <PrisonMenu
           person={person}
-          onAction={(action) => runAction(p => p.prisonAction(action))}
-          onClose={() => { }}
+          onAction={action => runAction(p => p.prisonAction(action))}
+          language={language}
+          t={t}
         />
       ) : (
         <ActionMenu
           onAgeUp={handleAgeUp}
           onAction={handleAction}
           onAgeSkip={handleAgeSkip}
+          language={language}
+          t={t}
         />
       )}
 
       {/* Interactive Modals */}
       {modal === 'system' && (
-        <SystemMenu
-          onResume={() => setModal(null)}
-          onSave={() => {
-            localStorage.setItem('bitlife_save', JSON.stringify(person));
-            showToast("Game Saved!", "good");
-            setModal(null);
-          }}
-          onGodMode={() => setModal('god_mode')}
-          onExit={() => {
-            handleExitToMenu();
-            setModal(null);
+        <Suspense fallback={<ModalLoader />}>
+          <LazySystemMenu
+            onResume={() => setModal(null)}
+            onSave={() => {
+              if (currentSlotId) {
+                saveGameData(person, currentSlotId);
+              }
+              showToast(t('toast.saved', 'Game Saved!'), 'good');
+              setModal(null);
+            }}
+            onGodMode={() => setModal('god_mode')}
+            onStats={() => setModal('stats')}
+            onHistory={() => setModal('stats')}
+            onFamilyTree={() => setModal('familytree')}
+            onWorldNews={() => setModal('world_news')}
+            onWorldOverview={() => setModal('world_overview')}
+            onAchievements={() => setModal('achievements')}
+            onChallenge={() => setModal('challenge')}
+            onTutorial={() => setShowOnboarding(true)}
+            onResetTutorial={() => {
+              localStorage.removeItem(TUTORIAL_DONE_KEY);
+              setShowOnboarding(true);
+              setModal(null);
+            }}
+            onExit={() => {
+              handleExitToMenu();
+              setModal(null);
+            }}
+            language={language}
+            onLanguageChange={handleLanguageChange}
+            t={t}
+            currentTheme={currentTheme}
+            onThemeChange={id => {
+              setCurrentTheme(id);
+              applyTheme(id);
+            }}
+            audioEnabled={audioEnabled}
+            onSoundToggle={handleAudioToggle}
+            sfxVolume={sfxVolume}
+            onSfxVolumeChange={handleSfxVolume}
+            musicVolume={musicVolume}
+            onMusicVolumeChange={handleMusicVolume}
+            hapticsEnabled={hapticsEnabled}
+            onHapticsToggle={setHapticsEnabled}
+            onDebug={() => setModal('debug')}
+            onRelationshipDashboard={() => setModal('relationships_dashboard')}
+            onLifeTimeline={() => setModal('life_timeline')}
+            onEventHistory={() => setModal('event_history')}
+            onCountryProfile={() => setModal('country_profile')}
+          />
+        </Suspense>
+      )}
+
+      {modal === 'world_news' && (
+        <WorldNewsFeed person={person} onClose={() => setModal(null)} language={language} t={t} />
+      )}
+
+      {modal === 'world_overview' && (
+        <Suspense fallback={<ModalLoader />}>
+          <LazyWorldOverview person={person} onClose={() => setModal(null)} />
+        </Suspense>
+      )}
+
+      {modal === 'challenge' && <ChallengeMenu person={person} onClose={() => setModal(null)} />}
+
+      {showOnboarding && (
+        <OnboardingOverlay
+          language={language}
+          t={t}
+          onClose={() => {
+            localStorage.setItem(TUTORIAL_DONE_KEY, '1');
+            setShowOnboarding(false);
           }}
         />
+      )}
+
+      {modal === 'debug' && (
+        <DebugMenu
+          onClose={() => setModal(null)}
+          t={t}
+        />
+      )}
+
+      {modal === 'travel' && (
+        <Suspense fallback={<ModalLoader />}>
+          <LazyTravelMap
+            person={person}
+            onTravel={city => {
+              runAction(p => {
+                const { travelToCity } = require('./logic/TravelSystem');
+                const result = travelToCity(p, city);
+                if (result.success) {
+                  showToast(`Traveled to ${city.name}. Cost: $${result.cost.toLocaleString()}`, 'good');
+                } else if (result.reason === 'no_money') {
+                  showToast(`Need $${result.cost.toLocaleString()} to travel there.`, 'bad');
+                }
+              });
+            }}
+            onClose={() => setModal(null)}
+            language={language}
+            t={t}
+          />
+        </Suspense>
+      )}
+
+      {modal === 'country_profile' && (
+        <Suspense fallback={<ModalLoader />}>
+          <LazyCountryProfile
+            person={person}
+            countryId={person.country}
+            onClose={() => setModal(null)}
+            language={language}
+            t={t}
+          />
+        </Suspense>
       )}
 
       {modal === 'god_mode' && (
-        <GodModeMenu
-          person={person}
-          onUpdate={(updateFn) => {
-            runAction(updateFn);
-          }}
-          onClose={() => setModal(null)}
-        />
+        <Suspense fallback={<ModalLoader />}>
+          <LazyGodModeMenu
+            person={person}
+            onUpdate={updateFn => {
+              runAction(updateFn);
+            }}
+            onClose={() => setModal(null)}
+            language={language}
+            t={t}
+          />
+        </Suspense>
       )}
 
       {modal === 'occupation' && (
-        <OccupationMenu
-          person={person}
-          onApply={handleJobApplication}
-          onQuit={() => runAction(p => p.quitJob())}
-          onClose={(action) => {
-            if (action === 'deploy') {
-              setModal('minesweeper');
-            } else {
-              setModal(null);
-            }
-          }}
-        />
+        <Suspense fallback={<ModalLoader />}>
+          <LazyOccupationMenu
+            person={person}
+            onApply={handleJobApplication}
+            onQuit={() => runAction(p => p.quitJob())}
+            onClose={action => {
+              if (action === 'deploy') {
+                setModal('minesweeper');
+              } else {
+                setModal(null);
+              }
+            }}
+            language={language}
+            t={t}
+          />
+        </Suspense>
       )}
 
       {modal === 'activities' && (
-        <ActivitiesMenu
-          person={person}
-          onDoActivity={handleActivity}
-          onClose={() => setModal(null)}
-        />
+        <Suspense fallback={<ModalLoader />}>
+          <LazyActivitiesMenu
+            person={person}
+            onDoActivity={handleActivity}
+            onClose={() => setModal(null)}
+            language={language}
+            t={t}
+          />
+        </Suspense>
       )}
 
       {modal === 'love' && (
-        <LoveMenu
-          person={person}
-          onDate={(candidate) => {
-            runAction(p => p.startDating(candidate));
-            setModal(null);
-          }}
-          onClose={() => setModal(null)}
-        />
+        <Suspense fallback={<ModalLoader />}>
+          <LazyLoveMenu
+            person={person}
+            onDate={candidate => {
+              runAction(p => p.startDating(candidate));
+              setModal(null);
+            }}
+            onClose={() => setModal(null)}
+            language={language}
+            t={t}
+          />
+        </Suspense>
       )}
 
       {modal === 'career_music' && (
-        <CareerModal
-          person={person}
-          onAction={(action, payload) => {
-            if (action === 'voice') runAction(p => p.practiceSkill('voice'));
-            if (action === 'practice') runAction(p => p.practiceSkill(payload));
-          }}
-          onClose={() => setModal(null)}
-        />
+        <Suspense fallback={<ModalLoader />}>
+          <LazyCareerModal
+            person={person}
+            onAction={(action, payload) => {
+              if (action === 'voice') {
+                runAction(p => p.practiceSkill('voice'));
+              }
+              if (action === 'practice') {
+                runAction(p => p.practiceSkill(payload));
+              }
+            }}
+            onBand={() => setModal('band')}
+            onClose={() => setModal(null)}
+            language={language}
+            t={t}
+          />
+        </Suspense>
+      )}
+
+      {modal === 'band' && (
+        <Suspense fallback={<ModalLoader />}>
+          <LazyBandMenu
+            person={person}
+            onAction={(action, payload) => {
+              if (action === 'form_band') {
+                runAction(p => p.formBand(payload.name, payload.genre));
+              } else if (action === 'disband') {
+                runAction(p => p.disband());
+              } else if (action === 'rest') {
+                runAction(p => p.rest(35));
+              }
+            }}
+            onClose={() => setModal(null)}
+            language={language}
+            t={t}
+          />
+        </Suspense>
       )}
 
       {modal === 'social' && (
-        <SocialMenu
+        <Suspense fallback={<ModalLoader />}>
+          <LazySocialMenu
+            person={person}
+            onPost={(platform, post) => runAction(p => p.postToSocial(platform.id, post.id))}
+            onMonetize={platform => runAction(p => p.monetizeSocial(platform.id))}
+            onBuyFollowers={platform => {
+              runAction(p => {
+                if (p.money >= 100) {
+                  p.money -= 100;
+                  if (!p.social.platforms[platform.id]) {
+                    p.social.platforms[platform.id] = { followers: 0, posts: 0 };
+                  }
+                  p.social.platforms[platform.id].followers += 500;
+                  p.logEvent(`You bought 500 followers for ${platform.name}.`, 'neutral');
+                } else {
+                  p.logEvent("You can't afford that!", 'bad');
+                }
+              });
+            }}
+            onClose={() => setModal(null)}
+            language={language}
+            t={t}
+          />
+        </Suspense>
+      )}
+
+      {modal === 'relationships_dashboard' && (
+        <RelationshipDashboard
           person={person}
-          onPost={(platform, post) => runAction(p => p.postToSocial(platform.id, post.id))}
-          onMonetize={(platform) => runAction(p => p.monetizeSocial(platform.id))}
-          onBuyFollowers={(platform) => {
-            runAction(p => {
-              if (p.money >= 100) {
-                p.money -= 100;
-                if (!p.social.platforms[platform.id]) p.social.platforms[platform.id] = { followers: 0, posts: 0 };
-                p.social.platforms[platform.id].followers += 500;
-                p.logEvent(`You bought 500 followers for ${platform.name}.`, "neutral");
-              } else {
-                p.logEvent("You can't afford that!", "bad");
-              }
-            });
-          }}
           onClose={() => setModal(null)}
+          onOpenFullManager={() => setModal('relationships')}
+          t={t}
         />
+      )}
+
+      {modal === 'life_timeline' && (
+        <Suspense fallback={<ModalLoader />}>
+          <LazyLifeTimeline
+            person={person}
+            onClose={() => setModal(null)}
+            t={t}
+          />
+        </Suspense>
+      )}
+
+      {modal === 'event_history' && (
+        <Suspense fallback={<ModalLoader />}>
+          <LazyEventHistoryModal
+            person={person}
+            onClose={() => setModal(null)}
+            t={t}
+          />
+        </Suspense>
       )}
 
       {modal === 'relationships' && (
-        <RelationshipsMenu
-          person={person}
-          onInteract={(id, action, payload) => {
-            runAction(p => p.interactWithRel(id, action, payload));
-          }}
-          onClose={() => setModal(null)}
-        />
+        <Suspense fallback={<ModalLoader />}>
+          <LazyRelationshipsMenu
+            person={person}
+            onInteract={(id, action, payload) => {
+              runAction(p => p.interactWithRel(id, action, payload));
+            }}
+            onClose={() => setModal(null)}
+            showToast={showToast}
+            language={language}
+            t={t}
+          />
+        </Suspense>
       )}
 
       {modal === 'mafia' && (
-        <MafiaMenu
-          person={person}
-          onJoin={(family) => {
-            runAction(p => {
-              const joined = p.joinMafia(family);
-              // If failed, maybe we alert? Log event handles it.
-              // We rely on log events.
-            });
-          }}
-          onAction={(action) => {
-            runAction(p => p.performMafiaAction(action));
-          }}
-          onClose={() => setModal(null)}
-        />
+        <Suspense fallback={<ModalLoader />}>
+          <LazyMafiaMenu
+            person={person}
+            onJoin={family => {
+              runAction(p => {
+                p.joinMafia(family);
+              });
+            }}
+            onAction={action => {
+              runAction(p => {
+                p.performMafiaAction(action);
+              });
+            }}
+            onClose={() => setModal(null)}
+            language={language}
+            t={t}
+          />
+        </Suspense>
       )}
 
       {modal === 'royalty' && (
-        <RoyaltyMenu
-          person={person}
-          onAction={(action) => {
-            runAction(p => {
-              if (action === 'public_service') p.performRoyalDuty();
-              if (action === 'abdicate') p.abdicate();
-              if (action === 'execute') p.executeSubject();
-              if (action === 'abdicate' || action === 'execute') setModal(null); // Close on big actions
-            });
-          }}
-          onClose={() => setModal(null)}
-        />
+        <Suspense fallback={<ModalLoader />}>
+          <LazyRoyaltyMenu
+            person={person}
+            onAction={action => {
+              runAction(p => {
+                if (action === 'public_service') {
+                  p.performRoyalDuty();
+                }
+                if (action === 'abdicate') {
+                  p.abdicate();
+                }
+                if (action === 'execute') {
+                  p.executeSubject();
+                }
+                if (action === 'abdicate' || action === 'execute') {
+                  setModal(null);
+                }
+              });
+            }}
+            onClose={() => setModal(null)}
+            language={language}
+            t={t}
+          />
+        </Suspense>
       )}
 
       {modal === 'politics' && (
-        <PoliticsMenu
-          person={person}
-          onRun={(office) => {
-            runAction(p => {
-              if (p.startCampaign(office)) {
-                // Keep modal open to show campaign dashboard immediately if desired
-                // or rely on re-render to show dashboard view
-              }
-            });
-          }}
-          onCampaignAction={(action) => {
-            runAction(p => p.campaignAction(action));
-          }}
-          onClose={() => setModal(null)}
-        />
+        <Suspense fallback={<ModalLoader />}>
+          <LazyPoliticsMenu
+            person={person}
+            onRun={office => {
+              runAction(p => {
+                p.startCampaign(office);
+              });
+            }}
+            onCampaignAction={action => {
+              runAction(p => p.campaignAction(action));
+            }}
+            onGeopolitics={() => setModal('geopolitics')}
+            onClose={() => setModal(null)}
+            language={language}
+            t={t}
+          />
+        </Suspense>
+      )}
+
+      {modal === 'geopolitics' && (
+        <Suspense fallback={<ModalLoader />}>
+          <LazyGeopoliticsModal
+            person={person}
+            onUpdate={fn => runAction(fn)}
+            onClose={() => setModal(null)}
+            language={language}
+            t={t}
+          />
+        </Suspense>
       )}
 
       {modal === 'gambling' && (
-        <GamblingMenu
-          person={person}
-          onResult={(amount) => {
-            runAction(p => {
-              p.money += amount;
-              if (amount > 0) p.logEvent(`You won $${amount.toLocaleString()} gambling!`, "good");
-              else p.logEvent(`You lost $${Math.abs(amount).toLocaleString()} gambling.`, "bad");
-            });
-          }}
-          onClose={() => setModal(null)}
-        />
+        <Suspense fallback={<ModalLoader />}>
+          <LazyGamblingMenu
+            person={person}
+            onResult={amount => {
+              runAction(p => {
+                p.money += amount;
+                if (amount > 0) {
+                  p.logEvent(`You won $${amount.toLocaleString()} gambling!`, 'good');
+                } else {
+                  p.logEvent(`You lost $${Math.abs(amount).toLocaleString()} gambling.`, 'bad');
+                }
+              });
+            }}
+            onClose={() => setModal(null)}
+            language={language}
+            t={t}
+          />
+        </Suspense>
       )}
 
       {modal === 'education' && (
-        <EducationMenu
-          person={person}
-          onEnroll={(school) => {
-            runAction(p => {
-              const success = p.enrollInSchool(school);
-              if (success) setModal(null);
-            });
-          }}
-          onStudy={() => {
-            runAction(p => p.studyHard());
-          }}
-          onDropOut={() => {
-            runAction(p => p.dropOut());
-          }}
-          onClose={() => setModal(null)}
-        />
+        <Suspense fallback={<ModalLoader />}>
+          <LazyEducationMenu
+            person={person}
+            onEnroll={school => {
+              runAction(p => {
+                const success = p.enrollInSchool(school);
+                if (success) {
+                  setModal(null);
+                }
+              });
+            }}
+            onStudy={() => {
+              runAction(p => p.studyHard());
+            }}
+            onDropOut={() => {
+              runAction(p => p.dropOut());
+            }}
+            onClose={() => setModal(null)}
+            language={language}
+            t={t}
+          />
+        </Suspense>
       )}
 
       {modal === 'assets' && (
-        <AssetsMenu
-          person={person}
-          onBuy={(asset, mortgage) => {
-            runAction(p => p.buyAsset(asset, mortgage));
-          }}
-          onSell={(index) => {
-            runAction(p => p.sellAsset(index));
-          }}
-          onRent={(index, amount) => runAction(p => p.rentAsset(index, amount))}
-          onEvict={(index) => runAction(p => p.evictTenant(index))}
-          onInvest={(asset, amount) => runAction(p => p.buyInvestment(asset, amount))}
-          onDivest={(id) => runAction(p => p.sellInvestment(id))}
-          onClose={() => setModal(null)}
-        />
+        <Suspense fallback={<ModalLoader />}>
+          <LazyAssetsMenu
+            person={person}
+            onBuy={(asset, mortgage) => {
+              runAction(p => p.buyAsset(asset, mortgage));
+            }}
+            onSell={index => {
+              runAction(p => p.sellAsset(index));
+            }}
+            onRent={(index, amount) => runAction(p => p.rentAsset(index, amount))}
+            onEvict={index => runAction(p => p.evictTenant(index))}
+            onInvest={(asset, amount) => runAction(p => p.buyInvestment(asset, amount))}
+            onDivest={id => runAction(p => p.sellInvestment(id))}
+            onPartialDivest={(id, pct) => runAction(p => p.sellPartialInvestment(id, pct))}
+            onClose={() => setModal(null)}
+            language={language}
+            t={t}
+          />
+        </Suspense>
       )}
 
       {modal === 'achievements' && (
-        <AchievementsMenu
-          unlockedIds={achievements}
-          onClose={() => setModal(null)}
-        />
+        <Suspense fallback={<ModalLoader />}>
+          <LazyAchievementsMenu
+            unlockedIds={achievements}
+            onClose={() => setModal(null)}
+            language={language}
+            t={t}
+          />
+        </Suspense>
       )}
 
       {modal === 'minigame_burglary' && (
-        <MiniGameModal
-          type="burglary"
-          difficulty={modalData?.difficulty || 1} // Dynamic difficulty
-          onResult={(success) => {
-            setModal(null);
-            runAction(p => p.commitCrime('burglary', success));
-          }}
-          onClose={() => setModal(null)}
-        />
+        <Suspense fallback={<ModalLoader />}>
+          <LazyMiniGameModal
+            type="burglary"
+            difficulty={modalData?.difficulty || 1}
+            onResult={success => {
+              setModal(null);
+              runAction(p => p.commitCrime('burglary', success));
+            }}
+            onClose={() => setModal(null)}
+            language={language}
+            t={t}
+          />
+        </Suspense>
       )}
 
       {modal === 'minesweeper' && (
-        <Minesweeper
-          onWin={() => {
-            setModal(null);
-            runAction(p => {
-              p.logEvent("MISSION ACCOMPLISHED! You survived the minefield.", "good");
-              p.promoteMilitary(); // Promotion for heroism
-            });
-          }}
-          onLose={() => {
-            setModal(null);
-            runAction(p => {
-              p.logEvent("BOOM! You stepped on a mine.", "bad");
-              p.isAlive = false;
-              p.logEvent("You were killed in action.", "bad");
-            });
-          }}
-          onClose={() => {
-            setModal(null);
-            runAction(p => p.logEvent("You retreated from the minefield. Coward.", "bad"));
-          }}
-        />
+        <Suspense fallback={<ModalLoader />}>
+          <LazyMinesweeper
+            onWin={() => {
+              setModal(null);
+              runAction(p => {
+                p.logEvent(
+                  t('app.minesweeperWin', 'MISSION ACCOMPLISHED! You survived the minefield.'),
+                  'good'
+                );
+                p.promoteMilitary();
+              });
+            }}
+            onLose={() => {
+              setModal(null);
+              runAction(p => {
+                p.logEvent(t('app.minesweeperBoom', 'BOOM! You stepped on a mine.'), 'bad');
+                p.isAlive = false;
+                p.logEvent(t('app.minesweeperKilled', 'You were killed in action.'), 'bad');
+              });
+            }}
+            onClose={() => {
+              setModal(null);
+              runAction(p =>
+                p.logEvent(
+                  t('app.minesweeperRetreat', 'You retreated from the minefield. Coward.'),
+                  'bad'
+                )
+              );
+            }}
+            language={language}
+            t={t}
+          />
+        </Suspense>
       )}
 
-
       {modal === 'doctor' && (
-        <DoctorMenu
-          person={person}
-          onTreat={(t) => {
-            runAction(p => p.visitDoctor(t));
-            setModal(null);
-          }}
-          onSurgery={(s) => {
-            runAction(p => p.plasticSurgery(s));
-            setModal(null);
-          }}
-          onClose={() => setModal(null)}
-        />
+        <Suspense fallback={<ModalLoader />}>
+          <LazyDoctorMenu
+            person={person}
+            onTreat={t => {
+              runAction(p => p.visitDoctor(t));
+            }}
+            onSurgery={s => {
+              runAction(p => p.plasticSurgery(s));
+            }}
+            onDiagnose={(diseaseId, treatmentId) => {
+              let msg = '';
+              runAction(p => {
+                const result = treatDisease(p, diseaseId, treatmentId);
+                msg = result?.message || 'Treatment applied.';
+              });
+              return msg;
+            }}
+            onClose={() => setModal(null)}
+            language={language}
+            t={t}
+          />
+        </Suspense>
       )}
 
       {modal === 'will' && (
-        <WillMenu
-          person={person}
-          onCreateWill={(beneficiary, allocations) => {
-            runAction(p => p.createWill(beneficiary, allocations));
-          }}
-          onClose={() => setModal(null)}
-        />
+        <Suspense fallback={<ModalLoader />}>
+          <LazyWillMenu
+            person={person}
+            onCreateWill={(beneficiary, allocations) => {
+              runAction(p => p.createWill(beneficiary, allocations));
+            }}
+            onClose={() => setModal(null)}
+            language={language}
+            t={t}
+          />
+        </Suspense>
       )}
 
       {modal === 'hobbies' && (
-        <HobbiesMenu
-          person={person}
-          onPractice={(skillId) => {
-            runAction(p => p.practiceSkill(skillId));
-          }}
-          onClose={() => setModal(null)}
-        />
-
+        <Suspense fallback={<ModalLoader />}>
+          <LazyHobbiesMenu
+            person={person}
+            onPractice={skillId => {
+              runAction(p => p.practiceSkill(skillId));
+            }}
+            onClose={() => setModal(null)}
+            language={language}
+            t={t}
+          />
+        </Suspense>
       )}
 
       {modal === 'pets' && (
-        <PetsMenu
-          person={person}
-          onInteract={(index, action) => {
-            runAction(p => p.interactWithPet(index, action));
-          }}
-          onAdopt={(pet) => {
-            runAction(p => p.adoptPet(pet));
-          }}
-          onClose={() => setModal(null)}
-        />
+        <Suspense fallback={<ModalLoader />}>
+          <LazyPetsMenu
+            person={person}
+            onInteract={(index, action) => {
+              runAction(p => p.interactWithPet(index, action));
+            }}
+            onAdopt={pet => {
+              runAction(p => p.adoptPet(pet));
+            }}
+            onClose={() => setModal(null)}
+            language={language}
+            t={t}
+          />
+        </Suspense>
       )}
 
       {modal === 'stats' && (
-        <StatsMenu
-          stats={lifetimeStats.getStats()}
-          onClose={() => setModal(null)}
-        />
+        <Suspense fallback={<ModalLoader />}>
+          <LazyStatsMenu
+            stats={lifetimeStats.getStats()}
+            onClose={() => setModal(null)}
+            language={language}
+            t={t}
+          />
+        </Suspense>
       )}
 
       {modal === 'familytree' && (
-        <FamilyTreeMenu
-          familyTree={familyTree}
+        <Suspense fallback={<ModalLoader />}>
+          <LazyFamilyTreeMenu
+            familyTree={familyTree}
+            onClose={() => setModal(null)}
+            language={language}
+            t={t}
+          />
+        </Suspense>
+      )}
+
+      {/* Generic modal loader for modals without custom rendering blocks */}
+      {modal && ![
+        'system','god_mode','occupation','activities','love','career_music','social',
+        'career','mafia','royalty','politics','geopolitics','gambling','education',
+        'assets','achievements','minigame_burglary','minesweeper','doctor','will',
+        'hobbies','pets','stats','familytree','world_news','world_overview','challenge',
+        'debug','relationships_dashboard','relationships','life_timeline','event_history',
+        'travel','country_profile',
+      ].includes(modal) && (
+        <LazyModalLoader
+          modalType={modal}
+          modalData={modalData}
+          person={person}
           onClose={() => setModal(null)}
+          language={language}
+          t={t}
         />
       )}
 
       {person.pendingEvent && (
         <DecisionModal
           event={person.pendingEvent}
-          onChoice={(choice) => {
+          onChoice={choice => {
             runAction(p => p.resolveEvent(choice));
           }}
+          language={language}
+          t={t}
         />
       )}
 
       {!person.isAlive && (
         <GameOver
           person={person}
-          onRestart={(child) => {
+          onRestart={child => {
             if (child && child.type === 'Child') {
-              // Inheritance Mode
               const heir = person.inherit(child);
-              // Ensure immediate save and state update
               setPerson(heir);
-              // Overwrite current slot? Or new one? Let's overwrite for continuity.
               saveGameData(heir, currentSlotId);
             } else {
-              // Clean Restart - Go back to Main Menu
-              // Maybe delete the save slot if they died and didn't inherit?
-              // For now, just clear person.
+              if (hapticsEnabled) HAPTICS.death();
               setPerson(null);
               setCurrentSlotId(null);
             }
           }}
+          language={language}
+          t={t}
         />
       )}
 
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
 }

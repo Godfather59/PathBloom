@@ -1,5 +1,5 @@
 {
-  "appId": "com.lifepath.ultimatesim",
-  "appName": "LifePath",
+  "appId": "com.pathbloom.lifesimulator",
+  "appName": "PathBloom: Life Simulator",
   "webDir": "dist"
 }

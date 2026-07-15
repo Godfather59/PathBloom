@@ -1,0 +1,141 @@
+.annual-recap {
+  width: min(94vw, 520px);
+  max-width: 520px;
+  max-height: 90dvh;
+}
+
+.recap-kicker {
+  margin-bottom: 4px;
+  color: var(--success-color);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.recap-stop-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 12px;
+  border: 1px solid rgba(255, 193, 7, 0.28);
+  border-radius: 12px;
+  background: rgba(255, 193, 7, 0.1);
+}
+
+.recap-stop-banner > span {
+  font-size: 1.4rem;
+}
+.recap-stop-banner div {
+  display: grid;
+  gap: 2px;
+}
+.recap-stop-banner small {
+  color: var(--text-secondary);
+}
+
+.recap-list {
+  display: grid;
+  gap: 10px;
+}
+
+.recap-year-card {
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.recap-year-card summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 50px;
+  padding: 12px 14px;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.recap-year-card summary::marker {
+  color: var(--accent-secondary);
+}
+.recap-section {
+  padding: 0 14px 14px;
+}
+.recap-section h3 {
+  margin: 4px 0 9px;
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+  text-transform: uppercase;
+}
+
+.recap-finance-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.recap-finance-item {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  padding: 9px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.recap-finance-item span {
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+}
+.recap-finance-item strong {
+  overflow-wrap: anywhere;
+  font-size: 0.9rem;
+}
+.positive {
+  color: var(--success-color) !important;
+}
+.negative {
+  color: var(--danger-color) !important;
+}
+
+.recap-stat-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.recap-stat-row span {
+  padding: 6px 8px;
+  border-radius: 999px;
+  background: var(--glass-bg);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.recap-change-list,
+.recap-event-list {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding-inline-start: 20px;
+  color: var(--text-secondary);
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+.recap-event-list li {
+  padding-inline-start: 5px;
+}
+.recap-continue {
+  margin-top: 14px;
+}
+
+@media (max-width: 380px) {
+  .annual-recap {
+    padding: 14px;
+  }
+  .recap-finance-grid {
+    grid-template-columns: 1fr;
+  }
+}

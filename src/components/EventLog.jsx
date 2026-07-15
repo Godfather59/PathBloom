@@ -1,30 +1,82 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, memo, useMemo } from 'react';
+import { translateGameMessage, translateGameText } from '../logic/i18n';
 import './EventLog.css';
 
-export function EventLog({ history = [] }) {
-    const endRef = useRef(null);
+const MAX_VISIBLE_EVENTS = 100;
+
+const localizeEvent = (event, language) =>
+  event.messageKey
+    ? translateGameMessage(language, event.messageKey, event.messageParams || {}, event.text)
+    : translateGameText(language, event.text);
+
+const EventCard = memo(({ event, language, t }) => (
+  <div className={`event-card type-${event.type || 'neutral'}`}>
+    <div className="event-text">{localizeEvent(event, language)}</div>
+    <span className="event-age-badge">
+      {t('common.age', 'Age')} {event.age}
+    </span>
+  </div>
+));
+
+export const EventLog = memo(
+  ({ history = [], language = 'en', t = (key, fallback) => fallback || key }) => {
     const containerRef = useRef(null);
 
     useEffect(() => {
-        // Use scrollTop instead of scrollIntoView checks to prevent bubbling up to the body
-        if (containerRef.current) {
-            containerRef.current.scrollTop = containerRef.current.scrollHeight;
+      const el = containerRef.current;
+      if (!el) {
+        return;
+      }
+
+      const updatePadding = () => {
+        const hud = document.querySelector('.hud-container');
+        const actionMenu = document.querySelector('.action-menu');
+        if (hud) {
+          el.style.paddingTop = `${hud.offsetHeight + 4}px`;
         }
+        if (actionMenu) {
+          el.style.paddingBottom = `${actionMenu.offsetHeight + 4}px`;
+        }
+      };
+
+      const ro = new ResizeObserver(updatePadding);
+      const hud = document.querySelector('.hud-container');
+      const actionMenu = document.querySelector('.action-menu');
+      if (hud) {
+        ro.observe(hud);
+      }
+      if (actionMenu) {
+        ro.observe(actionMenu);
+      }
+      updatePadding();
+
+      return () => ro.disconnect();
+    }, []);
+
+    useEffect(() => {
+      if (containerRef.current) {
+        containerRef.current.scrollTop = containerRef.current.scrollHeight;
+      }
     }, [history]);
 
-    // Display newest at the bottom naturally
-    const displayHistory = [...history].reverse();
+    const displayHistory = useMemo(() => {
+      const reversed = [...history].reverse();
+      return reversed.length > MAX_VISIBLE_EVENTS
+        ? reversed.slice(0, MAX_VISIBLE_EVENTS)
+        : reversed;
+    }, [history]);
 
     return (
-        <div className="event-log" ref={containerRef}>
-            {displayHistory.map((event, index) => (
-                <div key={index} className={`event-card type-${event.type || 'neutral'}`}>
-                    <div className="event-text">{event.text}</div>
-                    <span className="event-age-badge">Age {event.age}</span>
-                </div>
-            ))}
-
-            <div ref={endRef} />
-        </div>
+      <div className="event-log" ref={containerRef} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        {displayHistory.length === 0 && (
+          <div className="event-card type-neutral" style={{ opacity: 0.5, textAlign: 'center' }}>
+            <div className="event-text">{t('eventlog.empty', 'No events yet. Start living!')}</div>
+          </div>
+        )}
+        {displayHistory.map((event, index) => (
+          <EventCard key={event.id || index} event={event} language={language} t={t} />
+        ))}
+      </div>
     );
-}
+  }
+);

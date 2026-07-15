@@ -1,0 +1,26 @@
+# Dependencies
+node_modules
+dist
+android/app/build
+android/app/src/main/assets
+
+# Generated files
+coverage
+*.min.js
+*.min.css
+
+# Lock files
+package-lock.json
+yarn.lock
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.apk
+*.aab

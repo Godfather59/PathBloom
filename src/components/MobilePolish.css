@@ -1,6 +1,6 @@
 /* Android/mobile polish overrides loaded last. */
 :root {
-  --android-status-padding: max(56px, calc(env(safe-area-inset-top, 0px) + 24px));
+  --android-status-padding: max(50px, calc(env(safe-area-inset-top, 0px) + 18px));
   --android-bottom-padding: max(20px, calc(env(safe-area-inset-bottom, 0px) + 16px));
 }
 
@@ -26,7 +26,7 @@ body,
 }
 
 .hud-container {
-  padding: 12px 14px 12px;
+  padding: 10px 14px 10px;
   padding-top: var(--android-status-padding);
   max-width: 450px;
   left: 50%;
@@ -35,14 +35,15 @@ body,
 }
 
 .hud-header {
-  min-height: 56px;
+  min-height: 52px;
   align-items: flex-start;
   gap: 10px;
+  margin-bottom: 10px;
 }
 
 .hud-top-btns {
   position: absolute;
-  top: 0;
+  top: 2px;
   inset-inline-end: 0;
   display: flex;
   align-items: center;
@@ -55,7 +56,9 @@ body,
   top: auto;
   right: auto;
   left: auto;
-  flex: 0 0 44px;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
 }
 
 .hud-container[dir='rtl'] .settings-btn {
@@ -67,17 +70,17 @@ body,
   min-width: 0;
   padding-right: 0;
   padding-left: 0;
-  padding-inline-end: 104px;
+  padding-inline-end: 96px;
 }
 
 .hud-container[dir='rtl'] .person-info {
   padding-right: 0;
   padding-left: 0;
-  padding-inline-end: 104px;
+  padding-inline-end: 96px;
 }
 
 .person-name {
-  font-size: clamp(1.15rem, 5vw, 1.55rem);
+  font-size: clamp(1.12rem, 4.8vw, 1.5rem);
   line-height: 1.1;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -85,7 +88,8 @@ body,
 }
 
 .person-details {
-  line-height: 1.35;
+  line-height: 1.28;
+  font-size: 0.82rem;
 }
 
 .hud-money,
@@ -102,64 +106,100 @@ body,
   white-space: nowrap;
 }
 
+.avatar-circle {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+}
+
 .news-btn {
-  width: 52px;
-  height: 44px;
-  min-height: 44px;
-  padding: 4px 6px;
-  border-radius: 14px;
+  position: relative;
+  width: 42px;
+  height: 42px;
+  min-height: 42px;
+  padding: 0;
+  border-radius: 50%;
+  flex: 0 0 42px;
   flex-direction: column;
-  gap: 2px;
+  gap: 0;
+  background: rgba(255, 215, 0, 0.12);
 }
 
 .news-btn-icon {
-  font-size: 1rem;
+  font-size: 1.05rem;
   line-height: 1;
 }
 
 .news-btn-count {
-  font-size: 0.72rem;
+  position: absolute;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  inset-block-start: -5px;
+  inset-inline-end: -5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffd700;
+  color: #1a1600;
+  font-size: 0.58rem;
+  font-weight: 900;
   line-height: 1;
-  opacity: 0.9;
-  max-width: 44px;
+  opacity: 1;
+  max-width: 34px;
   overflow: hidden;
   text-overflow: ellipsis;
+  border: 2px solid rgba(20, 20, 33, 0.95);
 }
 
 .stat-grid {
-  gap: 9px 14px;
+  gap: 8px 14px;
 }
 
 .stat-header {
   text-transform: none;
   letter-spacing: 0.2px;
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   color: var(--text-secondary);
+}
+
+.progress-track {
+  height: 7px;
 }
 
 .event-log {
   padding-inline: 14px;
-  scroll-padding-top: 12px;
-  scroll-padding-bottom: 12px;
+  scroll-padding-top: 16px;
+  scroll-padding-bottom: 16px;
 }
 
 .event-card {
   border-radius: 14px;
-  padding: 13px 14px;
+  padding: 14px 14px;
   margin-bottom: 10px;
+  min-height: 54px;
+}
+
+.event-card:first-child {
+  margin-top: 4px;
 }
 
 .event-text {
   direction: inherit;
   unicode-bidi: plaintext;
   font-size: 0.96rem;
-  line-height: 1.45;
+  line-height: 1.5;
 }
 
 .event-age-badge {
   border-radius: 8px;
   padding: 3px 8px;
   line-height: 1.15;
+}
+
+.event-log[dir='rtl'] .event-age-badge {
+  direction: rtl;
 }
 
 .action-menu {
@@ -224,7 +264,7 @@ body,
 
   .person-info,
   .hud-container[dir='rtl'] .person-info {
-    padding-inline-end: 96px;
+    padding-inline-end: 90px;
   }
 
   .action-menu {
@@ -252,8 +292,16 @@ body,
 }
 
 @media (max-height: 720px) {
+  :root {
+    --android-status-padding: max(46px, calc(env(safe-area-inset-top, 0px) + 16px));
+  }
+
   .hud-container {
-    padding-top: max(48px, calc(env(safe-area-inset-top, 0px) + 18px));
+    padding-bottom: 8px;
+  }
+
+  .hud-header {
+    margin-bottom: 8px;
   }
 
   .action-btn {

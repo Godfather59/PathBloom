@@ -15,12 +15,14 @@ export const Hud = memo(
       return null;
     }
 
-    // Helper for currency formatting
     const formatMoney = amt => {
-      return new Intl.NumberFormat(language === 'ar' ? 'ar-MA' : 'en-US', {
-        style: 'currency',
-        currency: 'USD',
-      }).format(amt);
+      const value = Math.round(Number(amt) || 0);
+      const absValue = Math.abs(value).toLocaleString('en-US');
+      const sign = value < 0 ? '-' : '';
+
+      return language === 'ar'
+        ? `${sign}${absValue} دولار`
+        : `${sign}$${absValue}`;
     };
 
     const getAvatar = () => {
@@ -49,14 +51,16 @@ export const Hud = memo(
         : t('hud.unemployed', 'Unemployed');
     const totalDebt =
       Math.max(0, Number(person.loans) || 0) + Math.max(0, Number(person.personalDebt) || 0);
+    const locationLabel = [person.city, person.country]
+      .filter(Boolean)
+      .map(value => translateGameText(language, value))
+      .join(', ');
 
     return (
       <div className="hud-container" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-        {/* Header Section: Avatar + Name/Details */}
         <div className="hud-header">
           <div className="avatar-circle">
             {getAvatar()}
-            {/* Status Dot: Green if alive/healthy, could change later */}
             <div className="status-dot"></div>
             {person.social?.isInfluencer && <div className="influencer-badge">⭐</div>}
           </div>
@@ -70,11 +74,10 @@ export const Hud = memo(
                 <div className="hud-debt">💳 {t('hud.debt', 'Debt')}: {formatMoney(totalDebt)}</div>
               )}
               <div className="hud-role">{roleLabel}</div>
-              <div className="hud-location">📍 {person.city}, {person.country}</div>
+              <div className="hud-location">📍 {locationLabel}</div>
             </div>
           </div>
 
-          {/* Top-right action buttons */}
           <div className="hud-top-btns">
             {Array.isArray(person.worldNews) && person.worldNews.length > 0 && (
               <button
@@ -102,7 +105,6 @@ export const Hud = memo(
           </div>
         </div>
 
-        {/* Stats Grid */}
         <div className="stat-grid">
           <StatBar
             label={`😊 ${t('stat.happiness', 'Happiness')}`}
@@ -129,14 +131,16 @@ export const Hud = memo(
 );
 
 function StatBar({ label, value, type }) {
+  const safeValue = Math.max(0, Math.min(100, Math.round(Number(value) || 0)));
+
   return (
     <div className="stat-row">
       <div className="stat-header">
         <span>{label}</span>
-        <span>{value}%</span>
+        <span>{safeValue}%</span>
       </div>
       <div className="progress-track">
-        <div className={`progress-fill fill-${type}`} style={{ width: `${value}%` }} />
+        <div className={`progress-fill fill-${type}`} style={{ width: `${safeValue}%` }} />
       </div>
     </div>
   );

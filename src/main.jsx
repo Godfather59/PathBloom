@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { App as CapApp } from '@capacitor/app';
 import './index.css';
 import './components/NewFeatures.css';
+import './logic/GameEngineRuntimeFixes';
 import App from './App.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 

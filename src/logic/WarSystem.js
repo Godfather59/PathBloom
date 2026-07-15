@@ -16,7 +16,10 @@ export function getWarExhaustion(person, countryId) {
   if (!person.wars) person.wars = {};
   const war = person.wars[countryId];
   if (!war) return 0;
-  return Math.min(100, war.years * 8 + war.casualties);
+
+  const yearsExhaustion = (Number(war.years) || 0) * 8;
+  const casualtyExhaustion = Math.floor((Number(war.casualties) || 0) / 10000);
+  return Math.min(100, yearsExhaustion + casualtyExhaustion);
 }
 
 export function startWar(person, targetId) {

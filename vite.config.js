@@ -1,11 +1,31 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { visualizer } from 'rollup-plugin-visualizer';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { resolve } from 'path';
+import { fileURLToPath } from 'url';
 
-// https://vite.dev/config/
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
+
+const removeCrossOrigin = () => ({
+  name: 'remove-crossorigin',
+  enforce: 'post',
+  closeBundle() {
+    const htmlPath = resolve(__dirname, 'dist', 'index.html');
+    if (existsSync(htmlPath)) {
+      let html = readFileSync(htmlPath, 'utf-8');
+      html = html
+        .replace(/\s*crossorigin(=["'][^"']*["'])?/gi, '')
+        .replace(/<link\s+rel="modulepreload"[^>]*>\s*/gi, '');
+      writeFileSync(htmlPath, html, 'utf-8');
+    }
+  },
+});
+
 export default defineConfig({
   plugins: [
     react(),
+    removeCrossOrigin(),
     typeof process !== 'undefined' &&
       process.env &&
       process.env.ANALYZE &&

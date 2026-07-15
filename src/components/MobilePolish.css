@@ -1,0 +1,267 @@
+/* Android/mobile polish overrides loaded last. */
+:root {
+  --android-status-padding: max(56px, calc(env(safe-area-inset-top, 0px) + 24px));
+  --android-bottom-padding: max(20px, calc(env(safe-area-inset-bottom, 0px) + 16px));
+}
+
+html,
+body,
+#root {
+  min-height: 100dvh;
+}
+
+.app-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: var(--bg-surface);
+  text-align: start;
+}
+
+.app-container[dir='rtl'] {
+  direction: rtl;
+  text-align: right;
+}
+
+.hud-container {
+  padding: 12px 14px 12px;
+  padding-top: var(--android-status-padding);
+  max-width: 450px;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+}
+
+.hud-header {
+  min-height: 56px;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.hud-top-btns {
+  position: absolute;
+  top: 0;
+  inset-inline-end: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 65;
+}
+
+.settings-btn {
+  position: static;
+  top: auto;
+  right: auto;
+  left: auto;
+  flex: 0 0 44px;
+}
+
+.hud-container[dir='rtl'] .settings-btn {
+  left: auto;
+  right: auto;
+}
+
+.person-info {
+  min-width: 0;
+  padding-right: 0;
+  padding-left: 0;
+  padding-inline-end: 104px;
+}
+
+.hud-container[dir='rtl'] .person-info {
+  padding-right: 0;
+  padding-left: 0;
+  padding-inline-end: 104px;
+}
+
+.person-name {
+  font-size: clamp(1.15rem, 5vw, 1.55rem);
+  line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.person-details {
+  line-height: 1.35;
+}
+
+.hud-money,
+.hud-debt,
+.stat-header span:last-child {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.hud-location,
+.hud-role {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.news-btn {
+  width: 52px;
+  height: 44px;
+  min-height: 44px;
+  padding: 4px 6px;
+  border-radius: 14px;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.news-btn-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.news-btn-count {
+  font-size: 0.72rem;
+  line-height: 1;
+  opacity: 0.9;
+  max-width: 44px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stat-grid {
+  gap: 9px 14px;
+}
+
+.stat-header {
+  text-transform: none;
+  letter-spacing: 0.2px;
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+}
+
+.event-log {
+  padding-inline: 14px;
+  scroll-padding-top: 12px;
+  scroll-padding-bottom: 12px;
+}
+
+.event-card {
+  border-radius: 14px;
+  padding: 13px 14px;
+  margin-bottom: 10px;
+}
+
+.event-text {
+  direction: inherit;
+  unicode-bidi: plaintext;
+  font-size: 0.96rem;
+  line-height: 1.45;
+}
+
+.event-age-badge {
+  border-radius: 8px;
+  padding: 3px 8px;
+  line-height: 1.15;
+}
+
+.action-menu {
+  padding: 14px;
+  padding-bottom: var(--android-bottom-padding);
+  gap: 14px;
+}
+
+.action-menu-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.action-btn {
+  min-height: 78px;
+  border-radius: 18px;
+  padding: 10px 6px;
+}
+
+.action-icon {
+  margin-bottom: 7px;
+}
+
+.action-label {
+  font-size: 0.76rem;
+  line-height: 1.18;
+}
+
+.age-actions {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.age-up-btn,
+.age-skip-btn {
+  min-height: 56px;
+  border-radius: 18px;
+  font-size: 0.9rem;
+  line-height: 1.2;
+  text-transform: none;
+  white-space: normal;
+}
+
+.modal-content[dir='rtl'] .btn-secondary {
+  direction: rtl;
+}
+
+@media (max-width: 450px) {
+  .hud-container {
+    max-width: none;
+    left: 0;
+    right: 0;
+    transform: none;
+  }
+}
+
+@media (max-width: 370px) {
+  .hud-container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .person-info,
+  .hud-container[dir='rtl'] .person-info {
+    padding-inline-end: 96px;
+  }
+
+  .action-menu {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .action-menu-grid {
+    gap: 8px;
+  }
+
+  .action-btn {
+    min-height: 72px;
+  }
+
+  .age-actions {
+    gap: 8px;
+  }
+
+  .age-up-btn,
+  .age-skip-btn {
+    font-size: 0.82rem;
+    padding: 8px 6px;
+  }
+}
+
+@media (max-height: 720px) {
+  .hud-container {
+    padding-top: max(48px, calc(env(safe-area-inset-top, 0px) + 18px));
+  }
+
+  .action-btn {
+    min-height: 68px;
+  }
+
+  .age-up-btn,
+  .age-skip-btn {
+    min-height: 50px;
+  }
+}

@@ -229,7 +229,7 @@ body,
 }
 
 .age-actions {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -243,8 +243,86 @@ body,
   white-space: normal;
 }
 
+.month-btn {
+  background: rgba(3, 169, 244, 0.18);
+  border-color: rgba(3, 169, 244, 0.4);
+  box-shadow: 0 4px 14px rgba(3, 169, 244, 0.12);
+}
+
+.time-situation {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: rgba(3, 169, 244, 0.1);
+  border: 1px solid rgba(3, 169, 244, 0.22);
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.time-situation strong {
+  color: var(--text-primary);
+}
+
 .modal-content[dir='rtl'] .btn-secondary {
   direction: rtl;
+}
+
+.prison-modal {
+  border: 2px solid #ff4444;
+}
+
+.prison-title {
+  color: #ff4444;
+}
+
+.prison-sentence-card {
+  text-align: center;
+  margin-bottom: 14px;
+  padding: 15px;
+  background: rgba(255, 0, 0, 0.1);
+  border-radius: 14px;
+}
+
+.prison-sentence-card h3 {
+  margin: 8px 0;
+}
+
+.prison-sentence-value {
+  font-size: 1.65rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.prison-meta {
+  font-size: 0.82rem;
+  color: #aaa;
+  margin-top: 7px;
+}
+
+.prison-time-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.prison-section-title {
+  border-bottom: 1px solid #ff4444;
+}
+
+.prison-legal-title {
+  margin-top: 20px;
+}
+
+.prison-danger-action {
+  border-color: #ff4444 !important;
+  color: #ff7777 !important;
 }
 
 @media (max-width: 450px) {
@@ -280,7 +358,8 @@ body,
     min-height: 72px;
   }
 
-  .age-actions {
+  .age-actions,
+  .prison-time-actions {
     gap: 8px;
   }
 

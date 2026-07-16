@@ -35,6 +35,25 @@ jobs:
       - name: Validate bilingual content packs
         run: npm run validate:content
 
+      - name: Check World Simulation source syntax
+        id: syntax_check
+        continue-on-error: true
+        shell: bash
+        run: node --check src/logic/WorldSimulation2.js > world-syntax-report.txt 2>&1
+
+      - name: Upload syntax report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: world-syntax-report
+          path: world-syntax-report.txt
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Stop after syntax failure
+        if: steps.syntax_check.outcome == 'failure'
+        run: exit 1
+
       - name: Run World Simulation 2 tests
         id: world_tests
         continue-on-error: true

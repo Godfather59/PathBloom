@@ -1,6 +1,7 @@
 import { readFile, readdir } from 'node:fs/promises';
 import { extname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { ARABIC_UI_KEY_SUPPLEMENTS } from '../src/logic/ArabicSupplementalCatalog.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const srcRoot = resolve(root, 'src');
@@ -15,6 +16,7 @@ const report = {
   metrics: {
     englishUiKeys: 0,
     arabicUiKeys: 0,
+    supplementalArabicUiKeys: Object.keys(ARABIC_UI_KEY_SUPPLEMENTS).length,
     missingArabicUiKeys: 0,
     extraArabicUiKeys: 0,
     legacyPlaceholderEntries: 0,
@@ -68,7 +70,9 @@ function auditI18n(source, path) {
   report.metrics.englishUiKeys = englishKeys.size;
   report.metrics.arabicUiKeys = arabicKeys.size;
 
-  const missing = [...englishKeys].filter(key => !arabicKeys.has(key));
+  const missing = [...englishKeys].filter(
+    key => !arabicKeys.has(key) && !Object.hasOwn(ARABIC_UI_KEY_SUPPLEMENTS, key)
+  );
   const extra = [...arabicKeys].filter(key => !englishKeys.has(key));
   report.metrics.missingArabicUiKeys = missing.length;
   report.metrics.extraArabicUiKeys = extra.length;
@@ -176,7 +180,8 @@ for (const absolutePath of files) {
   }
   if (extension === '.jsx') auditJsx(source, path);
 
-  if (path !== 'src/logic/i18n.js') {
+  const isTestFixture = path.includes('/__tests__/') || path.includes('.test.');
+  if (path !== 'src/logic/i18n.js' && !isTestFixture) {
     for (const match of source.matchAll(/(?:['"`])([^'"`\n]*\sAR)(?:['"`])/g)) {
       addCritical(
         path,

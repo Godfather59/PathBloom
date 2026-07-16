@@ -181,4 +181,12 @@ describe('physical Android RTL screenshot fixes', () => {
     expect(css).toContain('grid-row: 1');
     expect(css).toContain('.news-btn-count');
   });
+
+  it('reserves a separate lane so automatic progression never covers shortcuts', () => {
+    const css = readComponentCss('ScreenshotRegressionFixes.css');
+    expect(css).toContain('.bottom-navigation');
+    expect(css).toContain('margin-top: 54px');
+    expect(css).toContain('.time-smart-action');
+    expect(css).toContain('top: -50px');
+  });
 });

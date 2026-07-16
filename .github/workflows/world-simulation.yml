@@ -36,40 +36,29 @@ jobs:
         run: npm run validate:content
 
       - name: Check World Simulation source syntax
-        id: syntax_check
-        continue-on-error: true
-        shell: bash
-        run: node --check src/logic/WorldSimulation2.js > world-syntax-report.txt 2>&1
-
-      - name: Upload syntax report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: world-syntax-report
-          path: world-syntax-report.txt
-          if-no-files-found: warn
-          retention-days: 7
-
-      - name: Stop after syntax failure
-        if: steps.syntax_check.outcome == 'failure'
-        run: exit 1
+        run: node --check src/logic/WorldSimulation2.js
 
       - name: Run World Simulation 2 tests
         id: world_tests
-        continue-on-error: true
-        run: npm run test:world -- --reporter=json --outputFile=world-test-results.json
+        shell: bash
+        run: |
+          set +e
+          npm run test:world 2>&1 | tee world-test-output.txt
+          exit_code=${PIPESTATUS[0]}
+          echo "exit_code=${exit_code}" >> "$GITHUB_OUTPUT"
+          exit 0
 
-      - name: Upload world test report
+      - name: Upload world test output
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: world-test-results
-          path: world-test-results.json
+          name: world-test-output
+          path: world-test-output.txt
           if-no-files-found: warn
           retention-days: 7
 
       - name: Stop after failed world tests
-        if: steps.world_tests.outcome == 'failure'
+        if: steps.world_tests.outputs.exit_code != '0'
         run: exit 1
 
       - name: Run multi-world stress check

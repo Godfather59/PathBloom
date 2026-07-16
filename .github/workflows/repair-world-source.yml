@@ -1,0 +1,47 @@
+name: Repair World Simulation source
+
+on:
+  push:
+    branches:
+      - agent/world-simulation-2
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/world-simulation-2
+          fetch-depth: 0
+
+      - name: Repair malformed country-pair loop
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('src/logic/WorldSimulation2.js')
+          source = path.read_text(encoding='utf-8')
+          broken = 'for (let rightIndex = leftIndex + 1; rightIndex += 1) {'
+          fixed = 'for (let rightIndex = leftIndex + 1; rightIndex < names.length; rightIndex += 1) {'
+          if broken in source:
+              path.write_text(source.replace(broken, fixed, 1), encoding='utf-8')
+          PY
+
+      - name: Commit repaired source
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo 'Source already repaired.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/logic/WorldSimulation2.js
+          git commit -m 'Fix World Simulation country relation loop'
+          git push origin HEAD:agent/world-simulation-2

@@ -36,7 +36,22 @@ jobs:
         run: npm run validate:content
 
       - name: Run World Simulation 2 tests
-        run: npm run test:world
+        id: world_tests
+        continue-on-error: true
+        run: npm run test:world -- --reporter=json --outputFile=world-test-results.json
+
+      - name: Upload world test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: world-test-results
+          path: world-test-results.json
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Stop after failed world tests
+        if: steps.world_tests.outcome == 'failure'
+        run: exit 1
 
       - name: Run multi-world stress check
         run: node scripts/run-world-simulation-checks.mjs --worlds=20 --months=240

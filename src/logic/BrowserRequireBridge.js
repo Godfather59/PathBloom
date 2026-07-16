@@ -25,13 +25,30 @@ export function browserRequire(moduleId) {
   return resolved;
 }
 
-if (typeof window !== 'undefined' || typeof globalThis.require !== 'function') {
-  Object.defineProperty(globalThis, 'require', {
-    value: browserRequire,
-    configurable: true,
-    enumerable: false,
-    writable: false,
-  });
+export function installBrowserRequire(target = globalThis) {
+  if (!target || typeof target !== 'object' && typeof target !== 'function') return false;
+  if (typeof target.require === 'function') return true;
+
+  try {
+    Object.defineProperty(target, 'require', {
+      value: browserRequire,
+      configurable: true,
+      enumerable: false,
+      writable: false,
+    });
+    return target.require === browserRequire;
+  } catch {
+    try {
+      target.require = browserRequire;
+      return target.require === browserRequire;
+    } catch {
+      return false;
+    }
+  }
+}
+
+if (typeof globalThis.require !== 'function') {
+  installBrowserRequire(globalThis);
 }
 
 export const supportedLegacyModules = Object.freeze(Object.keys(LEGACY_MODULES));

@@ -17,6 +17,7 @@ import './components/PhaseTwoScreens.css';
 import './components/PhaseTwoFeatureStyles.css';
 import './components/PhaseTwoMusicStyles.css';
 import './components/ReleasePolish.css';
+import './components/ReleasePerformance.css';
 
 const rootElement = document.getElementById('root');
 

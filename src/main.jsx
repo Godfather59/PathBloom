@@ -8,6 +8,7 @@ import './components/MobilePolish.css';
 import './components/ArabicRTL.css';
 import './components/DesignSystem.css';
 import './components/ShellExtensions.css';
+import './components/PrisonRedesign.css';
 
 const rootElement = document.getElementById('root');
 

@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "id": "war-core",
+  "name": { "en": "War Stories", "ar": "قصص الحرب" },
+  "description": { "en": "Civilian survival, military choices, propaganda, and recovery.", "ar": "بقاء المدنيين والاختيارات العسكرية والدعاية والتعافي." },
+  "category": "war",
+  "countries": ["*"],
+  "events": [
+    {
+      "id": "war_rationing",
+      "frequency": "month",
+      "weight": 8,
+      "cooldownMonths": 6,
+      "conditions": { "minAge": 16, "requiresWar": true },
+      "text": { "en": "Food and fuel shortages have forced your neighborhood to organize a rationing plan.", "ar": "أجبر نقص الغذاء والوقود حيّك على تنظيم خطة للتقنين." },
+      "choices": [
+        { "id": "cooperate", "text": { "en": "Join the community plan", "ar": "انضم إلى خطة المجتمع" }, "outcome": { "en": "The shared plan helped vulnerable families survive the shortage.", "ar": "ساعدت الخطة المشتركة العائلات الضعيفة على تجاوز النقص." }, "effects": { "money": -250, "stress": 3, "karma": 5 }, "reputation": { "public": 5, "trust": 6, "family": 2 }, "next": { "eventId": "war_rationing_result", "delayMonths": 3 } },
+        { "id": "stockpile", "text": { "en": "Stockpile supplies privately", "ar": "خزن المؤن لنفسك" }, "outcome": { "en": "Your household became safer, but neighbors noticed your behavior.", "ar": "أصبح منزلك أكثر أمانا، لكن الجيران لاحظوا تصرفك." }, "effects": { "money": -700, "stress": -2 }, "reputation": { "public": -5, "trust": -6 }, "setFlags": { "warStockpile": true }, "next": { "eventId": "war_rationing_result", "delayMonths": 3 } },
+        { "id": "black_market", "text": { "en": "Buy from the black market", "ar": "اشتر من السوق السوداء" }, "outcome": { "en": "You found supplies at a high price and accepted serious legal risk.", "ar": "وجدت مؤنا بسعر مرتفع وتحملت مخاطرة قانونية كبيرة." }, "effects": { "money": -1200, "stress": 5 }, "reputation": { "criminal": 6, "trust": -3 }, "next": { "eventId": "war_rationing_result", "delayMonths": 3 } }
+      ]
+    },
+    {
+      "id": "war_rationing_result",
+      "hidden": true,
+      "frequency": "month",
+      "text": { "en": "The shortage worsened, and your earlier rationing decision now affects other people.", "ar": "ازداد النقص سوءا، وأصبح قرارك السابق يؤثر في الآخرين." },
+      "choices": [
+        { "id": "share", "text": { "en": "Share what you have", "ar": "شارك ما لديك" }, "outcome": { "en": "Your supplies helped several neighbors through the crisis.", "ar": "ساعدت مؤنك عدة جيران خلال الأزمة." }, "effects": { "money": -300, "happiness": 3, "karma": 6 }, "reputation": { "public": 7, "trust": 7 } },
+        { "id": "protect", "text": { "en": "Protect your household first", "ar": "احم أسرتك أولا" }, "outcome": { "en": "Your family remained secure, but relationships in the neighborhood weakened.", "ar": "بقيت عائلتك آمنة، لكن علاقات الحي ضعفت." }, "effects": { "stress": -3 }, "reputation": { "family": 5, "public": -4, "trust": -3 } }
+      ]
+    },
+    {
+      "id": "war_evacuation_order",
+      "frequency": "month",
+      "weight": 5,
+      "cooldownMonths": 12,
+      "conditions": { "minAge": 18, "requiresWar": true },
+      "text": { "en": "Authorities issued an evacuation warning as fighting moved closer to your area.", "ar": "أصدرت السلطات تحذيرا بالإخلاء مع اقتراب القتال من منطقتك." },
+      "choices": [
+        { "id": "leave", "text": { "en": "Evacuate immediately", "ar": "اخل المنطقة فورا" }, "outcome": { "en": "You left quickly and reached a safer area with limited belongings.", "ar": "غادرت بسرعة ووصلت إلى منطقة أكثر أمانا بأمتعة قليلة." }, "effects": { "money": -1500, "stress": 8, "health": 2 }, "reputation": { "family": 3 }, "setFlags": { "warEvacuated": true } },
+        { "id": "help", "text": { "en": "Help others evacuate first", "ar": "ساعد الآخرين على الإخلاء أولا" }, "outcome": { "en": "You helped several people escape before leaving yourself.", "ar": "ساعدت عدة أشخاص على الهرب قبل أن تغادر." }, "effects": { "money": -1000, "stress": 12, "health": -2, "karma": 8 }, "reputation": { "public": 9, "trust": 8 }, "setFlags": { "warEvacuated": true } },
+        { "id": "stay", "text": { "en": "Stay and protect your property", "ar": "ابق لحماية ممتلكاتك" }, "outcome": { "en": "You stayed behind as the situation became increasingly dangerous.", "ar": "بقيت بينما أصبح الوضع أكثر خطورة." }, "effects": { "stress": 14, "health": -6 }, "reputation": { "family": -3 }, "setFlags": { "warStayedBehind": true } }
+      ]
+    },
+    {
+      "id": "war_propaganda_request",
+      "frequency": "year",
+      "weight": 4,
+      "cooldownMonths": 24,
+      "conditions": { "minAge": 18, "requiresWar": true, "minPublicReputation": 25 },
+      "text": { "en": "Government officials asked you to publicly support the war effort without discussing its failures.", "ar": "طلب منك مسؤولون دعم المجهود الحربي علنا من دون الحديث عن إخفاقاته." },
+      "choices": [
+        { "id": "support", "text": { "en": "Join the campaign", "ar": "انضم إلى الحملة" }, "outcome": { "en": "Your visibility increased, but many people questioned your independence.", "ar": "ازدادت شهرتك، لكن كثيرين شككوا في استقلالك." }, "effects": { "money": 5000, "fame": 5, "stress": 3 }, "reputation": { "political": 6, "public": 5, "trust": -6 }, "setFlags": { "supportedWarPropaganda": true } },
+        { "id": "balanced", "text": { "en": "Support civilians but criticize failures", "ar": "ادعم المدنيين وانتقد الإخفاقات" }, "outcome": { "en": "Your balanced message earned respect and angered officials.", "ar": "أكسبتك رسالتك المتوازنة الاحترام وأغضبت المسؤولين." }, "effects": { "stress": 7, "karma": 4 }, "reputation": { "public": 7, "trust": 7, "political": -2 } },
+        { "id": "refuse", "text": { "en": "Refuse to participate", "ar": "ارفض المشاركة" }, "outcome": { "en": "You protected your independence but lost official support.", "ar": "حافظت على استقلالك لكنك خسرت الدعم الرسمي." }, "effects": { "stress": 4 }, "reputation": { "trust": 5, "political": -5 } }
+      ]
+    }
+  ]
+}

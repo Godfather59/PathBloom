@@ -17,6 +17,7 @@ on:
       - 'src/components/Toast.jsx'
       - 'src/components/Toast.css'
       - 'src/components/ThemeCompatibility.css'
+      - 'src/components/ScreenshotRegressionFixes.css'
       - 'src/components/ReleasePolish.css'
       - 'src/components/ReleasePerformance.css'
       - 'src/components/SaveRelease.css'

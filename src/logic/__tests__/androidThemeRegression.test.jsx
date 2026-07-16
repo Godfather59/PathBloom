@@ -3,7 +3,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import {
   browserRequire,
@@ -11,10 +11,15 @@ import {
   supportedLegacyModules,
 } from '../BrowserRequireBridge';
 import { localizeToastMessage } from '../ToastLocalization';
+import { applyTheme, getStoredTheme, normalizeTheme, THEMES } from '../themes';
+import { orderHistoryNewestFirst } from '../../components/EventLog';
+import { MainMenu } from '../../components/MainMenu';
 import { Toast } from '../../components/Toast';
 
 const render = component => renderToStaticMarkup(component);
 const readComponentCss = fileName =>
+  fs.readFileSync(path.join(process.cwd(), 'src', 'components', fileName), 'utf8');
+const readComponentSource = fileName =>
   fs.readFileSync(path.join(process.cwd(), 'src', 'components', fileName), 'utf8');
 
 describe('Android ESM compatibility', () => {
@@ -46,6 +51,8 @@ describe('Android ESM compatibility', () => {
 });
 
 describe('Arabic runtime alerts', () => {
+  beforeEach(() => localStorage.clear());
+
   it('localizes natural-disaster alerts and country names', () => {
     expect(
       localizeToastMessage('A devastating natural disaster has struck Egypt.', 'ar')
@@ -67,15 +74,87 @@ describe('Arabic runtime alerts', () => {
   });
 });
 
-describe('light-theme compatibility', () => {
-  it('defines readable light and sepia PathBloom surfaces', () => {
+describe('life timeline position', () => {
+  it('keeps the current age first for native newest-first histories', () => {
+    const history = [{ age: 7 }, { age: 6 }, { age: 0 }];
+    expect(orderHistoryNewestFirst(history).map(event => event.age)).toEqual([7, 6, 0]);
+    expect(history.map(event => event.age)).toEqual([7, 6, 0]);
+  });
+
+  it('repairs older ascending save histories before display', () => {
+    const history = [{ age: 0 }, { age: 6 }, { age: 7 }];
+    expect(orderHistoryNewestFirst(history).map(event => event.age)).toEqual([7, 6, 0]);
+  });
+});
+
+describe('focused appearance modes', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    document.documentElement.removeAttribute('data-theme');
+  });
+
+  it('exposes only dark mode and clear mode', () => {
+    expect(Object.keys(THEMES)).toEqual(['dark', 'light']);
+    expect(THEMES.dark.name).toBe('Dark Mode');
+    expect(THEMES.light.name).toBe('Clear Mode');
+  });
+
+  it('migrates every retired theme to a supported mode', () => {
+    expect(normalizeTheme('sepia')).toBe('light');
+    expect(normalizeTheme('forest')).toBe('dark');
+    expect(normalizeTheme('ocean')).toBe('dark');
+    expect(normalizeTheme('midnight')).toBe('dark');
+
+    localStorage.setItem('bitlife_theme', 'sepia');
+    expect(getStoredTheme()).toBe('light');
+    expect(localStorage.getItem('bitlife_theme')).toBe('light');
+  });
+
+  it('applies readable clear-mode surfaces without legacy theme selectors', () => {
+    expect(applyTheme('light')).toBe('light');
+    expect(document.documentElement.dataset.theme).toBe('light');
+    expect(document.documentElement.style.colorScheme).toBe('light');
+
     const css = readComponentCss('ThemeCompatibility.css');
     expect(css).toContain(":root[data-theme='light']");
     expect(css).toContain('--pb-text: #142033');
     expect(css).toContain("[data-theme='light'] .timeline-card");
     expect(css).toContain("[data-theme='light'] .bottom-navigation");
     expect(css).toContain("[data-theme='light'] .hud-container");
-    expect(css).toContain(":root[data-theme='sepia']");
+    expect(css).not.toContain("data-theme='sepia'");
+    expect(css).not.toContain("data-theme='forest'");
+  });
+});
+
+describe('Arabic new-life setup', () => {
+  beforeEach(() => localStorage.clear());
+
+  it('renders a native RTL setup with Arabic fields and Morocco selected', () => {
+    const html = render(
+      <MainMenu
+        language="ar"
+        onLanguageChange={() => {}}
+        onStartGame={() => {}}
+        onStartDailyLife={() => {}}
+        hasSave={false}
+      />
+    );
+
+    expect(html).toContain('dir="rtl"');
+    expect(html).toContain('الاسم الأول');
+    expect(html).toContain('اسم العائلة');
+    expect(html).toContain('اكتب الاسم الأول');
+    expect(html).toContain('ابدأ الحياة');
+    expect(html).toContain('المغرب');
+    expect(html).toContain('value="Morocco" selected=""');
+  });
+
+  it('starts directly without importing or rendering AvatarCreator', () => {
+    const source = readComponentSource('MainMenu.jsx');
+    expect(source).not.toContain("import AvatarCreator");
+    expect(source).not.toContain('showAvatarCreator');
+    expect(source).not.toContain('<AvatarCreator');
+    expect(source).not.toContain('avatarData');
   });
 });
 

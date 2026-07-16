@@ -119,16 +119,38 @@ GameEngine.simulateYear = function simulateYearWithMonthlyCompatibility(person) 
 
 const originalAgeUp = GameEngine.ageUp.bind(GameEngine);
 GameEngine.ageUp = function ageUpWithHybridTime(person, amount = 1) {
-  ensureTimeProgress(person);
+  const timeState = ensureTimeProgress(person);
 
   if (amount === 'month') {
     return advanceOneMonth(person, target => originalAgeUp(target, 1));
   }
 
   const ageBefore = Math.max(0, Math.floor(Number(person?.age) || 0));
+  const wasInPrison = Boolean(person?.isInPrison);
+  if (wasInPrison && timeState.prisonMonthsRemaining === null) {
+    timeState.prisonMonthsRemaining = Math.max(
+      0,
+      Math.round((Number(person.prisonSentence) || 0) * 12)
+    );
+  }
+
   const result = originalAgeUp(person, amount);
   const ageAfter = Math.max(ageBefore, Math.floor(Number(person?.age) || ageBefore));
-  recordYearAdvance(person, ageAfter - ageBefore);
+  const completedYears = ageAfter - ageBefore;
+
+  if (wasInPrison) {
+    if (person.isInPrison) {
+      timeState.prisonMonthsRemaining = Math.max(
+        0,
+        (Number(timeState.prisonMonthsRemaining) || 0) - completedYears * 12
+      );
+      person.prisonSentence = Math.ceil(timeState.prisonMonthsRemaining / 12);
+    } else {
+      timeState.prisonMonthsRemaining = null;
+    }
+  }
+
+  recordYearAdvance(person);
   return result;
 };
 

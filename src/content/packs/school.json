@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "id": "school-core",
+  "name": { "en": "School Stories", "ar": "قصص المدرسة" },
+  "description": { "en": "Connected childhood and education events.", "ar": "أحداث مترابطة للطفولة والتعليم." },
+  "category": "school",
+  "countries": ["*"],
+  "events": [
+    {
+      "id": "school_group_project",
+      "frequency": "year",
+      "weight": 8,
+      "cooldownMonths": 36,
+      "conditions": { "minAge": 8, "maxAge": 18, "requiresSchool": true },
+      "text": { "en": "Your teacher assigned a difficult group project, but nobody wants to lead it.", "ar": "كلفكم المعلم بمشروع جماعي صعب، لكن لا أحد يريد قيادته." },
+      "choices": [
+        {
+          "id": "lead",
+          "text": { "en": "Take the lead", "ar": "تول القيادة" },
+          "outcome": { "en": "You organized the group and accepted the pressure.", "ar": "نظمت المجموعة وتحملت ضغط المسؤولية." },
+          "effects": { "smarts": 2, "stress": 4 },
+          "reputation": { "professional": 3, "trust": 2 },
+          "setFlags": { "schoolProjectRole": "leader" },
+          "next": { "eventId": "school_group_project_result", "delayMonths": 6 }
+        },
+        {
+          "id": "support",
+          "text": { "en": "Help quietly", "ar": "ساعد بهدوء" },
+          "outcome": { "en": "You completed your share without becoming the leader.", "ar": "أنجزت حصتك من دون أن تصبح القائد." },
+          "effects": { "smarts": 1, "stress": 1 },
+          "setFlags": { "schoolProjectRole": "support" },
+          "next": { "eventId": "school_group_project_result", "delayMonths": 6 }
+        },
+        {
+          "id": "avoid",
+          "text": { "en": "Avoid the work", "ar": "تهرب من العمل" },
+          "outcome": { "en": "Your classmates noticed that you disappeared when work began.", "ar": "لاحظ زملاؤك أنك اختفيت عندما بدأ العمل." },
+          "effects": { "happiness": 2, "smarts": -2 },
+          "reputation": { "trust": -4 },
+          "setFlags": { "schoolProjectRole": "avoid" },
+          "next": { "eventId": "school_group_project_result", "delayMonths": 6 }
+        }
+      ]
+    },
+    {
+      "id": "school_group_project_result",
+      "hidden": true,
+      "frequency": "month",
+      "conditions": { "minAge": 8, "maxAge": 19 },
+      "text": { "en": "The group project results are announced in front of the class.", "ar": "أعلن المعلم نتائج المشروع الجماعي أمام الصف." },
+      "choices": [
+        {
+          "id": "share_credit",
+          "text": { "en": "Share the credit", "ar": "شارك الفضل مع الجميع" },
+          "outcome": { "en": "Your classmates appreciated your fairness.", "ar": "قدر زملاؤك عدلك." },
+          "effects": { "happiness": 3 },
+          "reputation": { "trust": 5, "professional": 2 }
+        },
+        {
+          "id": "take_credit",
+          "text": { "en": "Take most of the credit", "ar": "انسب معظم النجاح لنفسك" },
+          "outcome": { "en": "The teacher was impressed, but your group resented you.", "ar": "أعجب بك المعلم، لكن مجموعتك استاءت منك." },
+          "effects": { "happiness": 4, "stress": 2 },
+          "reputation": { "professional": 4, "trust": -5 }
+        }
+      ]
+    },
+    {
+      "id": "school_exam_pressure",
+      "frequency": "year",
+      "weight": 7,
+      "cooldownMonths": 24,
+      "conditions": { "minAge": 12, "maxAge": 24, "requiresSchool": true },
+      "text": { "en": "Important exams are approaching and your schedule is becoming overwhelming.", "ar": "تقترب امتحانات مهمة وأصبح جدولك مرهقا." },
+      "choices": [
+        {
+          "id": "study_plan",
+          "text": { "en": "Create a study plan", "ar": "ضع خطة للدراسة" },
+          "outcome": { "en": "A structured routine made the workload manageable.", "ar": "جعل الروتين المنظم عبء الدراسة أسهل." },
+          "effects": { "smarts": 4, "stress": 2, "energy": -8 },
+          "reputation": { "professional": 2 }
+        },
+        {
+          "id": "cram",
+          "text": { "en": "Study all night", "ar": "ادرس طوال الليل" },
+          "outcome": { "en": "You learned a lot, but exhaustion hit hard.", "ar": "تعلمت كثيرا، لكن الإرهاق كان شديدا." },
+          "effects": { "smarts": 3, "health": -3, "stress": 7, "energy": -20 }
+        },
+        {
+          "id": "ignore",
+          "text": { "en": "Ignore the pressure", "ar": "تجاهل الضغط" },
+          "outcome": { "en": "The exams arrived before you felt ready.", "ar": "وصلت الامتحانات قبل أن تشعر بالاستعداد." },
+          "effects": { "happiness": 3, "smarts": -3, "stress": 5 }
+        }
+      ]
+    },
+    {
+      "id": "school_club_invitation",
+      "frequency": "year",
+      "weight": 5,
+      "cooldownMonths": 48,
+      "conditions": { "minAge": 10, "maxAge": 22, "requiresSchool": true },
+      "text": { "en": "A student club invited you to join and help organize its activities.", "ar": "دعاك ناد طلابي للانضمام والمساعدة في تنظيم أنشطته." },
+      "choices": [
+        {
+          "id": "join",
+          "text": { "en": "Join the club", "ar": "انضم إلى النادي" },
+          "outcome": { "en": "You met new people and learned how to organize a team.", "ar": "تعرفت إلى أشخاص جدد وتعلمت تنظيم فريق." },
+          "effects": { "happiness": 5, "stress": 2, "smarts": 1 },
+          "reputation": { "public": 2, "trust": 2 }
+        },
+        {
+          "id": "decline",
+          "text": { "en": "Focus on your own routine", "ar": "ركز على روتينك الخاص" },
+          "outcome": { "en": "You kept your free time but missed the social experience.", "ar": "احتفظت بوقتك الحر لكنك فوت التجربة الاجتماعية." },
+          "effects": { "stress": -2 }
+        }
+      ]
+    }
+  ]
+}

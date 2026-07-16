@@ -7,6 +7,11 @@ import './EventLog.css';
 const MAX_VISIBLE_EVENTS = 100;
 
 const localizeEvent = (event, language) => {
+  const packText = event.localizedText && typeof event.localizedText === 'object'
+    ? event.localizedText[language] || event.localizedText.en
+    : null;
+  if (packText) return String(packText);
+
   const localized = event.messageKey
     ? translateGameMessage(language, event.messageKey, event.messageParams || {}, event.text)
     : translateGameText(language, event.text);

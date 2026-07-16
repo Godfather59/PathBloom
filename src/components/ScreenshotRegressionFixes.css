@@ -32,6 +32,13 @@
   isolation: isolate;
 }
 
+/* The automatic control floats above the central one-step button. Reserve a
+   dedicated lane above the navigation so it never covers Career,
+   Relationships, Education, or Assets. */
+.bottom-navigation {
+  margin-top: 54px;
+}
+
 .time-primary-action {
   width: 92px;
   min-height: 74px;
@@ -58,7 +65,7 @@
 }
 
 .time-smart-action {
-  top: -52px;
+  top: -50px;
   min-width: 142px;
   min-height: 42px;
   padding: 6px 10px;
@@ -155,12 +162,16 @@
     padding-inline-end: 11px;
   }
 
+  .bottom-navigation {
+    margin-top: 50px;
+  }
+
   .time-primary-action {
     width: 82px;
   }
 
   .time-smart-action {
-    top: -48px;
+    top: -46px;
     min-width: 128px;
     min-height: 39px;
     padding-inline: 8px;

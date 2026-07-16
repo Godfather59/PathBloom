@@ -30,7 +30,8 @@ describe('World Simulation 2.0', () => {
 
   it('runs twenty years without invalid country state', () => {
     const person = makePerson('Canada');
-    const world = simulateWorldMonths(person, 240, { playerConsequences: false });
+    simulateWorldMonths(person, 120, { playerConsequences: false });
+    const world = simulateWorldMonths(person, 120, { playerConsequences: false });
     const validation = validateWorldSimulation2(person);
     expect(world.year).toBe(2046);
     expect(validation.valid).toBe(true);

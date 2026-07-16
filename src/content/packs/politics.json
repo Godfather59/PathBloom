@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "id": "politics-core",
+  "name": { "en": "Political Stories", "ar": "قصص السياسة" },
+  "description": { "en": "Campaign strategy, public pressure, donors, and corruption.", "ar": "استراتيجية الحملات وضغط الجمهور والمانحين والفساد." },
+  "category": "politics",
+  "countries": ["*"],
+  "events": [
+    {
+      "id": "politics_debate_preparation",
+      "frequency": "month",
+      "weight": 9,
+      "cooldownMonths": 8,
+      "conditions": { "minAge": 21, "requiresCampaign": true },
+      "text": { "en": "A major televised debate could change the direction of your campaign.", "ar": "قد تغير مناظرة تلفزيونية مهمة مسار حملتك." },
+      "choices": [
+        { "id": "policy", "text": { "en": "Prepare detailed policy answers", "ar": "جهز إجابات سياسية مفصلة" }, "outcome": { "en": "You appeared informed and serious.", "ar": "ظهرت بصورة مطلعة وجادة." }, "effects": { "smarts": 2, "stress": 5, "energy": -10 }, "reputation": { "political": 6, "trust": 5 }, "situationEffects": { "campaignPolling": 4 }, "next": { "eventId": "politics_debate_result", "delayMonths": 1 } },
+        { "id": "attack", "text": { "en": "Prepare aggressive attacks", "ar": "جهز هجمات قوية" }, "outcome": { "en": "Your attacks dominated the headlines.", "ar": "هيمنت هجماتك على العناوين." }, "effects": { "stress": 4, "karma": -3 }, "reputation": { "political": 4, "trust": -3, "public": 3 }, "situationEffects": { "campaignPolling": 3 }, "next": { "eventId": "politics_debate_result", "delayMonths": 1 } },
+        { "id": "authentic", "text": { "en": "Speak naturally", "ar": "تحدث بطبيعتك" }, "outcome": { "en": "Voters saw a more human side of you.", "ar": "رأى الناخبون جانبا أكثر إنسانية منك." }, "effects": { "stress": -2 }, "reputation": { "trust": 6, "public": 4 }, "situationEffects": { "campaignPolling": 2 }, "next": { "eventId": "politics_debate_result", "delayMonths": 1 } }
+      ]
+    },
+    {
+      "id": "politics_debate_result",
+      "hidden": true,
+      "frequency": "month",
+      "text": { "en": "Post-debate polls are released and your team asks how to respond.", "ar": "صدرت استطلاعات ما بعد المناظرة ويسأل فريقك عن طريقة الرد." },
+      "choices": [
+        { "id": "thank", "text": { "en": "Thank supporters and stay focused", "ar": "اشكر المؤيدين وحافظ على التركيز" }, "outcome": { "en": "Your calm response strengthened your image.", "ar": "عزز ردك الهادئ صورتك." }, "effects": { "stress": -3 }, "reputation": { "political": 3, "trust": 4 }, "situationEffects": { "campaignPolling": 2 } },
+        { "id": "spin", "text": { "en": "Claim total victory", "ar": "أعلن نصرا كاملا" }, "outcome": { "en": "The bold claim excited supporters but annoyed undecided voters.", "ar": "حمس الادعاء الجريء المؤيدين وأزعج المترددين." }, "effects": { "happiness": 3 }, "reputation": { "public": 3, "trust": -3 }, "situationEffects": { "campaignPolling": 1 } }
+      ]
+    },
+    {
+      "id": "politics_donor_pressure",
+      "frequency": "year",
+      "weight": 5,
+      "cooldownMonths": 36,
+      "conditions": { "minAge": 21, "requiresPoliticalCareer": true },
+      "text": { "en": "A wealthy donor offered major funding in exchange for a private policy promise.", "ar": "عرض مانح ثري تمويلا كبيرا مقابل وعد سياسي سري." },
+      "choices": [
+        { "id": "accept", "text": { "en": "Accept the deal", "ar": "اقبل الصفقة" }, "outcome": { "en": "Your campaign gained money, but the donor now expects influence.", "ar": "حصلت حملتك على المال، لكن المانح يتوقع نفوذا." }, "effects": { "money": 20000, "stress": 6, "karma": -8 }, "reputation": { "political": 4, "trust": -9, "criminal": 3 }, "setFlags": { "secretDonorPromise": true } },
+        { "id": "transparent", "text": { "en": "Only accept publicly disclosed support", "ar": "اقبل دعما معلنا فقط" }, "outcome": { "en": "The donor reduced the offer, but your transparency earned respect.", "ar": "خفض المانح عرضه، لكن شفافيتك أكسبتك الاحترام." }, "effects": { "money": 5000, "stress": 2 }, "reputation": { "political": 3, "trust": 7, "public": 3 } },
+        { "id": "reject", "text": { "en": "Reject the donor", "ar": "ارفض المانح" }, "outcome": { "en": "You protected your independence but lost valuable resources.", "ar": "حميت استقلالك لكنك خسرت موارد مهمة." }, "effects": { "stress": 3, "karma": 5 }, "reputation": { "trust": 6, "political": -1 } }
+      ]
+    },
+    {
+      "id": "politics_protest_response",
+      "frequency": "year",
+      "weight": 5,
+      "cooldownMonths": 30,
+      "conditions": { "minAge": 21, "requiresPoliticalCareer": true },
+      "text": { "en": "Thousands of people gathered to protest one of your government's decisions.", "ar": "تجمع آلاف الأشخاص للاحتجاج على أحد قرارات حكومتك." },
+      "choices": [
+        { "id": "meet", "text": { "en": "Meet protest representatives", "ar": "قابل ممثلي المحتجين" }, "outcome": { "en": "The meeting reduced tension and produced several compromises.", "ar": "خفض اللقاء التوتر وأنتج عدة حلول وسط." }, "effects": { "stress": 6, "smarts": 1 }, "reputation": { "political": 4, "trust": 7, "public": 4 } },
+        { "id": "ignore", "text": { "en": "Ignore the protest", "ar": "تجاهل الاحتجاج" }, "outcome": { "en": "The movement grew more frustrated and organized.", "ar": "ازدادت الحركة إحباطا وتنظيما." }, "effects": { "stress": -2 }, "reputation": { "political": -3, "trust": -7, "public": -4 } },
+        { "id": "force", "text": { "en": "Order a forceful dispersal", "ar": "أمر بتفريق المحتجين بالقوة" }, "outcome": { "en": "The streets cleared, but images of the crackdown spread everywhere.", "ar": "أصبحت الشوارع فارغة، لكن صور القمع انتشرت في كل مكان." }, "effects": { "stress": 8, "karma": -12 }, "reputation": { "political": -5, "trust": -12, "criminal": 6, "public": -8 } }
+      ]
+    }
+  ]
+}

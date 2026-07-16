@@ -60,6 +60,7 @@ export function rememberNPCMoment(person, relationship, type, impact = 0, detail
   memory.significantMoments = memory.significantMoments.slice(-MAX_MEMORIES);
   memory.trust = clamp(memory.trust + impact * 0.45);
   memory.closeness = clamp(memory.closeness + impact * 0.35);
+  memory.support = clamp(memory.support + impact * 0.3);
   memory.resentment = clamp(memory.resentment + (impact < 0 ? Math.abs(impact) * 0.5 : -impact * 0.25));
   relationship.stat = clamp((Number(relationship.stat) || 50) + impact * 0.2);
   return entry;
@@ -180,7 +181,11 @@ function simulateReconciliation(person, rel, memory) {
 }
 
 function simulateIndependentMove(person, rel, memory) {
-  if (Number(rel.age) < 18 || memory.autonomousState.country || (hash(`${rel.id}|move|${person.age}`) % 100) >= 6) {
+  if (
+    Number(rel.age) < 18 ||
+    memory.autonomousState.country ||
+    (hash(`${rel.id}|move|${person.age}`) % 100) >= 6
+  ) {
     return false;
   }
   const destinations = ['France', 'Canada', 'Germany', 'Japan', 'United States', 'Morocco', 'Spain'];
@@ -193,7 +198,13 @@ function simulateIndependentMove(person, rel, memory) {
 }
 
 function simulateSupportReturn(person, rel, memory) {
-  if (memory.support < 70 || memory.trust < 70 || (hash(`${rel.id}|support|${person.age}`) % 100) >= 8) return false;
+  if (
+    memory.support < 70 ||
+    memory.trust < 70 ||
+    (hash(`${rel.id}|support|${person.age}`) % 100) >= 8
+  ) {
+    return false;
+  }
   const help = Math.max(100, Math.min(5000, Math.floor((Number(rel.npcData?.money) || 2000) * 0.03)));
   person.money = (Number(person.money) || 0) + help;
   if (rel.npcData) rel.npcData.money = Math.max(0, Number(rel.npcData.money) - help);
@@ -211,6 +222,7 @@ export function processNPCMemoryYear(person) {
     if (yearsSinceContact >= 1) {
       memory.neglectYears += 1;
       memory.closeness = clamp(memory.closeness - (yearsSinceContact > 2 ? 5 : 2));
+      memory.support = clamp(memory.support - (yearsSinceContact > 2 ? 3 : 1));
       memory.resentment = clamp(memory.resentment + (yearsSinceContact > 2 ? 4 : 1));
     }
 

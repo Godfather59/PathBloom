@@ -10,6 +10,7 @@ import './components/DesignSystem.css';
 import './components/ShellExtensions.css';
 import './components/PrisonRedesign.css';
 import './components/DecisionSheet.css';
+import './components/DestinationScreens.css';
 
 const rootElement = document.getElementById('root');
 

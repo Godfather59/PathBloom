@@ -30,7 +30,10 @@ window.addEventListener('unhandledrejection', event => {
 
 async function bootstrap() {
   try {
+    // Compatibility fixes must load first; the deeper systems wrap the corrected
+    // yearly/monthly methods afterwards.
     await import('./logic/GameEngineRuntimeFixes');
+    await import('./logic/DeepSimulationRuntime');
 
     const [{ App: CapApp }, { default: App }, { default: ErrorBoundary }] = await Promise.all([
       import('@capacitor/app'),

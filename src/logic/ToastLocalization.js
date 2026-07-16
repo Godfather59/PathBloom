@@ -1,7 +1,31 @@
 import { translateCountryName } from './i18n';
 import { translateDeepSimulationText } from './DeepLocalization';
+import { COUNTRY_NAME_AR } from './WorldSimulation2Data';
 
 const ARABIC_TEXT = /[\u0600-\u06ff]/;
+const EXTRA_COUNTRY_AR = Object.freeze({
+  Egypt: 'مصر',
+  Algeria: 'الجزائر',
+  Tunisia: 'تونس',
+  Libya: 'ليبيا',
+  Mauritania: 'موريتانيا',
+  Turkey: 'تركيا',
+  Iran: 'إيران',
+  Iraq: 'العراق',
+  Jordan: 'الأردن',
+  Lebanon: 'لبنان',
+  Syria: 'سوريا',
+  Palestine: 'فلسطين',
+  Israel: 'إسرائيل',
+  Qatar: 'قطر',
+  Kuwait: 'الكويت',
+  Bahrain: 'البحرين',
+  Oman: 'عُمان',
+  Yemen: 'اليمن',
+  'South Africa': 'جنوب أفريقيا',
+  Nigeria: 'نيجيريا',
+  Kenya: 'كينيا',
+});
 
 export function getRuntimeLanguage() {
   try {
@@ -16,7 +40,9 @@ export function getRuntimeLanguage() {
 
 function countryAr(name) {
   const cleaned = String(name || '').trim().replace(/[.!?]+$/, '');
-  return translateCountryName('ar', cleaned) || cleaned;
+  const baseTranslation = translateCountryName('ar', cleaned);
+  if (baseTranslation && baseTranslation !== cleaned) return baseTranslation;
+  return COUNTRY_NAME_AR[cleaned] || EXTRA_COUNTRY_AR[cleaned] || cleaned;
 }
 
 export function localizeToastMessage(message, language = getRuntimeLanguage()) {

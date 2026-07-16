@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { formatArabicNumber } from '../logic/ArabicLocalization';
+import { getStoredLanguage } from '../logic/i18n';
 import {
-  PhaseTwoActionRow,
   PhaseTwoEmpty,
   PhaseTwoMetric,
   PhaseTwoProgress,
@@ -115,8 +115,7 @@ export function RelationshipDashboard({
   person,
   onClose,
   onOpenFullManager,
-  language = 'en',
-  t = (key, fallback) => fallback || key,
+  language = getStoredLanguage(),
 }) {
   const locale = language === 'ar' ? 'ar' : 'en';
   const copy = COPY[locale];

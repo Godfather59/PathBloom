@@ -12,6 +12,8 @@ export const ARABIC_TEXT_SUPPLEMENTS = Object.freeze({
   Streak: 'السلسلة اليومية',
   '{count} day streak': 'سلسلة مستمرة منذ {count} يوم',
   'Daily life already completed today.': 'أكملت الحياة اليومية لهذا اليوم بالفعل.',
+  'Dark Mode': 'الوضع الداكن',
+  'Clear Mode': 'الوضع الفاتح',
 
   // High-value hardcoded screens reported by the static audit.
   'Career Skills': 'مهارات المهنة',

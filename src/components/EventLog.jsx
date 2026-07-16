@@ -94,6 +94,18 @@ function detectCategory(event) {
   return 'life';
 }
 
+export function orderHistoryNewestFirst(history = []) {
+  const ordered = Array.isArray(history) ? [...history] : [];
+  if (ordered.length < 2) return ordered;
+
+  const firstAge = Number(ordered[0]?.age);
+  const lastAge = Number(ordered[ordered.length - 1]?.age);
+  if (Number.isFinite(firstAge) && Number.isFinite(lastAge) && firstAge < lastAge) {
+    ordered.reverse();
+  }
+  return ordered;
+}
+
 function collectEffectChips(event, language) {
   const source = event.effects || event.statChanges || event.changes || {};
   const values = { ...source };
@@ -209,12 +221,19 @@ export const EventLog = memo(function EventLog({
   }, []);
 
   useEffect(() => {
-    if (containerRef.current) containerRef.current.scrollTop = 0;
+    const element = containerRef.current;
+    if (!element) return undefined;
+    const frame = requestAnimationFrame(() => {
+      element.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    });
+    return () => cancelAnimationFrame(frame);
   }, [history.length]);
 
   const displayHistory = useMemo(() => {
-    const reversed = [...history].reverse();
-    return reversed.length > MAX_VISIBLE_EVENTS ? reversed.slice(0, MAX_VISIBLE_EVENTS) : reversed;
+    const newestFirst = orderHistoryNewestFirst(history);
+    return newestFirst.length > MAX_VISIBLE_EVENTS
+      ? newestFirst.slice(0, MAX_VISIBLE_EVENTS)
+      : newestFirst;
   }, [history]);
 
   const resolvedHeader = headerContent || (currentPerson ? (

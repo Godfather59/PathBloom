@@ -6,13 +6,18 @@ let processing = false;
 
 function currentLanguage() {
   try {
-    return localStorage.getItem('pathbloom_language') === 'ar' ||
-      localStorage.getItem('lifepath_language') === 'ar'
-      ? 'ar'
-      : 'en';
+    if (typeof localStorage !== 'undefined') {
+      return localStorage.getItem('pathbloom_language') === 'ar' ||
+        localStorage.getItem('lifepath_language') === 'ar'
+        ? 'ar'
+        : 'en';
+    }
   } catch {
-    return document.documentElement.lang?.startsWith('ar') ? 'ar' : 'en';
+    // Language storage is optional.
   }
+  return typeof document !== 'undefined' && document.documentElement.lang?.startsWith('ar')
+    ? 'ar'
+    : 'en';
 }
 
 function money(value, language) {
@@ -29,7 +34,7 @@ function number(value, language) {
     : amount.toLocaleString('en-US');
 }
 
-function calculateAssets(person) {
+export function getPhaseTwoAssetSummary(person) {
   const ownedValue = (person?.assets || []).reduce(
     (sum, asset) => sum + Math.max(0, Number(asset?.value ?? asset?.price) || 0),
     0
@@ -77,7 +82,9 @@ function createMetric(icon, label, value, tone = '') {
 function enhanceAssets(overlay) {
   if (!overlay || overlay.dataset.phaseTwoAssets === '1') return;
   const title = overlay.querySelector('.modal-title');
-  const tabs = [...overlay.querySelectorAll('button')].map(button => button.textContent || '').join(' ');
+  const tabs = [...overlay.querySelectorAll('button')]
+    .map(button => button.textContent || '')
+    .join(' ');
   const signature = `${title?.textContent || ''} ${tabs}`.toLowerCase();
   if (!/(assets|shopping|my assets|real estate|investments|الأصول|العقارات|الاستثمارات)/i.test(signature)) {
     return;
@@ -91,22 +98,23 @@ function enhanceAssets(overlay) {
 
   const person = getCurrentTimePerson();
   const language = currentLanguage();
-  const values = calculateAssets(person);
-  const copy = language === 'ar'
-    ? {
-        netWorth: 'صافي الثروة',
-        cash: 'النقد',
-        assets: 'قيمة الأصول',
-        debt: 'إجمالي الدين',
-        holdings: `${number(values.ownedCount, language)} أصل · ${number(values.positions, language)} استثمار`,
-      }
-    : {
-        netWorth: 'Net worth',
-        cash: 'Cash',
-        assets: 'Asset value',
-        debt: 'Total debt',
-        holdings: `${number(values.ownedCount, language)} assets · ${number(values.positions, language)} investments`,
-      };
+  const values = getPhaseTwoAssetSummary(person);
+  const copy =
+    language === 'ar'
+      ? {
+          netWorth: 'صافي الثروة',
+          cash: 'النقد',
+          assets: 'قيمة الأصول',
+          debt: 'إجمالي الدين',
+          holdings: `${number(values.ownedCount, language)} أصل · ${number(values.positions, language)} استثمار`,
+        }
+      : {
+          netWorth: 'Net worth',
+          cash: 'Cash',
+          assets: 'Asset value',
+          debt: 'Total debt',
+          holdings: `${number(values.ownedCount, language)} assets · ${number(values.positions, language)} investments`,
+        };
 
   const summary = document.createElement('section');
   summary.className = 'phase-two-assets-runtime-summary';
@@ -127,7 +135,12 @@ function enhanceAssets(overlay) {
   metrics.className = 'phase-two-assets-runtime-metrics';
   metrics.append(
     createMetric('💵', copy.cash, money(values.cash, language), 'growth'),
-    createMetric('🏠', copy.assets, money(values.ownedValue + values.portfolioValue, language), 'world'),
+    createMetric(
+      '🏠',
+      copy.assets,
+      money(values.ownedValue + values.portfolioValue, language),
+      'world'
+    ),
     createMetric('💳', copy.debt, money(values.debt, language), values.debt > 0 ? 'danger' : '')
   );
   summary.append(heading, metrics);

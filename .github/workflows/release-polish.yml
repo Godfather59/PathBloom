@@ -60,24 +60,18 @@ jobs:
         run: npm run validate:release
 
       - name: Test save recovery and player retention
-        id: release-tests
-        continue-on-error: true
         shell: bash
         run: |
           set -o pipefail
           npm run test:release 2>&1 | tee release-test-output.txt
 
-      - name: Upload release-test diagnostics
-        if: always()
+      - name: Upload failed release-test diagnostics
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: release-test-output
           path: release-test-output.txt
           retention-days: 7
-
-      - name: Stop after failed release tests
-        if: steps.release-tests.outcome == 'failure'
-        run: exit 1
 
       - name: Test redesigned UI destinations
         run: npm run test:ui

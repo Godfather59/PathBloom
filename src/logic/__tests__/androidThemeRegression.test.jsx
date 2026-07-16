@@ -14,6 +14,8 @@ import { localizeToastMessage } from '../ToastLocalization';
 import { Toast } from '../../components/Toast';
 
 const render = component => renderToStaticMarkup(component);
+const readComponentCss = fileName =>
+  fs.readFileSync(path.join(process.cwd(), 'src', 'components', fileName), 'utf8');
 
 describe('Android ESM compatibility', () => {
   it('resolves every legacy browser require used by App.jsx', () => {
@@ -67,15 +69,28 @@ describe('Arabic runtime alerts', () => {
 
 describe('light-theme compatibility', () => {
   it('defines readable light and sepia PathBloom surfaces', () => {
-    const css = fs.readFileSync(
-      path.join(process.cwd(), 'src', 'components', 'ThemeCompatibility.css'),
-      'utf8'
-    );
+    const css = readComponentCss('ThemeCompatibility.css');
     expect(css).toContain(":root[data-theme='light']");
     expect(css).toContain('--pb-text: #142033');
     expect(css).toContain("[data-theme='light'] .timeline-card");
     expect(css).toContain("[data-theme='light'] .bottom-navigation");
     expect(css).toContain("[data-theme='light'] .hud-container");
     expect(css).toContain(":root[data-theme='sepia']");
+  });
+});
+
+describe('physical Android RTL screenshot fixes', () => {
+  it('keeps the timeline rail on the right without reversing card text', () => {
+    const css = readComponentCss('ScreenshotRegressionFixes.css');
+    expect(css).toContain(".event-log[dir='rtl'] .timeline-event");
+    expect(css).toContain('direction: ltr');
+    expect(css).toContain(".event-log[dir='rtl'] .timeline-card");
+    expect(css).toContain('direction: rtl');
+  });
+
+  it('isolates Arabic labels from LTR currency values', () => {
+    const css = readComponentCss('ScreenshotRegressionFixes.css');
+    expect(css).toContain(".hud-container[dir='rtl'] .hud-money");
+    expect(css).toContain('unicode-bidi: isolate');
   });
 });

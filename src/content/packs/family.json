@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "id": "family-core",
+  "name": { "en": "Family Stories", "ar": "قصص العائلة" },
+  "description": { "en": "Long-term family choices and consequences.", "ar": "اختيارات عائلية بعواقب طويلة المدى." },
+  "category": "family",
+  "countries": ["*"],
+  "events": [
+    {
+      "id": "family_parent_job_loss",
+      "frequency": "year",
+      "weight": 5,
+      "cooldownMonths": 60,
+      "conditions": { "minAge": 8, "maxAge": 30 },
+      "text": { "en": "One of your parents lost their job and the household budget is under pressure.", "ar": "فقد أحد والديك عمله وأصبحت ميزانية الأسرة تحت ضغط." },
+      "choices": [
+        { "id": "help", "text": { "en": "Help the family", "ar": "ساعد العائلة" }, "outcome": { "en": "Your support brought the family closer.", "ar": "قرب دعمك أفراد العائلة من بعضهم." }, "effects": { "money": -500, "stress": 4, "happiness": 2 }, "reputation": { "family": 6, "trust": 4 }, "setFlags": { "supportedFamilyCrisis": true }, "next": { "eventId": "family_parent_job_result", "delayMonths": 8 } },
+        { "id": "emotional", "text": { "en": "Offer emotional support", "ar": "قدم دعما معنويا" }, "outcome": { "en": "You listened and helped everyone stay calm.", "ar": "استمعت للجميع وساعدتهم على الهدوء." }, "effects": { "stress": 2 }, "reputation": { "family": 4, "trust": 3 }, "next": { "eventId": "family_parent_job_result", "delayMonths": 8 } },
+        { "id": "distance", "text": { "en": "Keep your distance", "ar": "ابتعد عن المشكلة" }, "outcome": { "en": "Your family felt that you were absent during a difficult time.", "ar": "شعرت عائلتك أنك غبت في وقت صعب." }, "effects": { "stress": -2, "happiness": -2 }, "reputation": { "family": -5, "trust": -4 }, "next": { "eventId": "family_parent_job_result", "delayMonths": 8 } }
+      ]
+    },
+    {
+      "id": "family_parent_job_result",
+      "hidden": true,
+      "frequency": "month",
+      "text": { "en": "The family financial crisis has lasted for months, and everyone must decide what comes next.", "ar": "استمرت الأزمة المالية للعائلة عدة أشهر، ويجب على الجميع تحديد الخطوة التالية." },
+      "choices": [
+        { "id": "budget", "text": { "en": "Create a family budget", "ar": "ضع ميزانية عائلية" }, "outcome": { "en": "The family agreed on a realistic plan.", "ar": "اتفقت العائلة على خطة واقعية." }, "effects": { "stress": -4, "smarts": 2 }, "reputation": { "family": 4, "trust": 4 }, "setFlags": { "familyBudgetCreated": true } },
+        { "id": "move", "text": { "en": "Suggest moving somewhere cheaper", "ar": "اقترح الانتقال إلى مكان أرخص" }, "outcome": { "en": "The idea was painful, but it gave the family another option.", "ar": "كان الاقتراح مؤلما، لكنه منح العائلة خيارا آخر." }, "effects": { "happiness": -3, "stress": -2 }, "reputation": { "family": 2 } }
+      ]
+    },
+    {
+      "id": "family_sibling_conflict",
+      "frequency": "year",
+      "weight": 6,
+      "cooldownMonths": 30,
+      "conditions": { "minAge": 6, "maxAge": 35, "requiresRelationshipType": "Sibling" },
+      "text": { "en": "A long-running argument with your sibling has divided the family.", "ar": "قسم خلاف مستمر مع أخيك أو أختك أفراد العائلة." },
+      "choices": [
+        { "id": "apologize", "text": { "en": "Apologize first", "ar": "اعتذر أولا" }, "outcome": { "en": "Your apology opened the door to reconciliation.", "ar": "فتح اعتذارك باب المصالحة." }, "effects": { "happiness": 4, "stress": -5 }, "reputation": { "family": 5, "trust": 5 }, "relationshipEffects": { "type": "Sibling", "stat": 10 } },
+        { "id": "talk", "text": { "en": "Have an honest conversation", "ar": "أجر حوارا صريحا" }, "outcome": { "en": "You both explained what had been hurting you.", "ar": "شرح كل منكما ما كان يؤلمه." }, "effects": { "stress": -2 }, "reputation": { "family": 3, "trust": 3 }, "relationshipEffects": { "type": "Sibling", "stat": 6 } },
+        { "id": "cut_off", "text": { "en": "Cut contact", "ar": "اقطع التواصل" }, "outcome": { "en": "The conflict stopped, but the relationship became distant.", "ar": "توقف الخلاف، لكن العلاقة أصبحت بعيدة." }, "effects": { "stress": -4, "happiness": -5 }, "reputation": { "family": -7 }, "relationshipEffects": { "type": "Sibling", "stat": -20 } }
+      ]
+    },
+    {
+      "id": "family_aging_parent",
+      "frequency": "year",
+      "weight": 4,
+      "cooldownMonths": 48,
+      "conditions": { "minAge": 30, "requiresRelationshipType": "Parent" },
+      "text": { "en": "An aging parent needs more help with appointments, errands, and daily life.", "ar": "يحتاج أحد والديك المسنين إلى مساعدة أكبر في المواعيد والحاجات اليومية." },
+      "choices": [
+        { "id": "care", "text": { "en": "Take responsibility", "ar": "تحمل المسؤولية" }, "outcome": { "en": "Your parent felt safe and supported.", "ar": "شعر والدك بالأمان والدعم." }, "effects": { "stress": 7, "happiness": 2, "money": -1000 }, "reputation": { "family": 8, "trust": 6 }, "relationshipEffects": { "type": "Parent", "stat": 12 } },
+        { "id": "share", "text": { "en": "Share duties with relatives", "ar": "قسم المسؤوليات مع الأقارب" }, "outcome": { "en": "The family created a sustainable care schedule.", "ar": "وضعت العائلة جدولا مستداما للرعاية." }, "effects": { "stress": 2, "money": -400 }, "reputation": { "family": 5, "trust": 4 }, "relationshipEffects": { "type": "Parent", "stat": 7 } },
+        { "id": "refuse", "text": { "en": "Refuse the responsibility", "ar": "ارفض المسؤولية" }, "outcome": { "en": "Your parent felt abandoned.", "ar": "شعر والدك بأنه متروك." }, "effects": { "stress": -3, "happiness": -5 }, "reputation": { "family": -10, "trust": -7 }, "relationshipEffects": { "type": "Parent", "stat": -15 } }
+      ]
+    }
+  ]
+}

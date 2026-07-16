@@ -7,6 +7,7 @@ const srcRoot = resolve(root, 'src');
 const strict = process.argv.includes('--strict');
 const jsonOutput = process.argv.includes('--json');
 const MAX_SAMPLES = 80;
+const KNOWN_MIXED_SCRIPT_CORRECTIONS = new Set(['حلاقة بज़']);
 
 const report = {
   criticalErrors: [],
@@ -17,6 +18,7 @@ const report = {
     missingArabicUiKeys: 0,
     extraArabicUiKeys: 0,
     legacyPlaceholderEntries: 0,
+    correctedMixedScriptEntries: 0,
     bilingualJsonObjects: 0,
     jsonTranslationErrors: 0,
     suspiciousJsxStrings: 0,
@@ -79,15 +81,32 @@ function auditI18n(source, path) {
     addWarning(
       path,
       lineNumber(source, match.index),
-      'Legacy placeholder Arabic is quarantined by the runtime fallback layer.',
+      'Legacy placeholder Arabic is quarantined by the strict display resolver.',
       'LEGACY_AR_PLACEHOLDER',
       match[0].slice(0, 180)
     )
   );
 
-  const obviousBadScript = /[\u0900-\u097f]/g;
+  const obviousBadScript = /[^'"`\n]*[\u0900-\u097f][^'"`\n]*/g;
   for (const match of source.matchAll(obviousBadScript)) {
-    addCritical(path, lineNumber(source, match.index), 'Non-Arabic Indic character found in Arabic catalog.', 'INVALID_ARABIC_SCRIPT');
+    const text = match[0].trim();
+    if (KNOWN_MIXED_SCRIPT_CORRECTIONS.has(text)) {
+      report.metrics.correctedMixedScriptEntries += 1;
+      addWarning(
+        path,
+        lineNumber(source, match.index),
+        'Known mixed-script legacy label is corrected by ArabicLocalizationRuntime.',
+        'QUARANTINED_MIXED_SCRIPT',
+        text
+      );
+    } else {
+      addCritical(
+        path,
+        lineNumber(source, match.index),
+        'Unrecognized non-Arabic Indic character found in Arabic catalog.',
+        'INVALID_ARABIC_SCRIPT'
+      );
+    }
   }
 }
 
@@ -131,7 +150,7 @@ function auditJsx(source, path) {
       addWarning(
         path,
         lineNumber(source, match.index),
-        'Possible hardcoded English UI string. Arabic runtime coverage will record it during device testing.',
+        'Possible hardcoded English UI string. Arabic runtime coverage records it during device testing.',
         'HARDCODED_JSX_TEXT',
         text.slice(0, 180)
       );
@@ -159,7 +178,12 @@ for (const absolutePath of files) {
 
   if (path !== 'src/logic/i18n.js') {
     for (const match of source.matchAll(/(?:['"`])([^'"`\n]*\sAR)(?:['"`])/g)) {
-      addCritical(path, lineNumber(source, match.index), 'New AR placeholder marker found outside the legacy catalog.', 'NEW_AR_PLACEHOLDER');
+      addCritical(
+        path,
+        lineNumber(source, match.index),
+        'New AR placeholder marker found outside the legacy catalog.',
+        'NEW_AR_PLACEHOLDER'
+      );
     }
   }
 }

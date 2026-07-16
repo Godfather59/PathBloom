@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { installArabicLocalizationRuntime } from './logic/ArabicLocalizationRuntime';
 import { installArabicSupplementalRuntime } from './logic/ArabicSupplementalRuntime';
+import { installPhaseTwoScreenRuntime } from './logic/PhaseTwoScreenRuntime';
 import './index.css';
 import './components/NewFeatures.css';
 import './components/MobilePolish.css';
@@ -100,6 +101,7 @@ async function bootstrap() {
 
     installArabicSupplementalRuntime();
     installArabicLocalizationRuntime();
+    installPhaseTwoScreenRuntime();
   } catch (error) {
     showStartupError(error);
   }

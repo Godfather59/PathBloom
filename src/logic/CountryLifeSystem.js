@@ -15,6 +15,8 @@ const DEFAULT_RULES = {
   publicHealthcare: false,
   publicUniversity: false,
   marriageAge: 18,
+  unemploymentRate: 6,
+  jobMarketStrength: 60,
 };
 
 export const COUNTRY_LIFE_RULES = {
@@ -104,14 +106,36 @@ const clamp = (value, min = 0, max = 100) =>
 export function getCountryRules(personOrCountry, countryState = null) {
   const country = typeof personOrCountry === 'string' ? personOrCountry : personOrCountry?.country;
   const explicit = COUNTRY_LIFE_RULES[country] || {};
-  const dynamic = countryState && typeof countryState === 'object'
-    ? {
-        costOfLiving: Math.max(0.35, Math.min(1.6, 0.75 + (Number(countryState.inflation) || 0) / 45)),
-        politicalFreedom: Number(countryState.freedom),
-        creditAccess: clamp(80 - (Number(countryState.corruption) || 30) * 0.5),
-      }
-    : {};
-  return { ...DEFAULT_RULES, ...dynamic, ...explicit, country: country || 'Unknown' };
+  const base = { ...DEFAULT_RULES, ...explicit };
+  const inflation = Number(countryState?.inflation);
+  const unemployment = Number(countryState?.unemployment);
+  const stability = Number(countryState?.stability);
+  const corruption = Number(countryState?.corruption);
+  const freedom = Number(countryState?.freedom);
+  const economicPower = Number(countryState?.power ?? countryState?.technology ?? 55);
+
+  const inflationAdjustment = Number.isFinite(inflation)
+    ? Math.max(0.85, Math.min(1.35, 1 + (inflation - 3) / 100))
+    : 1;
+  const unemploymentRate = Number.isFinite(unemployment) ? clamp(unemployment, 0, 50) : base.unemploymentRate;
+  const jobMarketStrength = clamp(
+    75 - unemploymentRate * 2 + (Number.isFinite(stability) ? (stability - 50) * 0.25 : 0) +
+      (economicPower - 50) * 0.15,
+    5,
+    95
+  );
+
+  return {
+    ...base,
+    costOfLiving: Math.max(0.3, Math.min(1.8, base.costOfLiving * inflationAdjustment)),
+    politicalFreedom: Number.isFinite(freedom) ? clamp((base.politicalFreedom + freedom) / 2) : base.politicalFreedom,
+    creditAccess: Number.isFinite(corruption)
+      ? clamp(base.creditAccess * 0.65 + (100 - corruption) * 0.35)
+      : base.creditAccess,
+    unemploymentRate,
+    jobMarketStrength,
+    country: country || 'Unknown',
+  };
 }
 
 export function ensureCountryLife(person, countryState = null) {
@@ -128,6 +152,9 @@ export function ensureCountryLife(person, countryState = null) {
     educationAccess: rules.publicUniversity ? 'subsidized' : 'paid',
     legalFlags: Array.isArray(previous.legalFlags) ? previous.legalFlags : [],
     lastUpdatedAge: Number(person.age) || 0,
+    lastIncomeTax: Math.max(0, Number(previous.lastIncomeTax) || 0),
+    lastTaxAdjustment: Number(previous.lastTaxAdjustment) || 0,
+    layoffsExperienced: Math.max(0, Math.floor(Number(previous.layoffsExperienced) || 0)),
   };
   return person.countryLife;
 }
@@ -135,6 +162,38 @@ export function ensureCountryLife(person, countryState = null) {
 function getCountryState(person, worldState) {
   if (!worldState?.countries) return null;
   return Object.values(worldState.countries).find(country => country?.name === person.country) || null;
+}
+
+function processJobMarketRisk(person, countryLife, state) {
+  if (
+    !person.job ||
+    person.job.isMilitary ||
+    person.job.isPolitical ||
+    person.job.isMafia ||
+    person.job.isRetired ||
+    person.isInPrison
+  ) {
+    return false;
+  }
+
+  const unemployment = countryLife.rules.unemploymentRate;
+  const recession = Number(state?.gdpGrowth) < -1.5;
+  const weakMarket = countryLife.rules.jobMarketStrength < 40;
+  const risk = Math.max(
+    0,
+    Math.min(0.28, (unemployment - 7) / 220 + (recession ? 0.055 : 0) + (weakMarket ? 0.025 : 0))
+  );
+  if (risk <= 0 || Math.random() >= risk) return false;
+
+  const previousTitle = person.job.title;
+  person.job = null;
+  countryLife.layoffsExperienced += 1;
+  person.logEvent?.(
+    `You were laid off from your ${previousTitle} job as ${person.country}'s job market weakened.`,
+    'bad'
+  );
+  person.updateStats?.({ happiness: -8, stress: 12 });
+  return true;
 }
 
 export function processCountryLifeYear(person, worldState) {
@@ -148,6 +207,8 @@ export function processCountryLifeYear(person, worldState) {
     const safetyEffect = (Number(state.crime) || 40) >= 65 ? -1 : 0;
     person.updateStats?.({ health: healthEffect, smarts: educationEffect, happiness: safetyEffect });
   }
+
+  processJobMarketRisk(person, countryLife, state);
 
   if (
     rules.mandatoryService &&
@@ -175,6 +236,7 @@ export function processCountryLifeYear(person, worldState) {
     if (support > 0 && (Number(person.money) || 0) < support && Math.random() < 0.55) {
       person.money = (Number(person.money) || 0) + support;
       countryLife.benefitsReceived += support;
+      if (person.finance) person.finance.benefitsReceived = (Number(person.finance.benefitsReceived) || 0) + support;
       person.logEvent?.(`You received $${support.toLocaleString()} in unemployment support from ${person.country}.`, 'neutral');
     }
   }
@@ -205,6 +267,7 @@ export function resolveCountryServiceChoice(person, event, choice) {
     person.logEvent?.('Your national service was deferred while you continue your studies.', 'neutral');
   } else {
     person.personalDebt = Math.max(0, Number(person.personalDebt) || 0) + 1500;
+    countryLife.legalFlags = [...new Set([...(countryLife.legalFlags || []), 'service_refusal'])];
     person.logEvent?.('You refused national service and received a legal penalty.', 'bad');
   }
   person.pendingEvent = null;
@@ -222,5 +285,6 @@ export function getCountryLifeSummary(person, worldState = null) {
     militaryService: life.rules.mandatoryService
       ? life.militaryServiceCompleted ? 'completed' : life.militaryServiceDeferred ? 'deferred' : 'required'
       : 'not required',
+    layoffsExperienced: life.layoffsExperienced,
   };
 }

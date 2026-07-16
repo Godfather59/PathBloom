@@ -1,0 +1,31 @@
+export const WORLD2_VERSION = 1;
+
+export const WORLD2_COUNTRY_TEMPLATES = [
+  { name: 'Morocco', population: 37.5, gdp: 145, government: 'Constitutional Monarchy', ideology: 'centrist', leader: 'Nadia El Mansouri', traits: ['pragmatic', 'diplomatic'], stability: 68, freedom: 55, corruption: 46, military: 42, technology: 52, energy: 38, food: 72, minerals: 64, inflation: 4.5, unemployment: 9.2, debtRatio: 70 },
+  { name: 'United States', population: 340, gdp: 28500, government: 'Federal Republic', ideology: 'liberal', leader: 'Alex Morgan', traits: ['competitive', 'interventionist'], stability: 67, freedom: 86, corruption: 28, military: 96, technology: 96, energy: 84, food: 92, minerals: 72, inflation: 3.1, unemployment: 4.2, debtRatio: 123 },
+  { name: 'France', population: 68, gdp: 3200, government: 'Republic', ideology: 'social-democratic', leader: 'Camille Laurent', traits: ['reformist', 'diplomatic'], stability: 70, freedom: 89, corruption: 25, military: 73, technology: 84, energy: 68, food: 86, minerals: 46, inflation: 2.6, unemployment: 7.4, debtRatio: 111 },
+  { name: 'Germany', population: 84, gdp: 4700, government: 'Federal Republic', ideology: 'social-market', leader: 'Leonie Weber', traits: ['cautious', 'technocratic'], stability: 78, freedom: 92, corruption: 20, military: 61, technology: 91, energy: 50, food: 82, minerals: 43, inflation: 2.5, unemployment: 3.4, debtRatio: 64 },
+  { name: 'United Kingdom', population: 69, gdp: 3600, government: 'Constitutional Monarchy', ideology: 'liberal', leader: 'Oliver Reed', traits: ['pragmatic', 'Atlanticist'], stability: 70, freedom: 90, corruption: 23, military: 72, technology: 88, energy: 61, food: 67, minerals: 42, inflation: 3.0, unemployment: 4.5, debtRatio: 101 },
+  { name: 'Russia', population: 144, gdp: 2200, government: 'Authoritarian Republic', ideology: 'nationalist', leader: 'Viktor Sokolov', traits: ['aggressive', 'security-focused'], stability: 62, freedom: 22, corruption: 72, military: 87, technology: 68, energy: 96, food: 78, minerals: 94, inflation: 7.8, unemployment: 4.1, debtRatio: 25 },
+  { name: 'China', population: 1410, gdp: 18500, government: 'One-Party State', ideology: 'state-capitalist', leader: 'Li Wei', traits: ['strategic', 'industrialist'], stability: 82, freedom: 18, corruption: 43, military: 91, technology: 90, energy: 68, food: 74, minerals: 91, inflation: 1.8, unemployment: 5.4, debtRatio: 83 },
+  { name: 'Japan', population: 123, gdp: 4400, government: 'Parliamentary Monarchy', ideology: 'liberal-conservative', leader: 'Haruto Sato', traits: ['cautious', 'technocratic'], stability: 84, freedom: 91, corruption: 18, military: 69, technology: 95, energy: 25, food: 58, minerals: 22, inflation: 2.1, unemployment: 2.7, debtRatio: 255 },
+  { name: 'India', population: 1430, gdp: 4100, government: 'Federal Republic', ideology: 'pluralist', leader: 'Ananya Rao', traits: ['popular', 'development-focused'], stability: 68, freedom: 70, corruption: 51, military: 81, technology: 76, energy: 54, food: 78, minerals: 74, inflation: 5.1, unemployment: 7.1, debtRatio: 82 },
+  { name: 'Brazil', population: 216, gdp: 2300, government: 'Federal Republic', ideology: 'social-democratic', leader: 'Rafael Costa', traits: ['popular', 'environmentalist'], stability: 61, freedom: 78, corruption: 58, military: 55, technology: 63, energy: 89, food: 96, minerals: 93, inflation: 4.2, unemployment: 7.8, debtRatio: 88 },
+  { name: 'Saudi Arabia', population: 37, gdp: 1100, government: 'Absolute Monarchy', ideology: 'traditionalist', leader: 'Faisal Al Saud', traits: ['ambitious', 'centralizing'], stability: 76, freedom: 20, corruption: 48, military: 67, technology: 68, energy: 100, food: 35, minerals: 64, inflation: 2.4, unemployment: 5.6, debtRatio: 31 },
+  { name: 'UAE', population: 10, gdp: 550, government: 'Federal Monarchy', ideology: 'developmentalist', leader: 'Mariam Al Nahyan', traits: ['commercial', 'diplomatic'], stability: 88, freedom: 30, corruption: 24, military: 54, technology: 86, energy: 94, food: 26, minerals: 52, inflation: 2.3, unemployment: 2.8, debtRatio: 30 },
+  { name: 'Canada', population: 41, gdp: 2300, government: 'Parliamentary Monarchy', ideology: 'liberal', leader: 'Sophie Tremblay', traits: ['cooperative', 'environmentalist'], stability: 84, freedom: 94, corruption: 17, military: 55, technology: 88, energy: 95, food: 91, minerals: 92, inflation: 2.7, unemployment: 6.2, debtRatio: 107 },
+];
+
+export const COUNTRY_NAME_AR = {
+  Morocco: 'المغرب', 'United States': 'الولايات المتحدة', France: 'فرنسا', Germany: 'ألمانيا',
+  'United Kingdom': 'المملكة المتحدة', Russia: 'روسيا', China: 'الصين', Japan: 'اليابان',
+  India: 'الهند', Brazil: 'البرازيل', 'Saudi Arabia': 'السعودية', UAE: 'الإمارات', Canada: 'كندا',
+};
+
+export const GOVERNMENT_AR = {
+  'Constitutional Monarchy': 'ملكية دستورية', 'Federal Republic': 'جمهورية اتحادية', Republic: 'جمهورية',
+  'Authoritarian Republic': 'جمهورية سلطوية', 'One-Party State': 'دولة الحزب الواحد',
+  'Parliamentary Monarchy': 'ملكية برلمانية', 'Absolute Monarchy': 'ملكية مطلقة',
+  'Federal Monarchy': 'ملكية اتحادية', 'Military Government': 'حكومة عسكرية',
+  'Transitional Government': 'حكومة انتقالية', 'People’s Republic': 'جمهورية شعبية',
+};

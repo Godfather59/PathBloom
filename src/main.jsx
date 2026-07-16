@@ -12,6 +12,7 @@ import './components/PrisonRedesign.css';
 import './components/DecisionSheet.css';
 import './components/DestinationScreens.css';
 import './components/SystemMenuRedesign.css';
+import './components/PhaseTwoScreens.css';
 
 const rootElement = document.getElementById('root');
 

@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "id": "world-geopolitics",
+  "name": { "en": "World Geopolitics", "ar": "الجغرافيا السياسية العالمية" },
+  "description": { "en": "Personal consequences from wars, sanctions, elections, migration, and the global economy.", "ar": "عواقب شخصية ناتجة عن الحروب والعقوبات والانتخابات والهجرة والاقتصاد العالمي." },
+  "category": "world",
+  "countries": ["*"],
+  "events": [
+    {
+      "id": "war_home_front",
+      "frequency": "month",
+      "weight": 10,
+      "cooldownMonths": 10,
+      "hidden": true,
+      "conditions": { "minAge": 12, "requiresFlag": "world2HomeWar" },
+      "text": { "en": "The war is now affecting daily life in your country. How will you respond?", "ar": "أصبحت الحرب تؤثر في الحياة اليومية داخل بلدك. كيف ستتصرف؟" },
+      "choices": [
+        { "id": "volunteer", "text": { "en": "Volunteer for civil defense", "ar": "تطوع في الدفاع المدني" }, "outcome": { "en": "You helped protect civilians and distribute emergency supplies.", "ar": "ساعدت في حماية المدنيين وتوزيع الإمدادات الطارئة." }, "effects": { "stress": 8, "health": -1 }, "reputation": { "public": 6, "trust": 5 }, "setFlags": { "world2HomeWar": false } },
+        { "id": "protect_family", "text": { "en": "Focus on protecting your family", "ar": "ركز على حماية عائلتك" }, "outcome": { "en": "You prepared your family for shortages and emergencies.", "ar": "جهزت عائلتك لمواجهة النقص وحالات الطوارئ." }, "effects": { "money": -600, "stress": 4 }, "relationshipEffects": { "type": "family", "stat": 5 }, "setFlags": { "world2HomeWar": false } },
+        { "id": "leave_area", "text": { "en": "Move to a safer area ($2,000)", "ar": "انتقل إلى منطقة أكثر أمانا (2,000 دولار)" }, "outcome": { "en": "You temporarily moved away from the most dangerous area.", "ar": "انتقلت مؤقتا بعيدا عن المنطقة الأكثر خطورة." }, "effects": { "money": -2000, "stress": -4, "happiness": -2 }, "setFlags": { "world2HomeWar": false } }
+      ]
+    },
+    {
+      "id": "inflation_shortage_crisis",
+      "frequency": "month",
+      "weight": 10,
+      "cooldownMonths": 10,
+      "hidden": true,
+      "conditions": { "minAge": 18, "requiresFlag": "world2ShortageCrisis" },
+      "text": { "en": "Inflation and shortages have made food, fuel, and medicine much more expensive.", "ar": "جعل التضخم والنقص الغذاء والوقود والدواء أكثر تكلفة بكثير." },
+      "choices": [
+        { "id": "strict_budget", "text": { "en": "Adopt a strict household budget", "ar": "اعتمد ميزانية منزلية صارمة" }, "outcome": { "en": "You reduced spending and avoided the worst price increases.", "ar": "خفضت الإنفاق وتجنبت أسوأ زيادات الأسعار." }, "effects": { "happiness": -3, "stress": 2 }, "setFlags": { "world2ShortageCrisis": false } },
+        { "id": "stock_up", "text": { "en": "Stock up on essentials ($1,200)", "ar": "اشتر مخزونا من الضروريات (1,200 دولار)" }, "outcome": { "en": "Your household now has emergency supplies.", "ar": "أصبح لدى أسرتك مخزون للطوارئ." }, "effects": { "money": -1200, "stress": -3 }, "relationshipEffects": { "type": "family", "stat": 3 }, "setFlags": { "world2ShortageCrisis": false } },
+        { "id": "community_help", "text": { "en": "Organize a community buying group", "ar": "نظم مجموعة شراء جماعية" }, "outcome": { "en": "Neighbors pooled resources and lowered costs together.", "ar": "جمع الجيران مواردهم وخفضوا التكاليف معا." }, "effects": { "stress": 3, "smarts": 1 }, "reputation": { "public": 5, "trust": 5 }, "setFlags": { "world2ShortageCrisis": false } }
+      ]
+    },
+    {
+      "id": "sanctions_personal_cost",
+      "frequency": "year",
+      "weight": 8,
+      "cooldownMonths": 18,
+      "hidden": true,
+      "conditions": { "minAge": 18, "requiresFlag": "world2Sanctions" },
+      "text": { "en": "International sanctions are disrupting imports, banking, and jobs in your country.", "ar": "تعطل العقوبات الدولية الواردات والخدمات المصرفية والوظائف في بلدك." },
+      "choices": [
+        { "id": "adapt_business", "text": { "en": "Find local alternatives", "ar": "ابحث عن بدائل محلية" }, "outcome": { "en": "You adapted to locally available products and services.", "ar": "تكيفت مع المنتجات والخدمات المتاحة محليا." }, "effects": { "money": -500, "smarts": 2 }, "reputation": { "professional": 2 }, "setFlags": { "world2Sanctions": false } },
+        { "id": "move_savings", "text": { "en": "Protect your savings", "ar": "احم مدخراتك" }, "outcome": { "en": "You diversified your savings before restrictions tightened.", "ar": "نوعت مدخراتك قبل تشديد القيود." }, "effects": { "money": -250, "stress": -2 }, "setFlags": { "world2Sanctions": false } },
+        { "id": "protest", "text": { "en": "Join a protest against the crisis", "ar": "شارك في احتجاج ضد الأزمة" }, "outcome": { "en": "You publicly demanded a diplomatic solution.", "ar": "طالبت علنا بحل دبلوماسي." }, "effects": { "stress": 6 }, "reputation": { "political": 5, "public": 3 }, "setFlags": { "world2Sanctions": false } }
+      ]
+    },
+    {
+      "id": "refugee_arrival",
+      "frequency": "month",
+      "weight": 9,
+      "cooldownMonths": 12,
+      "hidden": true,
+      "conditions": { "minAge": 16, "requiresFlag": "world2RefugeeArrival" },
+      "text": { "en": "A large group of refugees has arrived in your community seeking safety.", "ar": "وصلت مجموعة كبيرة من اللاجئين إلى مجتمعك بحثا عن الأمان." },
+      "choices": [
+        { "id": "donate", "text": { "en": "Donate $500", "ar": "تبرع بـ500 دولار" }, "outcome": { "en": "Your donation paid for food, medicine, and temporary shelter.", "ar": "ساهم تبرعك في توفير الغذاء والدواء والمأوى المؤقت." }, "effects": { "money": -500, "happiness": 2 }, "reputation": { "public": 6, "trust": 6 }, "setFlags": { "world2RefugeeArrival": false } },
+        { "id": "volunteer", "text": { "en": "Volunteer at a reception center", "ar": "تطوع في مركز استقبال" }, "outcome": { "en": "You spent time helping families complete paperwork and find housing.", "ar": "ساعدت العائلات في الإجراءات والعثور على السكن." }, "effects": { "energy": -15, "stress": 3, "happiness": 4 }, "reputation": { "public": 5, "trust": 7 }, "setFlags": { "world2RefugeeArrival": false } },
+        { "id": "ignore", "text": { "en": "Stay uninvolved", "ar": "ابتعد عن الأمر" }, "outcome": { "en": "You chose not to become involved in the humanitarian response.", "ar": "اخترت عدم المشاركة في الاستجابة الإنسانية." }, "effects": { "stress": -1 }, "reputation": { "public": -2 }, "setFlags": { "world2RefugeeArrival": false } }
+      ]
+    },
+    {
+      "id": "national_election_day",
+      "frequency": "year",
+      "weight": 9,
+      "cooldownMonths": 24,
+      "hidden": true,
+      "conditions": { "minAge": 18, "requiresFlag": "world2Election" },
+      "text": { "en": "A national election is reshaping the political direction of your country.", "ar": "تعيد انتخابات وطنية تشكيل الاتجاه السياسي لبلدك." },
+      "choices": [
+        { "id": "campaign", "text": { "en": "Campaign for your preferred side", "ar": "شارك في حملة الطرف الذي تفضله" }, "outcome": { "en": "You became more visible in national politics.", "ar": "أصبحت أكثر حضورا في السياسة الوطنية." }, "effects": { "stress": 5, "energy": -10 }, "reputation": { "political": 7, "public": 3 }, "setFlags": { "world2Election": false } },
+        { "id": "vote", "text": { "en": "Vote and follow the results", "ar": "صوت وتابع النتائج" }, "outcome": { "en": "You participated in the election without joining a campaign.", "ar": "شاركت في الانتخابات من دون الانضمام إلى حملة." }, "effects": { "happiness": 1 }, "reputation": { "trust": 2 }, "setFlags": { "world2Election": false } },
+        { "id": "abstain", "text": { "en": "Stay away from politics", "ar": "ابتعد عن السياسة" }, "outcome": { "en": "You ignored the election and focused on private life.", "ar": "تجاهلت الانتخابات وركزت على حياتك الخاصة." }, "effects": { "stress": -2 }, "setFlags": { "world2Election": false } }
+      ]
+    },
+    {
+      "id": "regime_change_at_home",
+      "frequency": "month",
+      "weight": 10,
+      "cooldownMonths": 30,
+      "hidden": true,
+      "conditions": { "minAge": 14, "requiresFlag": "world2RegimeChange" },
+      "text": { "en": "A sudden regime change has created uncertainty, demonstrations, and security checkpoints.", "ar": "أدى تغيير مفاجئ للنظام إلى حالة من عدم اليقين والمظاهرات ونقاط التفتيش." },
+      "choices": [
+        { "id": "stay_home", "text": { "en": "Stay home and protect your family", "ar": "ابق في المنزل واحم عائلتك" }, "outcome": { "en": "You avoided the most dangerous demonstrations.", "ar": "تجنبت أخطر المظاهرات." }, "effects": { "happiness": -3, "stress": 5 }, "relationshipEffects": { "type": "family", "stat": 4 }, "setFlags": { "world2RegimeChange": false } },
+        { "id": "demonstrate", "text": { "en": "Join peaceful demonstrations", "ar": "شارك في مظاهرات سلمية" }, "outcome": { "en": "You publicly demanded accountable government.", "ar": "طالبت علنا بحكومة خاضعة للمساءلة." }, "effects": { "stress": 9, "health": -1 }, "reputation": { "political": 8, "public": 5 }, "setFlags": { "world2RegimeChange": false } },
+        { "id": "prepare_exit", "text": { "en": "Prepare an emergency exit plan ($1,500)", "ar": "جهز خطة خروج طارئة (1,500 دولار)" }, "outcome": { "en": "You prepared documents, cash, and transport in case the crisis worsens.", "ar": "جهزت الوثائق والمال ووسيلة النقل تحسبا لتفاقم الأزمة." }, "effects": { "money": -1500, "stress": -2 }, "setFlags": { "world2RegimeChange": false } }
+      ]
+    },
+    {
+      "id": "layoff_wave",
+      "frequency": "month",
+      "weight": 8,
+      "cooldownMonths": 18,
+      "hidden": true,
+      "conditions": { "minAge": 18, "requiresJob": true, "requiresFlag": "world2LayoffWave" },
+      "text": { "en": "A national downturn has triggered layoffs across your industry.", "ar": "أدى ركود وطني إلى موجة تسريح في قطاع عملك." },
+      "choices": [
+        { "id": "prove_value", "text": { "en": "Work overtime to prove your value", "ar": "اعمل ساعات إضافية لإثبات قيمتك" }, "outcome": { "en": "Management kept you, but the pressure was exhausting.", "ar": "احتفظت بك الإدارة، لكن الضغط كان مرهقا." }, "effects": { "stress": 9, "health": -2 }, "jobEffects": { "performance": 8 }, "setFlags": { "world2LayoffWave": false } },
+        { "id": "negotiate", "text": { "en": "Negotiate reduced hours", "ar": "تفاوض على ساعات عمل أقل" }, "outcome": { "en": "You kept your position with a temporary reduction in pay.", "ar": "احتفظت بوظيفتك مع خفض مؤقت في الأجر." }, "effects": { "stress": 2 }, "jobEffects": { "salaryMultiplier": 0.9 }, "setFlags": { "world2LayoffWave": false } },
+        { "id": "retrain", "text": { "en": "Start retraining for another industry", "ar": "ابدأ التدريب لقطاع آخر" }, "outcome": { "en": "You began preparing for a more resilient career.", "ar": "بدأت الاستعداد لمهنة أكثر استقرارا." }, "effects": { "money": -1000, "smarts": 4, "stress": 4 }, "reputation": { "professional": 3 }, "setFlags": { "world2LayoffWave": false } }
+      ]
+    },
+    {
+      "id": "economic_boom_opportunity",
+      "frequency": "year",
+      "weight": 7,
+      "cooldownMonths": 24,
+      "hidden": true,
+      "conditions": { "minAge": 18, "requiresFlag": "world2EconomicBoom" },
+      "text": { "en": "Strong growth in your country has created new jobs and investment opportunities.", "ar": "أدى النمو القوي في بلدك إلى خلق وظائف وفرص استثمار جديدة." },
+      "choices": [
+        { "id": "invest", "text": { "en": "Invest $2,000 in a growing sector", "ar": "استثمر 2,000 دولار في قطاع نام" }, "outcome": { "en": "Your early investment produced a useful return.", "ar": "حقق استثمارك المبكر عائدا جيدا." }, "effects": { "money": 600, "stress": 2 }, "reputation": { "professional": 2 }, "setFlags": { "world2EconomicBoom": false } },
+        { "id": "seek_raise", "text": { "en": "Use the labor shortage to seek a raise", "ar": "استغل نقص العمالة لطلب زيادة" }, "outcome": { "en": "Your employer raised your salary to keep you.", "ar": "رفع صاحب العمل راتبك للاحتفاظ بك." }, "effects": { "stress": 3 }, "jobEffects": { "salaryMultiplier": 1.08, "performance": 2 }, "setFlags": { "world2EconomicBoom": false } },
+        { "id": "save", "text": { "en": "Build an emergency fund", "ar": "كوّن صندوقا للطوارئ" }, "outcome": { "en": "You used the good economy to strengthen your finances.", "ar": "استفدت من الاقتصاد القوي لتعزيز وضعك المالي." }, "effects": { "happiness": 2, "stress": -3 }, "setFlags": { "world2EconomicBoom": false } }
+      ]
+    }
+  ]
+}

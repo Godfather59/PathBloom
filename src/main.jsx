@@ -73,6 +73,7 @@ async function bootstrap() {
     await import('./logic/DataDrivenContentRuntime');
     await import('./logic/SmartMonthRuntime');
     await import('./logic/ReleasePolishRuntime');
+    await import('./logic/FeedbackPreferencesRuntime');
 
     const [{ App: CapApp }, { default: App }, { default: ErrorBoundary }] = await Promise.all([
       import('@capacitor/app'),

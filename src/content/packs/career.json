@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "id": "career-core",
+  "name": { "en": "Career Stories", "ar": "قصص العمل" },
+  "description": { "en": "Workplace choices, ethics, burnout, and advancement.", "ar": "اختيارات العمل والأخلاق والإرهاق والتقدم المهني." },
+  "category": "career",
+  "countries": ["*"],
+  "events": [
+    {
+      "id": "career_promotion_offer",
+      "frequency": "year",
+      "weight": 7,
+      "cooldownMonths": 48,
+      "conditions": { "minAge": 20, "requiresJob": true, "minJobYears": 1 },
+      "text": { "en": "Your manager offered you a promotion that comes with more pay and much more pressure.", "ar": "عرض عليك مديرك ترقية براتب أعلى وضغط أكبر بكثير." },
+      "choices": [
+        { "id": "accept", "text": { "en": "Accept the promotion", "ar": "اقبل الترقية" }, "outcome": { "en": "You stepped into a more demanding role.", "ar": "انتقلت إلى دور أكثر تطلبا." }, "effects": { "happiness": 5, "stress": 8 }, "reputation": { "professional": 7, "public": 1 }, "jobEffects": { "salaryMultiplier": 1.15, "performance": 5 }, "next": { "eventId": "career_promotion_review", "delayMonths": 10 } },
+        { "id": "negotiate", "text": { "en": "Negotiate better terms", "ar": "فاوض على شروط أفضل" }, "outcome": { "en": "You asked for clearer responsibilities and better compensation.", "ar": "طلبت مسؤوليات أوضح وتعويضا أفضل." }, "effects": { "stress": 4 }, "reputation": { "professional": 4, "trust": 2 }, "jobEffects": { "salaryMultiplier": 1.08, "performance": 2 }, "next": { "eventId": "career_promotion_review", "delayMonths": 10 } },
+        { "id": "decline", "text": { "en": "Decline for now", "ar": "ارفض حاليا" }, "outcome": { "en": "You protected your balance but slowed your advancement.", "ar": "حافظت على توازنك لكن تقدمك المهني تباطأ." }, "effects": { "stress": -4, "happiness": 1 }, "reputation": { "professional": -1 } }
+      ]
+    },
+    {
+      "id": "career_promotion_review",
+      "hidden": true,
+      "frequency": "month",
+      "text": { "en": "Your first major performance review in the new role has arrived.", "ar": "حان أول تقييم مهم لأدائك في الدور الجديد." },
+      "choices": [
+        { "id": "prepare", "text": { "en": "Prepare detailed results", "ar": "جهز نتائج مفصلة" }, "outcome": { "en": "Your preparation impressed the leadership team.", "ar": "أعجب فريق الإدارة باستعدادك." }, "effects": { "smarts": 2, "stress": 3 }, "reputation": { "professional": 6, "trust": 3 }, "jobEffects": { "performance": 8 } },
+        { "id": "blame", "text": { "en": "Blame the team for problems", "ar": "حمّل الفريق مسؤولية المشاكل" }, "outcome": { "en": "You protected yourself briefly, but damaged trust.", "ar": "حميت نفسك مؤقتا لكنك أضرت بالثقة." }, "effects": { "stress": -2 }, "reputation": { "professional": -2, "trust": -7 }, "jobEffects": { "performance": -3 } }
+      ]
+    },
+    {
+      "id": "career_ethics_pressure",
+      "frequency": "year",
+      "weight": 6,
+      "cooldownMonths": 36,
+      "conditions": { "minAge": 21, "requiresJob": true },
+      "text": { "en": "A senior coworker asked you to hide a mistake that could hurt customers.", "ar": "طلب منك زميل كبير إخفاء خطأ قد يضر بالعملاء." },
+      "choices": [
+        { "id": "report", "text": { "en": "Report the mistake", "ar": "أبلغ عن الخطأ" }, "outcome": { "en": "The company fixed the problem, but some coworkers became hostile.", "ar": "أصلحت الشركة المشكلة، لكن بعض الزملاء أصبحوا عدائيين." }, "effects": { "stress": 7, "karma": 6 }, "reputation": { "professional": 5, "trust": 8 } },
+        { "id": "fix_quietly", "text": { "en": "Fix it quietly", "ar": "أصلحه بهدوء" }, "outcome": { "en": "You prevented harm without creating a public conflict.", "ar": "منعت الضرر من دون إثارة صراع علني." }, "effects": { "stress": 4, "smarts": 2 }, "reputation": { "professional": 4, "trust": 3 } },
+        { "id": "hide", "text": { "en": "Help hide it", "ar": "ساعد في إخفائه" }, "outcome": { "en": "The immediate danger passed, but the secret may return later.", "ar": "مر الخطر المباشر، لكن السر قد يعود لاحقا." }, "effects": { "stress": 5, "karma": -7 }, "reputation": { "trust": -7, "criminal": 3 }, "setFlags": { "hiddenWorkMistake": true } }
+      ]
+    },
+    {
+      "id": "career_burnout_warning",
+      "frequency": "year",
+      "weight": 6,
+      "cooldownMonths": 24,
+      "conditions": { "minAge": 20, "requiresJob": true, "minStress": 65 },
+      "text": { "en": "You are showing clear signs of burnout after months of heavy work.", "ar": "تظهر عليك علامات واضحة للإرهاق بعد أشهر من العمل الشاق." },
+      "choices": [
+        { "id": "leave", "text": { "en": "Take unpaid leave", "ar": "خذ إجازة غير مدفوعة" }, "outcome": { "en": "Rest helped your health, but reduced your income.", "ar": "ساعدتك الراحة صحيا، لكنها خفضت دخلك." }, "effects": { "health": 7, "stress": -15, "money": -1200 }, "reputation": { "professional": -1 } },
+        { "id": "boundaries", "text": { "en": "Set strict work boundaries", "ar": "ضع حدودا صارمة للعمل" }, "outcome": { "en": "Your schedule became healthier and more predictable.", "ar": "أصبح جدولك أكثر صحة واستقرارا." }, "effects": { "stress": -9, "happiness": 3 }, "reputation": { "professional": 2, "trust": 2 } },
+        { "id": "push", "text": { "en": "Keep pushing", "ar": "واصل الضغط على نفسك" }, "outcome": { "en": "You maintained output, but your body paid the price.", "ar": "حافظت على الإنتاج، لكن جسدك دفع الثمن." }, "effects": { "health": -7, "stress": 10 }, "reputation": { "professional": 4 }, "jobEffects": { "performance": 5 } }
+      ]
+    }
+  ]
+}

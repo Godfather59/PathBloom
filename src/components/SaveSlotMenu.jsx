@@ -1,5 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { deleteSaveTransaction, inspectSaveSlot } from '../logic/SaveReliability';
 import './Modal.css';
+import './ReleasePolish.css';
+
+function currentLanguage() {
+  try {
+    return localStorage.getItem('pathbloom_language') === 'ar' ||
+      localStorage.getItem('lifepath_language') === 'ar'
+      ? 'ar'
+      : 'en';
+  } catch {
+    return 'en';
+  }
+}
 
 export function SaveSlotMenu({
   onSelectSlot,
@@ -9,6 +22,8 @@ export function SaveSlotMenu({
   t = (key, fallback) => fallback || key,
 }) {
   const [slots, setSlots] = useState([]);
+  const language = currentLanguage();
+  const isArabic = language === 'ar';
 
   useEffect(() => {
     try {
@@ -16,21 +31,10 @@ export function SaveSlotMenu({
       if (meta) {
         const parsed = JSON.parse(meta);
         const validSlots = Array.isArray(parsed)
-          ? parsed.filter(slot => {
-              if (!slot || typeof slot.id !== 'string' || typeof slot.name !== 'string') {
-                return false;
-              }
-              const rawSave = localStorage.getItem(`bitlife_save_${slot.id}`);
-              if (!rawSave) {
-                return false;
-              }
-              try {
-                const save = JSON.parse(rawSave);
-                return Boolean(save && typeof save === 'object' && !Array.isArray(save));
-              } catch {
-                return false;
-              }
-            })
+          ? parsed
+              .filter(slot => slot && typeof slot.id === 'string' && typeof slot.name === 'string')
+              .map(slot => ({ ...slot, saveHealth: inspectSaveSlot(slot.id) }))
+              .filter(slot => slot.saveHealth.loadable)
           : [];
         setSlots(validSlots);
       }
@@ -40,21 +44,22 @@ export function SaveSlotMenu({
     }
   }, []);
 
-  const handleDelete = (e, slotId) => {
-    e.stopPropagation();
+  const handleDelete = (event, slotId) => {
+    event.stopPropagation();
     if (
       window.confirm(
         t(
           'saveload.deleteConfirm',
-          'Are you sure you want to delete this save? This cannot be undone.'
+          isArabic
+            ? 'هل أنت متأكد من حذف هذا الحفظ؟ لا يمكن التراجع عن ذلك.'
+            : 'Are you sure you want to delete this save? This cannot be undone.'
         )
       )
     ) {
-      // Remove data
       try {
-        localStorage.removeItem(`bitlife_save_${slotId}`);
-        const newSlots = slots.filter(s => s.id !== slotId);
-        localStorage.setItem('bitlife_save_meta', JSON.stringify(newSlots));
+        deleteSaveTransaction(slotId);
+        const newSlots = slots.filter(slot => slot.id !== slotId);
+        localStorage.setItem('bitlife_save_meta', JSON.stringify(newSlots.map(({ saveHealth, ...slot }) => slot)));
         setSlots(newSlots);
         onSlotsChanged?.(newSlots);
       } catch (error) {
@@ -63,64 +68,83 @@ export function SaveSlotMenu({
     }
   };
 
+  const statusCopy = health => {
+    if (health?.recoveryAvailable || health?.status === 'recoverable') {
+      return isArabic ? 'نسخة قابلة للاسترداد' : 'Recovery available';
+    }
+    if (health?.backupAvailable) {
+      return isArabic ? 'نسخة احتياطية جاهزة' : 'Backup ready';
+    }
+    return isArabic ? 'حفظ سليم' : 'Healthy save';
+  };
+
   return (
     <div className="modal-overlay">
-      <div className="modal-content">
+      <div className="modal-content save-slot-release" dir={isArabic ? 'rtl' : 'ltr'}>
         <div className="modal-header">
-          <h2 className="modal-title">{t('saveload.title', 'Load Game')}</h2>
-          <button className="close-btn" onClick={onClose} aria-label={t('common.close', 'Close')}>
+          <h2 className="modal-title">{t('saveload.title', isArabic ? 'تحميل لعبة' : 'Load Game')}</h2>
+          <button className="close-btn" onClick={onClose} aria-label={t('common.close', isArabic ? 'إغلاق' : 'Close')}>
             &times;
           </button>
         </div>
         <div className="modal-body">
           {slots.length === 0 ? (
-            <div style={{ padding: '20px', textAlign: 'center', color: '#aaa' }}>
-              {t('saveload.noSaves', 'No saved games found.')}
+            <div className="save-slot-empty">
+              <span aria-hidden="true">🌱</span>
+              <strong>{t('saveload.noSaves', isArabic ? 'لا توجد ألعاب محفوظة.' : 'No saved games found.')}</strong>
+              <small>{isArabic ? 'ابدأ حياة جديدة وسيحمي الحفظ التلقائي تقدمك.' : 'Start a new life and autosave will protect your progress.'}</small>
             </div>
           ) : (
-            slots.map(slot => (
-              <div
-                key={slot.id}
-                className="list-item"
-                role="button"
-                tabIndex={0}
-                onClick={() => onSelectSlot(slot.id)}
-                onKeyDown={event => {
-                  if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    onSelectSlot(slot.id);
-                  }
-                }}
-                style={{ cursor: 'pointer' }}
-              >
+            <div className="save-slot-list">
+              {slots.map(slot => (
                 <div
-                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                  key={slot.id}
+                  className="save-slot-card"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => onSelectSlot(slot.id)}
+                  onKeyDown={event => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      onSelectSlot(slot.id);
+                    }
+                  }}
                 >
-                  <div>
-                    <div className="list-item-title">{slot.name}</div>
-                    <div className="list-item-subtitle">
-                      Age: {slot.age} - {slot.job}
-                      <br />
-                      <span style={{ fontSize: '0.8em', opacity: 0.6 }}>
-                        Last Played: {new Date(slot.lastPlayed).toLocaleDateString()}
+                  <div className="save-slot-card-main">
+                    <span className="save-slot-avatar" aria-hidden="true">🌿</span>
+                    <span className="save-slot-copy">
+                      <strong dir="auto">{slot.name}</strong>
+                      <small dir="auto">
+                        {isArabic ? 'العمر' : 'Age'} {slot.age} · {slot.job}
+                      </small>
+                      <span className={`save-slot-health ${slot.saveHealth.recoveryAvailable ? 'is-recovery' : 'is-healthy'}`}>
+                        {statusCopy(slot.saveHealth)}
                       </span>
-                    </div>
+                    </span>
+                    <span className="save-slot-date">
+                      {new Date(slot.lastPlayed).toLocaleDateString(isArabic ? 'ar-MA' : 'en-US')}
+                    </span>
                   </div>
-                  <button
-                    className="btn-danger"
-                    style={{ padding: '5px 10px', fontSize: '0.8em' }}
-                    onClick={e => handleDelete(e, slot.id)}
-                  >
-                    {t('saveload.delete', 'Delete')}
-                  </button>
+                  <div className="save-slot-actions">
+                    <button type="button" className="save-slot-load" onClick={() => onSelectSlot(slot.id)}>
+                      {isArabic ? 'تابع' : 'Continue'}
+                    </button>
+                    <button
+                      type="button"
+                      className="save-slot-delete"
+                      onClick={event => handleDelete(event, slot.id)}
+                    >
+                      {t('saveload.delete', isArabic ? 'حذف' : 'Delete')}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))
+              ))}
+            </div>
           )}
 
-          <div style={{ marginTop: '20px', borderTop: '1px solid #444', paddingTop: '20px' }}>
-            <button className="btn-primary" style={{ width: '100%' }} onClick={onNewGame}>
-              + {t('saveload.newLife', 'Start New Life')}
+          <div className="save-slot-new">
+            <button className="btn-primary" onClick={onNewGame}>
+              + {t('saveload.newLife', isArabic ? 'ابدأ حياة جديدة' : 'Start New Life')}
             </button>
           </div>
         </div>

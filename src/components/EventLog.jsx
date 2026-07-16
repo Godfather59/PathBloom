@@ -2,28 +2,44 @@ import React, { useEffect, useRef, memo, useMemo } from 'react';
 import { translateGameMessage, translateGameText } from '../logic/i18n';
 import { cleanLocalizedText } from '../logic/localizationSanitizer';
 import { translateDeepSimulationText } from '../logic/DeepLocalization';
+import { formatArabicNumber, localizeArabicCandidate } from '../logic/ArabicLocalization';
 import './EventLog.css';
 
 const MAX_VISIBLE_EVENTS = 100;
 
 const localizeEvent = (event, language) => {
-  const packText = event.localizedText && typeof event.localizedText === 'object'
-    ? event.localizedText[language] || event.localizedText.en
-    : null;
-  if (packText) return String(packText);
+  const packText =
+    event.localizedText && typeof event.localizedText === 'object'
+      ? event.localizedText[language] || event.localizedText.en
+      : null;
+  if (packText) {
+    return language === 'ar'
+      ? localizeArabicCandidate(
+          packText,
+          event.localizedText.en || event.text,
+          `history:${event.type || 'event'}`
+        )
+      : String(packText);
+  }
 
   const localized = event.messageKey
     ? translateGameMessage(language, event.messageKey, event.messageParams || {}, event.text)
     : translateGameText(language, event.text);
   const cleaned = cleanLocalizedText(localized, event.text, language);
-  return translateDeepSimulationText(cleaned, language);
+  const deepLocalized = translateDeepSimulationText(cleaned, language);
+  return language === 'ar'
+    ? localizeArabicCandidate(deepLocalized, event.text, `history:${event.type || 'event'}`)
+    : deepLocalized;
 };
 
 const EventCard = memo(({ event, language, t }) => (
   <div className={`event-card type-${event.type || 'neutral'}`}>
-    <div className="event-text">{localizeEvent(event, language)}</div>
+    <div className="event-text" dir="auto">
+      {localizeEvent(event, language)}
+    </div>
     <span className="event-age-badge">
-      {t('common.age', 'Age')} {event.age}
+      {t('common.age', 'Age')}{' '}
+      {language === 'ar' ? formatArabicNumber(event.age, { maximumFractionDigits: 0 }) : event.age}
     </span>
   </div>
 ));
@@ -60,7 +76,9 @@ export const EventLog = memo(
 
     const displayHistory = useMemo(() => {
       const reversed = [...history].reverse();
-      return reversed.length > MAX_VISIBLE_EVENTS ? reversed.slice(0, MAX_VISIBLE_EVENTS) : reversed;
+      return reversed.length > MAX_VISIBLE_EVENTS
+        ? reversed.slice(0, MAX_VISIBLE_EVENTS)
+        : reversed;
     }, [history]);
 
     return (

@@ -122,7 +122,7 @@ function createInitialWorld() {
   const names = Object.keys(countries);
   const relations = {};
   for (let leftIndex = 0; leftIndex < names.length; leftIndex += 1) {
-    for (let rightIndex = leftIndex + 1; rightIndex += 1) {
+    for (let rightIndex = leftIndex + 1; rightIndex < names.length; rightIndex += 1) {
       const left = countries[names[leftIndex]];
       const right = countries[names[rightIndex]];
       const relation = makeRelation(left, right);

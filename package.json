@@ -12,6 +12,8 @@
     "test": "vitest run",
     "test:simulation": "vitest run src/logic/__tests__/simulation.test.js",
     "test:deep": "vitest run src/logic/__tests__/deepSimulation.test.js",
+    "test:content": "vitest run src/logic/__tests__/contentPacks.test.js",
+    "validate:content": "node scripts/validate-content-packs.mjs",
     "test:watch": "vitest",
     "simulate": "node scripts/run-life-simulations.mjs",
     "simulate:quick": "node scripts/run-life-simulations.mjs --lives 100",
@@ -47,7 +49,7 @@
     "globals": "^16.5.0",
     "jsdom": "^29.1.1",
     "prettier": "^3.9.5",
-    "rollup-plugin-visualizer": "^7.0.1",
+    "rollup-plugin-visualizer": "^7.1.0",
     "vite": "^7.2.4",
     "vitest": "^4.1.10"
   }

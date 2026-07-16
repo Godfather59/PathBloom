@@ -17,7 +17,7 @@ export const Hud = memo(
     }
 
     const timeState = ensureTimeProgress(person);
-    setCurrentTimePerson(person);
+    setCurrentTimePerson(person, language);
 
     const formatMoney = amt => {
       const value = Math.round(Number(amt) || 0);

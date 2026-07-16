@@ -9,6 +9,11 @@ function number(value, language) {
     : Number(value || 0).toLocaleString('en-US');
 }
 
+function dispatchJourneyAction(action) {
+  if (typeof window === 'undefined' || !action) return;
+  window.dispatchEvent(new CustomEvent('pathbloom-journey-action', { detail: { action } }));
+}
+
 export const JourneyCard = memo(function JourneyCard({
   person,
   language = 'en',
@@ -50,8 +55,13 @@ export const JourneyCard = memo(function JourneyCard({
       setExpanded(value => !value);
       return;
     }
-    if (view.action === 'age_up') onAgeUp?.();
-    else onAction?.(view.action);
+    if (view.action === 'age_up') {
+      if (onAgeUp) onAgeUp();
+      else dispatchJourneyAction('age_up');
+      return;
+    }
+    if (onAction) onAction(view.action);
+    else dispatchJourneyAction(view.action);
   };
 
   return (

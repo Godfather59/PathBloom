@@ -8,6 +8,7 @@ import { CountryProfile } from '../../components/CountryProfile';
 import { WorldOverview } from '../../components/WorldOverview';
 import { WorldNewsFeed } from '../../components/WorldNewsFeed';
 import { CareerModal } from '../../components/CareerModal';
+import { getPhaseTwoAssetSummary } from '../PhaseTwoScreenRuntime';
 
 const noop = () => {};
 const t = (key, fallback) => fallback || key;
@@ -53,8 +54,20 @@ const worldPerson = {
   ...basePerson,
   country: 'morocco',
   worldNews: [
-    { age: 26, year: 2026, category: 'geopolitics', type: 'good', text: 'Morocco signed a trade agreement.' },
-    { age: 25, year: 2025, type: 'bad', relName: 'Nadia', text: 'Your friend, Nadia lost her job.' },
+    {
+      age: 26,
+      year: 2026,
+      category: 'geopolitics',
+      type: 'good',
+      text: 'Morocco signed a trade agreement.',
+    },
+    {
+      age: 25,
+      year: 2025,
+      type: 'bad',
+      relName: 'Nadia',
+      text: 'Your friend, Nadia lost her job.',
+    },
   ],
   geopoliticalState: {
     countries: {
@@ -151,6 +164,26 @@ describe('phase two destination redesign', () => {
     expect(html).toContain('الحب');
     expect(html).toContain('الخلافات');
     expect(html).toContain('Sara');
+  });
+
+  it('calculates net worth for the redesigned assets summary', () => {
+    const summary = getPhaseTwoAssetSummary({
+      money: 20000,
+      loans: 3000,
+      personalDebt: 2000,
+      assets: [
+        { value: 100000, mortgage: { balance: 60000 } },
+        { price: 15000 },
+      ],
+      portfolio: [{ currentValue: 12000 }, { value: 3000 }],
+    });
+    expect(summary.cash).toBe(20000);
+    expect(summary.ownedValue).toBe(115000);
+    expect(summary.portfolioValue).toBe(15000);
+    expect(summary.debt).toBe(65000);
+    expect(summary.netWorth).toBe(85000);
+    expect(summary.ownedCount).toBe(2);
+    expect(summary.positions).toBe(2);
   });
 
   it('renders country overview, economy, society, and security tabs', () => {

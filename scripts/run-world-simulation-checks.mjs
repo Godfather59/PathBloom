@@ -8,6 +8,18 @@ const worlds = Math.max(1, Math.min(5000, Number(worldsArg?.split('=')[1]) || 10
 const months = Math.max(12, Math.min(2400, Number(monthsArg?.split('=')[1]) || 600));
 const countries = ['Morocco', 'United States', 'France', 'Germany', 'Russia', 'China', 'Japan', 'India', 'Brazil', 'Saudi Arabia', 'UAE', 'Canada'];
 
+if (typeof globalThis.localStorage === 'undefined') {
+  const storage = new Map();
+  globalThis.localStorage = {
+    getItem: key => (storage.has(String(key)) ? storage.get(String(key)) : null),
+    setItem: (key, value) => storage.set(String(key), String(value)),
+    removeItem: key => storage.delete(String(key)),
+    clear: () => storage.clear(),
+    key: index => [...storage.keys()][index] || null,
+    get length() { return storage.size; },
+  };
+}
+
 const report = {
   worlds,
   months,
@@ -32,6 +44,7 @@ const server = await createServer({
   root,
   logLevel: 'error',
   appType: 'custom',
+  optimizeDeps: { noDiscovery: true },
   server: { middlewareMode: true, hmr: false },
 });
 

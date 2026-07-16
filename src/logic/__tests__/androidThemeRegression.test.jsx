@@ -4,7 +4,11 @@ import fs from 'node:fs';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { browserRequire, supportedLegacyModules } from '../BrowserRequireBridge';
+import {
+  browserRequire,
+  installBrowserRequire,
+  supportedLegacyModules,
+} from '../BrowserRequireBridge';
 import { localizeToastMessage } from '../ToastLocalization';
 import { Toast } from '../../components/Toast';
 
@@ -18,7 +22,19 @@ describe('Android ESM compatibility', () => {
     expect(browserRequire('./logic/Audio').playTap).toBeTypeOf('function');
     expect(browserRequire('./logic/ImmigrationSystem').ImmigrationManager).toBeTypeOf('function');
     expect(browserRequire('./logic/TravelSystem').travelToCity).toBeTypeOf('function');
-    expect(globalThis.require('./logic/Audio').setSfxVolume).toBeTypeOf('function');
+  });
+
+  it('installs the bridge on an Android WebView-like global object', () => {
+    const webViewGlobal = {};
+    expect(installBrowserRequire(webViewGlobal)).toBe(true);
+    expect(webViewGlobal.require('./logic/Audio').setSfxVolume).toBeTypeOf('function');
+  });
+
+  it('does not overwrite an existing runtime require function', () => {
+    const existingRequire = () => 'existing';
+    const runtime = { require: existingRequire };
+    expect(installBrowserRequire(runtime)).toBe(true);
+    expect(runtime.require).toBe(existingRequire);
   });
 
   it('rejects unknown dynamic modules instead of silently failing', () => {

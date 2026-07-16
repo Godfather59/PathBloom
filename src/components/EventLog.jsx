@@ -1,13 +1,16 @@
-import React, { useEffect, useRef, memo, useMemo } from 'react';
+import React, { useEffect, useRef, memo, useMemo, useState } from 'react';
 import { translateGameMessage, translateGameText } from '../logic/i18n';
 import { cleanLocalizedText } from '../logic/localizationSanitizer';
 import { translateDeepSimulationText } from '../logic/DeepLocalization';
+import { getCurrentTimePerson } from '../logic/TimeProgression';
 import {
   formatArabicMoney,
   formatArabicNumber,
   localizeArabicCandidate,
 } from '../logic/ArabicLocalization';
 import { AppIcon } from './AppIcon';
+import { JourneyCard } from './JourneyCard';
+import { MilestoneCelebration } from './MilestoneCelebration';
 import './EventLog.css';
 
 const MAX_VISIBLE_EVENTS = 140;
@@ -176,6 +179,8 @@ export const EventLog = memo(function EventLog({
   headerContent = null,
 }) {
   const containerRef = useRef(null);
+  const [notification, setNotification] = useState(null);
+  const currentPerson = getCurrentTimePerson();
 
   useEffect(() => {
     const element = containerRef.current;
@@ -198,6 +203,12 @@ export const EventLog = memo(function EventLog({
   }, []);
 
   useEffect(() => {
+    const handleNotification = event => setNotification(event.detail || null);
+    window.addEventListener('pathbloom-journey-notification', handleNotification);
+    return () => window.removeEventListener('pathbloom-journey-notification', handleNotification);
+  }, []);
+
+  useEffect(() => {
     if (containerRef.current) containerRef.current.scrollTop = 0;
   }, [history.length]);
 
@@ -206,6 +217,10 @@ export const EventLog = memo(function EventLog({
     return reversed.length > MAX_VISIBLE_EVENTS ? reversed.slice(0, MAX_VISIBLE_EVENTS) : reversed;
   }, [history]);
 
+  const resolvedHeader = headerContent || (currentPerson ? (
+    <JourneyCard person={currentPerson} language={language} />
+  ) : null);
+
   return (
     <main className="event-log" ref={containerRef} dir={language === 'ar' ? 'rtl' : 'ltr'}>
       <div className="timeline-heading">
@@ -213,7 +228,7 @@ export const EventLog = memo(function EventLog({
         <strong>{language === 'ar' ? 'أحدث الأحداث أولا' : 'Newest first'}</strong>
       </div>
 
-      {headerContent}
+      {resolvedHeader}
 
       {displayHistory.length === 0 && (
         <div className="timeline-empty">
@@ -233,6 +248,12 @@ export const EventLog = memo(function EventLog({
           />
         ))}
       </div>
+
+      <MilestoneCelebration
+        notification={notification}
+        language={language}
+        onClose={() => setNotification(null)}
+      />
     </main>
   );
 });

@@ -1,0 +1,55 @@
+name: Rebalance World Simulation events
+
+on:
+  push:
+    branches:
+      - agent/world-simulation-2
+
+permissions:
+  contents: write
+
+jobs:
+  rebalance:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/world-simulation-2
+          fetch-depth: 0
+
+      - name: Tune rare geopolitical crises
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('src/logic/WorldSimulation2.js')
+          source = path.read_text(encoding='utf-8')
+          replacements = {
+              "score -= 45;": "score -= 65;",
+              "const coupRisk = country.freedom < 45 && country.stability < 32 && country.corruption > 55 ? 0.025 : 0;": "const coupRisk = country.freedom < 45 && country.stability < 45 && country.corruption > 55 ? 0.008 : 0;",
+              "const revolutionRisk = country.stability < 24 && country.unemployment > 14 ? 0.018 : 0;": "const revolutionRisk = country.stability < 36 && country.unemployment > 11 ? 0.006 : 0;",
+              "if (!rel.sanctions && rel.score <= -62 && Math.random() < 0.08) imposeSanctions(world, leftName, rightName);": "if (!rel.sanctions && rel.score <= -55 && Math.random() < 0.18) imposeSanctions(world, leftName, rightName);",
+              "const warChance = rel.score <= -82 && rel.borderTension >= 62 && !rel.alliance ? 0.012 : 0;": "const warChance = rel.score <= -70 && rel.borderTension >= 40 && !rel.alliance ? 0.04 : 0;",
+              "const sources = countries.filter(country => country.atWar.length > 0 || country.stability < 42 || country.unemployment > 17);": "const sources = countries.filter(country => country.atWar.length > 0 || country.sanctionsFrom.length > 0 || country.stability < 55 || country.unemployment > 13 || country.inflation > 12);",
+              "const crisis = source.atWar.length * 1.8 + Math.max(0, 50 - source.stability) / 15 + Math.max(0, source.unemployment - 10) / 10;": "const crisis = source.atWar.length * 1.8 + source.sanctionsFrom.length * 0.7 + Math.max(0, 58 - source.stability) / 15 + Math.max(0, source.unemployment - 10) / 10 + Math.max(0, source.inflation - 8) / 12;",
+          }
+          for old, new in replacements.items():
+              source = source.replace(old, new, 1)
+          path.write_text(source, encoding='utf-8')
+          PY
+
+      - name: Commit balanced source
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo 'Balance changes already applied.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/logic/WorldSimulation2.js
+          git commit -m 'Balance geopolitical crises and migration'
+          git push origin HEAD:agent/world-simulation-2

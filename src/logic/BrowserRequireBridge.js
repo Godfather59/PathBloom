@@ -25,7 +25,7 @@ export function browserRequire(moduleId) {
   return resolved;
 }
 
-if (typeof globalThis.require !== 'function') {
+if (typeof window !== 'undefined' || typeof globalThis.require !== 'function') {
   Object.defineProperty(globalThis, 'require', {
     value: browserRequire,
     configurable: true,

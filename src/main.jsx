@@ -4,6 +4,7 @@ import { installArabicLocalizationRuntime } from './logic/ArabicLocalizationRunt
 import './index.css';
 import './components/NewFeatures.css';
 import './components/MobilePolish.css';
+import './components/ArabicRTL.css';
 
 const rootElement = document.getElementById('root');
 

@@ -66,12 +66,13 @@ function injectSaveStatus() {
   let indicator = roleLine.querySelector('.hud-save-status');
   if (!indicator) {
     indicator = document.createElement('span');
-    indicator.className = 'hud-save-status';
     roleLine.append(indicator);
   }
-  indicator.className = `hud-save-status is-${lastSaveStatus.status || 'idle'}`;
-  indicator.textContent = saveStatusCopy(lastSaveStatus.status, language());
-  indicator.setAttribute('aria-live', 'polite');
+  const nextClass = `hud-save-status is-${lastSaveStatus.status || 'idle'}`;
+  const nextText = saveStatusCopy(lastSaveStatus.status, language());
+  if (indicator.className !== nextClass) indicator.className = nextClass;
+  if (indicator.textContent !== nextText) indicator.textContent = nextText;
+  if (indicator.getAttribute('aria-live') !== 'polite') indicator.setAttribute('aria-live', 'polite');
 }
 
 function isPrimarySaveKey(key) {
@@ -214,6 +215,12 @@ function patchMethod(target, name, after) {
   target[name] = wrappedMethod;
 }
 
+function scheduleJourneyUpdate(person) {
+  const run = () => emitJourneyNotifications(person);
+  if (typeof queueMicrotask === 'function') queueMicrotask(run);
+  else Promise.resolve().then(run);
+}
+
 function installJourneyHooks() {
   patchMethod(Person.prototype, 'clone', function afterClone(result) {
     ensurePlayerJourney(this);
@@ -237,7 +244,7 @@ function installJourneyHooks() {
       playAchievement();
       if (hapticsAllowed()) HAPTICS.achievement();
     }
-    queueMicrotask(() => emitJourneyNotifications(this));
+    scheduleJourneyUpdate(this);
   });
 
   patchMethod(Person.prototype, 'performActivity', function afterActivity(result, args) {
@@ -362,7 +369,15 @@ function installPerformanceProfile() {
 
 function installDomObserver() {
   if (typeof MutationObserver === 'undefined' || domObserver) return;
-  domObserver = new MutationObserver(() => injectSaveStatus());
+  domObserver = new MutationObserver(mutations => {
+    const needsRefresh = mutations.some(mutation =>
+      [...mutation.addedNodes].some(node =>
+        node.nodeType === Node.ELEMENT_NODE &&
+        (node.matches?.('.hud-container, .hud-role-line') || node.querySelector?.('.hud-role-line'))
+      )
+    );
+    if (needsRefresh) injectSaveStatus();
+  });
   domObserver.observe(document.documentElement, { subtree: true, childList: true });
   injectSaveStatus();
 }

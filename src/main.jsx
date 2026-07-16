@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { installArabicLocalizationRuntime } from './logic/ArabicLocalizationRuntime';
+import { installArabicSupplementalRuntime } from './logic/ArabicSupplementalRuntime';
 import './index.css';
 import './components/NewFeatures.css';
 import './components/MobilePolish.css';
@@ -90,6 +91,7 @@ async function bootstrap() {
       </StrictMode>
     );
 
+    installArabicSupplementalRuntime();
     installArabicLocalizationRuntime();
   } catch (error) {
     showStartupError(error);

@@ -3,6 +3,7 @@ import { LANGUAGES } from '../logic/i18n';
 import { THEMES } from '../logic/themes';
 import { getCurrentTimePerson } from '../logic/TimeProgression';
 import SimulationDashboard from './SimulationDashboard';
+import ContentStudio from './ContentStudio';
 import './Modal.css';
 
 export function SystemMenu({
@@ -40,6 +41,7 @@ export function SystemMenu({
   onSimulationDashboard,
 }) {
   const [showSimulation, setShowSimulation] = useState(false);
+  const [showContentStudio, setShowContentStudio] = useState(false);
   const currentPerson = getCurrentTimePerson();
   const openSimulation = onSimulationDashboard || (() => setShowSimulation(true));
 
@@ -54,10 +56,21 @@ export function SystemMenu({
     );
   }
 
+  if (showContentStudio) {
+    return (
+      <ContentStudio
+        onClose={() => setShowContentStudio(false)}
+        language={language}
+        t={t}
+      />
+    );
+  }
+
   const navigation = [
     [onStats, '📊', 'system.stats', 'Lifetime Stats'],
     [onHistory, '📈', 'system.history', 'Current Life Trends'],
     [openSimulation, '🧩', 'system.simulation', 'Simulation Overview'],
+    [() => setShowContentStudio(true), '🧰', 'system.contentStudio', language === 'ar' ? 'استوديو المحتوى' : 'Content Studio'],
     [onFamilyTree, '🌳', 'system.familyTree', 'Family Dynasty'],
     [onWorldNews, '📰', 'system.worldNews', 'World News'],
     [onWorldOverview, '🌍', 'system.worldOverview', 'World Overview'],

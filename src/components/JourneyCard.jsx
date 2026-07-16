@@ -14,6 +14,14 @@ function dispatchJourneyAction(action) {
   window.dispatchEvent(new CustomEvent('pathbloom-journey-action', { detail: { action } }));
 }
 
+function storedGuidedPreference() {
+  try {
+    return localStorage.getItem('pathbloom_guided_journey') === 'true';
+  } catch {
+    return false;
+  }
+}
+
 export const JourneyCard = memo(function JourneyCard({
   person,
   language = 'en',
@@ -22,7 +30,10 @@ export const JourneyCard = memo(function JourneyCard({
 }) {
   const [expanded, setExpanded] = useState(false);
   const locale = language === 'ar' ? 'ar' : 'en';
-  const journey = ensurePlayerJourney(person);
+  const hadJourney = Boolean(person?.playerJourney);
+  const journey = ensurePlayerJourney(person, {
+    newLife: !hadJourney && storedGuidedPreference(),
+  });
   const view = useMemo(() => getJourneyView(person, locale), [person, locale]);
   const goals = useMemo(() => getJourneyGoals(person, locale), [person, locale]);
 

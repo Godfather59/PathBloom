@@ -15,7 +15,7 @@ function render(component) {
 }
 
 describe('redesigned gameplay shell', () => {
-  it('renders the four English destinations and contextual time actions', () => {
+  it('renders the four English destinations and clearly separated time actions', () => {
     const html = render(
       <BottomNavigation
         activeDestination="life"
@@ -33,8 +33,11 @@ describe('redesigned gameplay shell', () => {
     expect(html).toContain('Activities');
     expect(html).toContain('World');
     expect(html).toContain('Menu');
-    expect(html).toContain('Age Up');
-    expect(html).toContain('Smart +5');
+    expect(html).toContain('+1 Year');
+    expect(html).toContain('One step');
+    expect(html).toContain('Auto: 5 Years');
+    expect(html).toContain('Stops for decisions');
+    expect(html).not.toContain('Smart +5');
     expect(html).toContain('aria-current="page"');
   });
 
@@ -58,6 +61,9 @@ describe('redesigned gameplay shell', () => {
     expect(html).toContain('العالم');
     expect(html).toContain('القائمة');
     expect(html).toContain('تابع الحملة شهرا');
+    expect(html).toContain('شهر واحد');
+    expect(html).toContain('تلقائي: حتى 12 شهرا');
+    expect(html).toContain('يتوقف عند ظهور قرار');
     expect(html).toContain('is-monthly');
   });
 

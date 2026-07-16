@@ -159,10 +159,10 @@ describe('release onboarding and celebrations', () => {
     const arabic = render(<OnboardingOverlay language="ar" onClose={() => {}} />);
 
     expect(english).toContain('Every life becomes a story');
-    expect(english).toContain('Start guided journey');
+    expect(english).toContain('Next');
     expect(english).toContain('Your timeline remembers important moments');
     expect(arabic).toContain('كل حياة تتحول إلى قصة');
-    expect(arabic).toContain('ابدأ الرحلة الموجهة');
+    expect(arabic).toContain('التالي');
   });
 
   it('renders clear goal and unlock milestone feedback', () => {

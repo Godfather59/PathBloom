@@ -1,14 +1,20 @@
 let currentPerson = null;
+let currentLanguage = 'en';
 
 const clampInt = (value, min, max) =>
   Math.max(min, Math.min(max, Math.floor(Number(value) || 0)));
 
-export function setCurrentTimePerson(person) {
+export function setCurrentTimePerson(person, language = currentLanguage) {
   currentPerson = person || null;
+  currentLanguage = language === 'ar' ? 'ar' : 'en';
 }
 
 export function getCurrentTimePerson() {
   return currentPerson;
+}
+
+function logTimeEvent(person, english, arabic, type = 'neutral') {
+  person.logEvent?.(currentLanguage === 'ar' ? arabic : english, type);
 }
 
 export function ensureTimeProgress(person) {
@@ -161,7 +167,12 @@ function progressTreatment(person, state) {
   if (state.treatmentMonths >= 3 && Math.random() < 0.3) {
     person.inTreatment = false;
     state.treatmentMonths = 0;
-    person.logEvent?.('You completed a course of treatment.', 'good');
+    logTimeEvent(
+      person,
+      'You completed a course of treatment.',
+      'أكملت دورة العلاج بنجاح.',
+      'good'
+    );
   }
 }
 
@@ -177,13 +188,18 @@ function progressPrison(person, state) {
   state.prisonMonthsRemaining = Math.max(0, state.prisonMonthsRemaining - 1);
   person.prisonSentence = Math.ceil(state.prisonMonthsRemaining / 12);
   person.updateStats?.({ happiness: -1, stress: 1, energy: 20 });
-  person.logEvent?.('You served one month in prison.', 'neutral');
+  logTimeEvent(person, 'You served one month in prison.', 'قضيت شهرا واحدا في السجن.');
 
   if (state.prisonMonthsRemaining <= 0) {
     person.isInPrison = false;
     person.prisonSentence = 0;
     state.prisonMonthsRemaining = null;
-    person.logEvent?.('You have been released from prison!', 'good');
+    logTimeEvent(
+      person,
+      'You have been released from prison!',
+      'تم إطلاق سراحك من السجن!',
+      'good'
+    );
     person.updateStats?.({ happiness: 20, stress: -10 });
   }
 }
@@ -199,12 +215,16 @@ function progressSituation(person, situation, state) {
     case 'campaign':
       progressCampaign(person);
       person.updateStats?.({ stress: 2, energy: 20 });
-      person.logEvent?.('One month passed in your election campaign.', 'neutral');
+      logTimeEvent(
+        person,
+        'One month passed in your election campaign.',
+        'مر شهر في حملتك الانتخابية.'
+      );
       break;
     case 'pregnancy':
       progressPregnancy(person);
       person.updateStats?.({ stress: 1, energy: 15 });
-      person.logEvent?.('One month passed in the pregnancy.', 'neutral');
+      logTimeEvent(person, 'One month passed in the pregnancy.', 'مر شهر من فترة الحمل.');
       break;
     case 'treatment':
       progressTreatment(person, state);
@@ -212,25 +232,46 @@ function progressSituation(person, situation, state) {
     case 'lawsuit':
       progressLawsuits(person);
       person.updateStats?.({ stress: 2, energy: 20 });
-      person.logEvent?.('One month passed while your court case continued.', 'neutral');
+      logTimeEvent(
+        person,
+        'One month passed while your court case continued.',
+        'مر شهر بينما استمرت قضيتك في المحكمة.'
+      );
       break;
     case 'deployment':
       person.updateStats?.({ stress: 3, health: -1, energy: 25 });
-      person.logEvent?.('One month passed during your deployment.', 'neutral');
+      logTimeEvent(
+        person,
+        'One month passed during your deployment.',
+        'مر شهر خلال مهمتك العسكرية.'
+      );
       break;
     case 'sports':
       person.collegeSport.seasonMonth =
         Math.max(0, Math.floor(Number(person.collegeSport.seasonMonth) || 0)) + 1;
       person.updateStats?.({ health: 1, stress: 1, energy: 20 });
-      person.logEvent?.('One month passed in the sports season.', 'neutral');
+      logTimeEvent(
+        person,
+        'One month passed in the sports season.',
+        'مر شهر من الموسم الرياضي.'
+      );
       break;
     case 'business':
       person.updateStats?.({ stress: 2, energy: 20 });
-      person.logEvent?.('One month passed while you managed the business crisis.', 'neutral');
+      logTimeEvent(
+        person,
+        'One month passed while you managed the business crisis.',
+        'مر شهر وأنت تدير أزمة الشركة.'
+      );
       break;
     case 'war':
       person.updateStats?.({ stress: 2, happiness: -1, energy: 20 });
-      person.logEvent?.('One month passed while the war continued.', 'bad');
+      logTimeEvent(
+        person,
+        'One month passed while the war continued.',
+        'مر شهر آخر بينما استمرت الحرب.',
+        'bad'
+      );
       break;
     default:
       person.updateStats?.({ energy: 20, stress: -1 });
@@ -244,7 +285,11 @@ export function advanceOneMonth(person, advanceYear) {
 
   const situation = getActiveMonthlySituation(person);
   if (!situation) {
-    person.logEvent?.('Monthly progression is available only during an active situation.', 'neutral');
+    logTimeEvent(
+      person,
+      'Monthly progression is available only during an active situation.',
+      'التقدم الشهري متاح فقط أثناء وجود حالة نشطة.'
+    );
     return person;
   }
 
@@ -267,8 +312,11 @@ export function advanceOneMonth(person, advanceYear) {
   return person;
 }
 
-export function recordYearAdvance(person, yearsAdvanced) {
+export function recordYearAdvance(person) {
   const state = ensureTimeProgress(person);
-  state.monthsLived += Math.max(0, Math.floor(Number(yearsAdvanced) || 0)) * 12;
+  state.monthsLived = Math.max(
+    state.monthsLived,
+    Math.max(0, Math.floor(Number(person?.age) || 0)) * 12 + state.month
+  );
   return state;
 }

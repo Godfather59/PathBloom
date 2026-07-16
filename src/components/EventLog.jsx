@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, memo, useMemo } from 'react';
 import { translateGameMessage, translateGameText } from '../logic/i18n';
 import { cleanLocalizedText } from '../logic/localizationSanitizer';
+import { translateDeepSimulationText } from '../logic/DeepLocalization';
 import './EventLog.css';
 
 const MAX_VISIBLE_EVENTS = 100;
@@ -9,8 +10,8 @@ const localizeEvent = (event, language) => {
   const localized = event.messageKey
     ? translateGameMessage(language, event.messageKey, event.messageParams || {}, event.text)
     : translateGameText(language, event.text);
-
-  return cleanLocalizedText(localized, event.text, language);
+  const cleaned = cleanLocalizedText(localized, event.text, language);
+  return translateDeepSimulationText(cleaned, language);
 };
 
 const EventCard = memo(({ event, language, t }) => (
@@ -28,32 +29,21 @@ export const EventLog = memo(
 
     useEffect(() => {
       const el = containerRef.current;
-      if (!el) {
-        return;
-      }
+      if (!el) return;
 
       const updatePadding = () => {
         const hud = document.querySelector('.hud-container');
         const actionMenu = document.querySelector('.action-menu');
-        if (hud) {
-          el.style.paddingTop = `${hud.offsetHeight + 8}px`;
-        }
-        if (actionMenu) {
-          el.style.paddingBottom = `${actionMenu.offsetHeight + 8}px`;
-        }
+        if (hud) el.style.paddingTop = `${hud.offsetHeight + 8}px`;
+        if (actionMenu) el.style.paddingBottom = `${actionMenu.offsetHeight + 8}px`;
       };
 
       const ro = new ResizeObserver(updatePadding);
       const hud = document.querySelector('.hud-container');
       const actionMenu = document.querySelector('.action-menu');
-      if (hud) {
-        ro.observe(hud);
-      }
-      if (actionMenu) {
-        ro.observe(actionMenu);
-      }
+      if (hud) ro.observe(hud);
+      if (actionMenu) ro.observe(actionMenu);
       updatePadding();
-
       return () => ro.disconnect();
     }, []);
 
@@ -65,9 +55,7 @@ export const EventLog = memo(
 
     const displayHistory = useMemo(() => {
       const reversed = [...history].reverse();
-      return reversed.length > MAX_VISIBLE_EVENTS
-        ? reversed.slice(0, MAX_VISIBLE_EVENTS)
-        : reversed;
+      return reversed.length > MAX_VISIBLE_EVENTS ? reversed.slice(0, MAX_VISIBLE_EVENTS) : reversed;
     }, [history]);
 
     return (

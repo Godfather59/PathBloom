@@ -90,7 +90,7 @@ function makeRelation(left, right) {
   ];
   if (friendlyPairs.some(pair => pair.includes(left.name) && pair.includes(right.name))) score += 45;
   const tensePairs = [['United States', 'Russia'], ['United States', 'China'], ['Japan', 'China']];
-  if (tensePairs.some(pair => pair.includes(left.name) && pair.includes(right.name))) score -= 45;
+  if (tensePairs.some(pair => pair.includes(left.name) && pair.includes(right.name))) score -= 65;
   return {
     score: clamp(score, -100, 100),
     trade: clamp(35 + score / 3 + Math.floor(Math.random() * 25), 0, 100),
@@ -291,8 +291,8 @@ function processPolitics(world, country) {
     }
   }
 
-  const coupRisk = country.freedom < 45 && country.stability < 32 && country.corruption > 55 ? 0.025 : 0;
-  const revolutionRisk = country.stability < 24 && country.unemployment > 14 ? 0.018 : 0;
+  const coupRisk = country.freedom < 45 && country.stability < 45 && country.corruption > 55 ? 0.008 : 0;
+  const revolutionRisk = country.stability < 36 && country.unemployment > 11 ? 0.006 : 0;
   if (coupRisk && Math.random() < coupRisk) {
     country.government = 'Military Government';
     country.leader = replacementLeader(country);
@@ -386,11 +386,11 @@ function processDiplomacy(world) {
     world.treaties.push({ id: `trade_${world.month}_${world.sequence++}`, type: 'trade', members: [leftName, rightName], startMonth: world.month, active: true });
     logWorld(world, 'trade', `${leftName} and ${rightName} signed a trade agreement.`, `وقّعت ${COUNTRY_NAME_AR[leftName] || leftName} و${COUNTRY_NAME_AR[rightName] || rightName} اتفاقية تجارية.`, { countries: [leftName, rightName] });
   }
-  if (!rel.sanctions && rel.score <= -62 && Math.random() < 0.08) imposeSanctions(world, leftName, rightName);
+  if (!rel.sanctions && rel.score <= -55 && Math.random() < 0.18) imposeSanctions(world, leftName, rightName);
   if (!rel.rivalry && rel.score <= -58) updateRivalry(world, leftName, rightName, true);
   if (rel.rivalry && rel.score > -25) updateRivalry(world, leftName, rightName, false);
 
-  const warChance = rel.score <= -82 && rel.borderTension >= 62 && !rel.alliance ? 0.012 : 0;
+  const warChance = rel.score <= -70 && rel.borderTension >= 40 && !rel.alliance ? 0.04 : 0;
   if (warChance && Math.random() < warChance) {
     const attacker = left.military + left.leader.approval / 5 >= right.military + right.leader.approval / 5 ? leftName : rightName;
     const defender = attacker === leftName ? rightName : leftName;
@@ -467,14 +467,14 @@ function processWars(world) {
 
 function processMigration(world) {
   const countries = Object.values(world.countries);
-  const sources = countries.filter(country => country.atWar.length > 0 || country.stability < 42 || country.unemployment > 17);
+  const sources = countries.filter(country => country.atWar.length > 0 || country.sanctionsFrom.length > 0 || country.stability < 55 || country.unemployment > 13 || country.inflation > 12);
   const destinations = countries.filter(country => country.stability >= 68 && country.atWar.length === 0 && country.unemployment < 10);
   if (!sources.length || !destinations.length) return;
   const source = pick(sources);
   const possible = destinations.filter(country => country.name !== source.name);
   if (!possible.length) return;
   const destination = possible.sort((a, b) => (b.stability - b.unemployment) - (a.stability - a.unemployment))[Math.floor(Math.random() * Math.min(3, possible.length))];
-  const crisis = source.atWar.length * 1.8 + Math.max(0, 50 - source.stability) / 15 + Math.max(0, source.unemployment - 10) / 10;
+  const crisis = source.atWar.length * 1.8 + source.sanctionsFrom.length * 0.7 + Math.max(0, 58 - source.stability) / 15 + Math.max(0, source.unemployment - 10) / 10 + Math.max(0, source.inflation - 8) / 12;
   const people = Math.max(500, Math.floor((4000 + Math.random() * 26000) * Math.max(0.5, crisis)));
   source.population = Math.max(0.5, round(source.population - people / 1_000_000, 4));
   destination.population = round(destination.population + people / 1_000_000, 4);

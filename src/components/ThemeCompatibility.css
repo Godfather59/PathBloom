@@ -24,47 +24,18 @@
   --pb-shadow-nav: 0 -10px 28px rgba(22, 38, 56, 0.12);
 }
 
-:root[data-theme='sepia'] {
-  --pb-bg: #efe5cf;
-  --pb-bg-soft: #f8f0df;
-  --pb-surface: #fffaf0;
-  --pb-surface-raised: #f5ead5;
-  --pb-surface-muted: #eadcc4;
-  --pb-border: rgba(78, 54, 34, 0.14);
-  --pb-border-strong: rgba(78, 54, 34, 0.24);
-  --pb-text: #352419;
-  --pb-text-secondary: #624b3a;
-  --pb-text-muted: #8a715e;
-  --pb-growth: #567c38;
-  --pb-growth-strong: #42642b;
-  --pb-growth-soft: rgba(86, 124, 56, 0.13);
-  --pb-gold: #8b620d;
-  --pb-danger: #a8323f;
-  --pb-warning: #9b5d15;
-  --pb-blue: #456f92;
-  --pb-purple: #725783;
-  --pb-rose: #9d556d;
-  --pb-cyan: #3e7772;
-  --pb-yellow: #806719;
-  --pb-shadow-card: 0 8px 22px rgba(67, 45, 27, 0.1);
-  --pb-shadow-nav: 0 -10px 28px rgba(67, 45, 27, 0.12);
-}
-
-:root[data-theme='light'] body,
-:root[data-theme='sepia'] body {
+:root[data-theme='light'] body {
   background: var(--bg-gradient);
 }
 
-:root[data-theme='light'] #root,
-:root[data-theme='sepia'] #root {
+:root[data-theme='light'] #root {
   background:
     radial-gradient(circle at 85% 0%, color-mix(in srgb, var(--pb-growth) 8%, transparent), transparent 30%),
     linear-gradient(180deg, var(--pb-bg-soft), var(--pb-bg));
   box-shadow: 0 0 46px rgba(31, 45, 61, 0.14);
 }
 
-:root[data-theme='light'] .hud-container,
-:root[data-theme='sepia'] .hud-container {
+:root[data-theme='light'] .hud-container {
   color: var(--pb-text);
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--pb-surface) 98%, transparent), color-mix(in srgb, var(--pb-surface-raised) 96%, transparent));
@@ -74,10 +45,7 @@
 
 :root[data-theme='light'] .hud-stat-summary,
 :root[data-theme='light'] .hud-icon-button,
-:root[data-theme='light'] .compact-stat,
-:root[data-theme='sepia'] .hud-stat-summary,
-:root[data-theme='sepia'] .hud-icon-button,
-:root[data-theme='sepia'] .compact-stat {
+:root[data-theme='light'] .compact-stat {
   color: var(--pb-text-secondary);
   background: color-mix(in srgb, var(--pb-surface-muted) 72%, transparent);
   border-color: var(--pb-border);
@@ -85,29 +53,22 @@
 
 :root[data-theme='light'] .person-name,
 :root[data-theme='light'] .hud-money,
-:root[data-theme='light'] .hud-age-pill,
-:root[data-theme='sepia'] .person-name,
-:root[data-theme='sepia'] .hud-money,
-:root[data-theme='sepia'] .hud-age-pill {
+:root[data-theme='light'] .hud-age-pill {
   color: var(--pb-text);
 }
 
 :root[data-theme='light'] .hud-role,
 :root[data-theme='light'] .hud-location,
 :root[data-theme='light'] .hud-debt,
-:root[data-theme='sepia'] .hud-role,
-:root[data-theme='sepia'] .hud-location,
-:root[data-theme='sepia'] .hud-debt {
+:root[data-theme='light'] .hud-save-status {
   color: var(--pb-text-secondary);
 }
 
-:root[data-theme='light'] .timeline-heading,
-:root[data-theme='sepia'] .timeline-heading {
+:root[data-theme='light'] .timeline-heading {
   color: var(--pb-text-secondary);
 }
 
-:root[data-theme='light'] .timeline-card,
-:root[data-theme='sepia'] .timeline-card {
+:root[data-theme='light'] .timeline-card {
   color: var(--pb-text);
   background:
     linear-gradient(110deg, color-mix(in srgb, var(--category-color) 6%, transparent), transparent 46%),
@@ -117,30 +78,26 @@
 }
 
 :root[data-theme='light'] .timeline-age,
-:root[data-theme='light'] .effect-chip,
-:root[data-theme='sepia'] .timeline-age,
-:root[data-theme='sepia'] .effect-chip {
+:root[data-theme='light'] .effect-chip {
   color: var(--pb-text-secondary);
   background: color-mix(in srgb, var(--pb-surface-muted) 74%, transparent);
   border-color: var(--pb-border);
 }
 
-:root[data-theme='light'] .timeline-dot,
-:root[data-theme='sepia'] .timeline-dot {
+:root[data-theme='light'] .timeline-dot {
   background: color-mix(in srgb, var(--category-color) 10%, var(--pb-surface));
   box-shadow: 0 0 0 4px var(--pb-bg);
 }
 
-:root[data-theme='light'] .life-shortcut,
-:root[data-theme='sepia'] .life-shortcut {
+:root[data-theme='light'] .life-shortcut {
   color: var(--pb-text-secondary);
   background: color-mix(in srgb, var(--pb-surface) 96%, transparent);
   border-color: var(--pb-border);
   box-shadow: var(--pb-shadow-card);
 }
 
-:root[data-theme='light'] .active-situation-card,
-:root[data-theme='sepia'] .active-situation-card {
+:root[data-theme='light'] .active-situation-card {
+  color: var(--pb-text);
   background:
     linear-gradient(135deg, color-mix(in srgb, var(--pb-warning) 10%, transparent), transparent 58%),
     var(--pb-surface);
@@ -148,51 +105,46 @@
   box-shadow: var(--pb-shadow-card);
 }
 
-:root[data-theme='light'] .active-situation-track,
-:root[data-theme='sepia'] .active-situation-track {
+:root[data-theme='light'] .active-situation-track {
   background: color-mix(in srgb, var(--pb-text) 10%, transparent);
 }
 
-:root[data-theme='light'] .bottom-navigation,
-:root[data-theme='sepia'] .bottom-navigation {
+:root[data-theme='light'] .bottom-navigation {
   color: var(--pb-text);
   background: color-mix(in srgb, var(--pb-surface) 97%, transparent);
   border-color: var(--pb-border);
   box-shadow: var(--pb-shadow-nav);
 }
 
-:root[data-theme='light'] .bottom-nav-item,
-:root[data-theme='sepia'] .bottom-nav-item {
+:root[data-theme='light'] .bottom-nav-item {
   color: var(--pb-text-muted);
 }
 
-:root[data-theme='light'] .bottom-nav-item.is-active,
-:root[data-theme='sepia'] .bottom-nav-item.is-active {
+:root[data-theme='light'] .bottom-nav-item.is-active {
   color: var(--pb-growth-strong);
   background: var(--pb-growth-soft);
 }
 
-:root[data-theme='light'] .time-control-dock,
-:root[data-theme='sepia'] .time-control-dock {
+:root[data-theme='light'] .time-control-dock {
   background: color-mix(in srgb, var(--pb-surface-raised) 96%, transparent);
   border-color: var(--pb-border);
 }
 
-:root[data-theme='light'] .time-smart-action,
-:root[data-theme='sepia'] .time-smart-action {
+:root[data-theme='light'] .time-smart-action {
   color: var(--pb-text-secondary);
   background: var(--pb-surface);
   border-color: var(--pb-border);
+}
+
+:root[data-theme='light'] .modal-overlay {
+  background: rgba(44, 57, 72, 0.32);
 }
 
 :root[data-theme='light'] .modal-content,
 :root[data-theme='light'] .system-destination,
 :root[data-theme='light'] .destination-screen,
 :root[data-theme='light'] .situation-detail-sheet,
-:root[data-theme='sepia'] .modal-content,
-:root[data-theme='sepia'] .system-destination,
-:root[data-theme='sepia'] .destination-screen,
-:root[data-theme='sepia'] .situation-detail-sheet {
+:root[data-theme='light'] .phase-two-screen {
   color: var(--pb-text);
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--pb-surface) 98%, transparent), color-mix(in srgb, var(--pb-bg-soft) 98%, transparent));
@@ -204,25 +156,46 @@
 :root[data-theme='light'] .setting-card,
 :root[data-theme='light'] .system-menu-tile,
 :root[data-theme='light'] .list-item,
-:root[data-theme='sepia'] .timeline-empty,
-:root[data-theme='sepia'] .setting-card,
-:root[data-theme='sepia'] .system-menu-tile,
-:root[data-theme='sepia'] .list-item {
+:root[data-theme='light'] .phase-two-card {
   color: var(--pb-text-secondary);
   background: color-mix(in srgb, var(--pb-surface) 94%, transparent);
   border-color: var(--pb-border);
 }
 
-:root[data-theme='light'] .release-onboarding .onboarding-card,
-:root[data-theme='sepia'] .release-onboarding .onboarding-card {
+:root[data-theme='light'] .setting-card-heading,
+:root[data-theme='light'] .system-section-heading,
+:root[data-theme='light'] .destination-header,
+:root[data-theme='light'] .phase-two-title {
+  color: var(--pb-text);
+}
+
+:root[data-theme='light'] .segmented-control button,
+:root[data-theme='light'] .choice-chip-grid button,
+:root[data-theme='light'] .destination-close {
+  color: var(--pb-text-secondary);
+  background: var(--pb-surface-muted);
+  border-color: var(--pb-border);
+}
+
+:root[data-theme='light'] .segmented-control button.is-active,
+:root[data-theme='light'] .choice-chip-grid button.is-active {
+  color: var(--pb-growth-strong);
+  background: var(--pb-growth-soft);
+  border-color: color-mix(in srgb, var(--pb-growth) 30%, var(--pb-border));
+}
+
+:root[data-theme='light'] .release-onboarding .onboarding-card {
   color: var(--pb-text);
   background:
     radial-gradient(circle at 50% -10%, color-mix(in srgb, var(--pb-growth) 12%, transparent), transparent 36%),
     linear-gradient(180deg, var(--pb-bg-soft), var(--pb-bg));
 }
 
-:root[data-theme='light'] .journey-card,
-:root[data-theme='sepia'] .journey-card {
+:root[data-theme='light'] .release-onboarding-footer {
+  background: color-mix(in srgb, var(--pb-surface) 95%, transparent);
+}
+
+:root[data-theme='light'] .journey-card {
   color: var(--pb-text);
   background:
     linear-gradient(135deg, var(--pb-growth-soft), transparent 58%),
@@ -231,10 +204,16 @@
   box-shadow: var(--pb-shadow-card);
 }
 
-:root[data-theme='light'] .save-slot-card,
-:root[data-theme='sepia'] .save-slot-card {
+:root[data-theme='light'] .save-slot-release,
+:root[data-theme='light'] .save-slot-card {
   color: var(--pb-text);
   background: var(--pb-surface);
   border-color: var(--pb-border);
   box-shadow: var(--pb-shadow-card);
+}
+
+:root[data-theme='light'] .toast-message {
+  color: var(--pb-text);
+  background: color-mix(in srgb, var(--pb-surface) 96%, transparent);
+  border-color: var(--pb-border-strong);
 }

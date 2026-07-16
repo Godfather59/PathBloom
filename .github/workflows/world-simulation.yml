@@ -1,0 +1,45 @@
+name: World simulation validation
+
+on:
+  pull_request:
+    paths:
+      - 'src/logic/WorldSimulation2*.js'
+      - 'src/components/WorldSimulation2Dashboard.jsx'
+      - 'src/content/packs/world-geopolitics.json'
+      - 'src/logic/__tests__/worldSimulation2.test.js'
+      - 'scripts/run-world-simulation-checks.mjs'
+      - 'src/main.jsx'
+      - 'src/components/SystemMenu.jsx'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/world-simulation.yml'
+  workflow_dispatch:
+
+jobs:
+  validate-world:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate bilingual content packs
+        run: npm run validate:content
+
+      - name: Run World Simulation 2 tests
+        run: npm run test:world
+
+      - name: Run multi-world stress check
+        run: node scripts/run-world-simulation-checks.mjs --worlds=20 --months=240
+
+      - name: Build production app
+        run: npm run build

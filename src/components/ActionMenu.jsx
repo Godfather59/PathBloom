@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from 'react';
+import React, { memo, useMemo, useState } from 'react';
 import {
   getActiveMonthlySituation,
   getCurrentTimePerson,
@@ -7,6 +7,8 @@ import {
 import { getMonthlySituationSummary } from '../logic/MonthlySituationEngine';
 import { BottomNavigation } from './BottomNavigation';
 import { AppIcon } from './AppIcon';
+import SituationDetailsSheet from './SituationDetailsSheet';
+import WorldSimulation2Dashboard from './WorldSimulation2Dashboard';
 import './ActionMenu.css';
 
 const LIFE_SHORTCUTS = [
@@ -175,6 +177,7 @@ export const ActionMenu = memo(function ActionMenu({
   onOpenSituation,
   language = 'en',
 }) {
+  const [localOverlay, setLocalOverlay] = useState(null);
   const person = getCurrentTimePerson();
   const activeSituation = getActiveMonthlySituation(person);
   const isArabic = language === 'ar';
@@ -186,6 +189,28 @@ export const ActionMenu = memo(function ActionMenu({
     () => getSituationPresentation(person, activeSituation, summary, locale),
     [person, activeSituation, summary, locale]
   );
+
+  if (localOverlay === 'world' && person) {
+    return (
+      <WorldSimulation2Dashboard
+        person={person}
+        onClose={() => setLocalOverlay(null)}
+        language={locale}
+      />
+    );
+  }
+
+  if (localOverlay === 'situation' && activeSituation) {
+    return (
+      <SituationDetailsSheet
+        person={person}
+        situation={activeSituation}
+        summary={summary}
+        language={locale}
+        onClose={() => setLocalOverlay(null)}
+      />
+    );
+  }
 
   const primaryLabel = activeSituation ? labels[activeSituation.id] || labels.normal : labels.normal;
   const primaryHint = activeSituation ? copy.monthlyHint : copy.normalHint;
@@ -199,6 +224,28 @@ export const ActionMenu = memo(function ActionMenu({
   const handleSmart = () => {
     if (activeSituation) onAgeSkip?.('smart_months');
     else onAgeSkip?.(5);
+  };
+
+  const handleNavigate = destination => {
+    if (onNavigate) {
+      onNavigate(destination);
+      return;
+    }
+    if (destination === 'activities') {
+      onAction?.('activities');
+    } else if (destination === 'world') {
+      setLocalOverlay('world');
+    } else if (destination === 'menu') {
+      document.querySelector('.hud-menu-fallback')?.click();
+    }
+  };
+
+  const handleSituationOpen = () => {
+    if (onOpenSituation) {
+      onOpenSituation(activeSituation?.id);
+      return;
+    }
+    setLocalOverlay('situation');
   };
 
   return (
@@ -221,7 +268,7 @@ export const ActionMenu = memo(function ActionMenu({
         <button
           type="button"
           className="active-situation-card"
-          onClick={() => onOpenSituation?.(activeSituation.id)}
+          onClick={handleSituationOpen}
           title={copy.inspect}
         >
           <span className="active-situation-icon" aria-hidden="true">
@@ -250,7 +297,7 @@ export const ActionMenu = memo(function ActionMenu({
 
       <BottomNavigation
         activeDestination="life"
-        onNavigate={onNavigate}
+        onNavigate={handleNavigate}
         onPrimaryAction={handlePrimary}
         onSmartAdvance={handleSmart}
         primaryLabel={primaryLabel}

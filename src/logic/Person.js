@@ -19,6 +19,7 @@ import { writeTimeCapsule, readTimeCapsule } from './TimeCapsule';
 import { getDefaultCityForCountry, CITIES } from './City';
 import { familyTree } from './DynastyMode';
 import { resolveActivity, getActivityWithDefaults } from './ActivityEngine';
+import { generateBandMembers } from './Band';
 
 const MAX_RELATIONSHIP_MEMORIES = 8;
 const IMPORTANT_RELATIONSHIP_TYPES = new Set([
@@ -2432,7 +2433,6 @@ export class Person {
       this.logEvent('You are already in a band.', 'neutral');
       return null;
     }
-    const { generateBandMembers } = require('./Band');
     const memberCount = 2 + Math.floor(Math.random() * 2) + (this.fame > 30 ? 1 : 0);
     this.band = {
       name,

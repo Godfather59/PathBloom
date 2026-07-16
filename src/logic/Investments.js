@@ -71,6 +71,54 @@ export function getActiveIPOs() {
   return activeIPOs;
 }
 
+export function getInvestmentMarketState() {
+  return {
+    nextIpoId,
+    activeIPOs: activeIPOs.map(ipo => ({ ...ipo })),
+  };
+}
+
+export function restoreInvestmentMarketState(state = {}) {
+  const restoredIPOs = Array.isArray(state?.activeIPOs)
+    ? state.activeIPOs
+        .filter(ipo => ipo && typeof ipo.id === 'string' && typeof ipo.name === 'string')
+        .map(ipo => {
+          const ipoAge = Number(ipo.ipoAge);
+          const ipoPrice = Number(ipo.ipoPrice);
+          const volatility = Number(ipo.volatility);
+          const dividendYield = Number(ipo.dividendYield);
+          return {
+            id: ipo.id,
+            name: ipo.name,
+            type: 'stock',
+            volatility: Number.isFinite(volatility) ? Math.max(0, Math.min(1, volatility)) : 0.3,
+            risk: ['low', 'medium', 'high', 'extreme'].includes(ipo.risk) ? ipo.risk : 'medium',
+            sector: typeof ipo.sector === 'string' ? ipo.sector : 'index',
+            dividendYield: Number.isFinite(dividendYield)
+              ? Math.max(0, Math.min(1, dividendYield))
+              : 0,
+            ipoAge: Number.isFinite(ipoAge) ? Math.max(0, Math.floor(ipoAge)) : 0,
+            ipoPrice: Number.isFinite(ipoPrice) ? Math.max(0.01, ipoPrice) : 0.01,
+          };
+        })
+    : [];
+  const highestSavedId = restoredIPOs.reduce((highest, ipo) => {
+    const match = /^ipo_(\d+)$/.exec(ipo.id);
+    return match ? Math.max(highest, Number(match[1])) : highest;
+  }, 0);
+  const savedNextId = Number(state?.nextIpoId);
+  const requestedNextId = Number.isFinite(savedNextId) ? Math.max(1, Math.floor(savedNextId)) : 1;
+
+  activeIPOs = restoredIPOs;
+  nextIpoId = Math.max(requestedNextId, highestSavedId + 1);
+  return getInvestmentMarketState();
+}
+
+export function resetInvestmentMarketState() {
+  activeIPOs = [];
+  nextIpoId = 1;
+}
+
 export function clearOldIPOs() {
   activeIPOs = activeIPOs.filter(ipo => ipo.ipoAge < 15);
 }

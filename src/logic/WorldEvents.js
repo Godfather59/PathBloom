@@ -170,7 +170,10 @@ for (const event of WORLD_EVENTS) {
 let activeEvents = [];
 
 export function getActiveWorldEvents() {
-  return [...activeEvents];
+  return activeEvents.map(event => ({
+    ...event,
+    effects: { ...(event.effects || {}) },
+  }));
 }
 
 export function getActiveEventIds() {
@@ -217,6 +220,29 @@ export function ageWorldEvents() {
 
 export function clearWorldEvents() {
   activeEvents = [];
+}
+
+export function restoreWorldEvents(events = []) {
+  const catalogById = new Map(WORLD_EVENTS.map(event => [event.id, event]));
+  const restored = [];
+  const seen = new Set();
+
+  for (const savedEvent of Array.isArray(events) ? events : []) {
+    const eventId = typeof savedEvent === 'string' ? savedEvent : savedEvent?.id;
+    const catalogEvent = catalogById.get(eventId);
+    if (!catalogEvent || seen.has(eventId)) {
+      continue;
+    }
+
+    seen.add(eventId);
+    restored.push({
+      ...catalogEvent,
+      effects: { ...catalogEvent.effects },
+    });
+  }
+
+  activeEvents = restored;
+  return getActiveWorldEvents();
 }
 
 export function getEventEffects() {

@@ -16,6 +16,9 @@ import {
   getActiveIPOs,
   clearOldIPOs,
   ageIPOs,
+  getInvestmentMarketState,
+  restoreInvestmentMarketState,
+  resetInvestmentMarketState,
 } from './Investments';
 import { ROYAL_COUNTRIES, getTitle } from './RoyaltyLogic';
 import { processCollegeSports } from './CollegeSports';
@@ -34,6 +37,9 @@ import {
   ageWorldEvents,
   getEventEffects,
   getActiveEventIds,
+  getActiveWorldEvents,
+  restoreWorldEvents,
+  clearWorldEvents,
 } from './WorldEvents';
 import { CITIES, getCityByName } from './City';
 import { buildWorldState, simulateWorldYear } from './WorldSimulation';
@@ -106,6 +112,69 @@ export class GameEngine {
     indexFund: 100, // Starts at $100
     dogecoin: 0.5, // Starts at $0.50
   };
+
+  static captureSimulationState() {
+    return {
+      version: 1,
+      worldState: {
+        ...this.worldState,
+        activeWorldEvents: [...(this.worldState.activeWorldEvents || [])],
+      },
+      marketTrends: { ...this.marketTrends },
+      worldEvents: getActiveWorldEvents(),
+      investmentMarket: getInvestmentMarketState(),
+    };
+  }
+
+  static restoreSimulationState(state = null) {
+    const savedState = state && typeof state === 'object' ? state : {};
+    const savedWorld =
+      savedState.worldState && typeof savedState.worldState === 'object'
+        ? savedState.worldState
+        : {};
+    const savedMarket =
+      savedState.marketTrends && typeof savedState.marketTrends === 'object'
+        ? savedState.marketTrends
+        : {};
+    const economy = ['Normal', 'Recession', 'Boom'].includes(savedWorld.economy)
+      ? savedWorld.economy
+      : 'Normal';
+    const conflict = ['Peace', 'War'].includes(savedWorld.conflict)
+      ? savedWorld.conflict
+      : 'Peace';
+    const indexFund = Number(savedMarket.indexFund);
+    const dogecoin = Number(savedMarket.dogecoin);
+
+    restoreWorldEvents(savedState.worldEvents || savedWorld.activeWorldEvents);
+    restoreInvestmentMarketState(savedState.investmentMarket);
+
+    this.worldState = {
+      economy,
+      conflict,
+      pandemic: savedWorld.pandemic === true,
+      activeWorldEvents: getActiveEventIds(),
+    };
+    this.marketTrends = {
+      indexFund: Number.isFinite(indexFund) && indexFund > 0 ? indexFund : 100,
+      dogecoin: Number.isFinite(dogecoin) && dogecoin > 0 ? dogecoin : 0.5,
+    };
+
+    return this.captureSimulationState();
+  }
+
+  static resetSimulationState() {
+    clearWorldEvents();
+    resetInvestmentMarketState();
+    this.worldState = {
+      economy: 'Normal',
+      conflict: 'Peace',
+      pandemic: false,
+      activeWorldEvents: [],
+    };
+    this.marketTrends = { indexFund: 100, dogecoin: 0.5 };
+    return this.captureSimulationState();
+  }
+
   /**
    * Central one-year simulation tick — ordered pipeline.
    * Every sub-system runs in a deterministic order so that world, country,

@@ -39,7 +39,12 @@ for (let index = 0; index < worlds; index += 1) {
     person.isAlive = true;
     person.contentState = { flags: {}, scheduled: [], history: {}, resolved: [] };
     ensureWorldSimulation2(person);
-    const world = simulateWorldMonths(person, months, { playerConsequences: false });
+    let remaining = months;
+    while (remaining > 0) {
+      simulateWorldMonths(person, Math.min(120, remaining), { playerConsequences: false });
+      remaining -= Math.min(120, remaining);
+    }
+    const world = person.worldSimulation2;
     const validation = validateWorldSimulation2(person);
     if (!validation.valid) {
       report.invalidWorlds += 1;

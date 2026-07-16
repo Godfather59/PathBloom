@@ -1,6 +1,7 @@
 /* @vitest-environment jsdom */
 
 import fs from 'node:fs';
+import path from 'node:path';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -67,7 +68,7 @@ describe('Arabic runtime alerts', () => {
 describe('light-theme compatibility', () => {
   it('defines readable light and sepia PathBloom surfaces', () => {
     const css = fs.readFileSync(
-      new URL('../../components/ThemeCompatibility.css', import.meta.url),
+      path.join(process.cwd(), 'src', 'components', 'ThemeCompatibility.css'),
       'utf8'
     );
     expect(css).toContain(":root[data-theme='light']");

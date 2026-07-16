@@ -48,6 +48,9 @@ function normalizeChoice(choice) {
     effects: asObject(source.effects),
     reputation: asObject(source.reputation),
     setFlags: asObject(source.setFlags),
+    relationshipEffects: source.relationshipEffects ? asObject(source.relationshipEffects) : null,
+    jobEffects: source.jobEffects ? asObject(source.jobEffects) : null,
+    situationEffects: source.situationEffects ? asObject(source.situationEffects) : null,
     next: source.next ? asObject(source.next) : null,
   };
 }
@@ -134,11 +137,15 @@ export function validateContentPack(input) {
         addError(errors, `${choicePath}.text`, 'Every choice requires English and Arabic text.', 'MISSING_TRANSLATION');
       }
       if (!choice.outcome.en || !choice.outcome.ar) {
-        warnings.push({
-          path: `${choicePath}.outcome`,
-          code: 'MISSING_OUTCOME_TRANSLATION',
-          message: 'Choice outcome should include both English and Arabic text.',
-        });
+        addError(
+          errors,
+          `${choicePath}.outcome`,
+          'Every choice outcome requires English and Arabic text.',
+          'MISSING_TRANSLATION'
+        );
+      }
+      if (choice.next && !hasText(choice.next.eventId)) {
+        addError(errors, `${choicePath}.next.eventId`, 'A follow-up must include an eventId.', 'BROKEN_FOLLOW_UP');
       }
     });
   });

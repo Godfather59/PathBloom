@@ -16,6 +16,7 @@ import './components/SystemMenuRedesign.css';
 import './components/PhaseTwoScreens.css';
 import './components/PhaseTwoFeatureStyles.css';
 import './components/PhaseTwoMusicStyles.css';
+import './components/ReleasePolish.css';
 
 const rootElement = document.getElementById('root');
 
@@ -61,14 +62,15 @@ window.addEventListener('unhandledrejection', event => {
 async function bootstrap() {
   try {
     // Runtime order matters: foundational fixes first, connected personal simulation second,
-    // country careers and the autonomous world next, data-driven content after that, and
-    // smart monthly controls last so fast-forward loops pass through every completed system.
+    // country careers and the autonomous world next, data-driven content after that, smart
+    // monthly controls next, and release/save polish last so it observes the final behavior.
     await import('./logic/GameEngineRuntimeFixes');
     await import('./logic/DeepSimulationRuntime');
     await import('./logic/CountryJobRuntime');
     await import('./logic/WorldSimulation2Runtime');
     await import('./logic/DataDrivenContentRuntime');
     await import('./logic/SmartMonthRuntime');
+    await import('./logic/ReleasePolishRuntime');
 
     const [{ App: CapApp }, { default: App }, { default: ErrorBoundary }] = await Promise.all([
       import('@capacitor/app'),

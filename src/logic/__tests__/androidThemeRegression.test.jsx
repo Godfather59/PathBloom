@@ -172,4 +172,13 @@ describe('physical Android RTL screenshot fixes', () => {
     expect(css).toContain(".hud-container[dir='rtl'] .hud-money");
     expect(css).toContain('unicode-bidi: isolate');
   });
+
+  it('keeps the numbered World News control inside the first compact HUD row', () => {
+    const css = readComponentCss('ScreenshotRegressionFixes.css');
+    expect(css).toContain('@media (max-width: 420px)');
+    expect(css).toContain('grid-template-columns: auto minmax(0, 1fr) auto auto');
+    expect(css).toContain('.hud-top-btns');
+    expect(css).toContain('grid-row: 1');
+    expect(css).toContain('.news-btn-count');
+  });
 });

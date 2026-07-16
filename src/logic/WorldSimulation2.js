@@ -358,9 +358,11 @@ function createWar(world, attackerName, defenderName) {
 
 function processDiplomacy(world) {
   const names = Object.keys(world.countries);
-  const leftName = pick(names);
-  let rightName = pick(names);
-  while (rightName === leftName) rightName = pick(names);
+  if (names.length < 2) return;
+  const leftIndex = Math.floor(Math.random() * names.length);
+  const rightOffset = 1 + Math.floor(Math.random() * (names.length - 1));
+  const leftName = names[leftIndex];
+  const rightName = names[(leftIndex + rightOffset) % names.length];
   const left = world.countries[leftName];
   const right = world.countries[rightName];
   const rel = relation(world, leftName, rightName);

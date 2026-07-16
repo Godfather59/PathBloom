@@ -20,6 +20,7 @@ import './components/ReleasePolish.css';
 import './components/ReleasePerformance.css';
 import './components/SaveRelease.css';
 import './components/ThemeCompatibility.css';
+import './components/ScreenshotRegressionFixes.css';
 
 const rootElement = document.getElementById('root');
 

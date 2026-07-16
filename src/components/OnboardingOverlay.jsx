@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { getCurrentTimePerson } from '../logic/TimeProgression';
+import { setGuidedJourney } from '../logic/PlayerJourney';
 import './Modal.css';
 import './ReleasePolish.css';
 
@@ -79,6 +81,17 @@ export function OnboardingOverlay({ language = 'en', onClose }) {
     ? { brand: 'PathBloom', skip: 'تخطَّ', back: 'السابق', next: 'التالي', start: 'ابدأ الرحلة الموجهة' }
     : { brand: 'PathBloom', skip: 'Skip', back: 'Back', next: 'Next', start: 'Start guided journey' };
 
+  const finish = guided => {
+    const person = getCurrentTimePerson();
+    if (person) setGuidedJourney(person, guided);
+    try {
+      localStorage.setItem('pathbloom_guided_journey', guided ? 'true' : 'false');
+    } catch {
+      // Storage is optional; the person save will retain the choice after the next action.
+    }
+    onClose?.({ guided, skipped: !guided });
+  };
+
   return (
     <div className="modal-overlay onboarding-overlay release-onboarding">
       <div className="modal-content onboarding-card" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
@@ -87,7 +100,7 @@ export function OnboardingOverlay({ language = 'en', onClose }) {
             <span aria-hidden="true">🌱</span>
             <span>{copy.brand}</span>
           </div>
-          <button type="button" className="release-onboarding-skip" onClick={() => onClose?.({ guided: false, skipped: true })}>
+          <button type="button" className="release-onboarding-skip" onClick={() => finish(false)}>
             {copy.skip}
           </button>
         </header>
@@ -130,7 +143,7 @@ export function OnboardingOverlay({ language = 'en', onClose }) {
               type="button"
               className="release-onboarding-next"
               onClick={() => {
-                if (isLast) onClose?.({ guided: true, skipped: false });
+                if (isLast) finish(true);
                 else setIndex(value => value + 1);
               }}
             >

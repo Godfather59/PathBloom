@@ -1,0 +1,34 @@
+/* Fixes captured during physical Android screenshot review. */
+
+/* CSS Grid line numbers follow the element's writing direction. Keep the
+   structural grid LTR so the explicit RTL column placement does not reverse
+   twice, while the card content itself remains naturally RTL. */
+.event-log[dir='rtl'] .timeline-event {
+  direction: ltr;
+}
+
+.event-log[dir='rtl'] .timeline-card {
+  direction: rtl;
+}
+
+/* Keep mixed Arabic labels and currency values isolated from each other. */
+.hud-container[dir='rtl'] .hud-finance-block,
+.hud-container[dir='rtl'] .hud-money,
+.hud-container[dir='rtl'] .hud-debt {
+  unicode-bidi: isolate;
+}
+
+.hud-container[dir='rtl'] .hud-money {
+  direction: ltr;
+}
+
+.hud-container[dir='rtl'] .hud-debt {
+  direction: rtl;
+}
+
+@media (max-width: 360px) {
+  .event-log[dir='rtl'] {
+    padding-inline-start: 12px;
+    padding-inline-end: 11px;
+  }
+}

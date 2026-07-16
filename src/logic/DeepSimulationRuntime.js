@@ -1,4 +1,4 @@
-import { GameEngine } from './GameEngine';
+import { GameEngine, calculateIncomeTax } from './GameEngine';
 import { Person } from './Person';
 import {
   ensureEventChains,
@@ -57,6 +57,44 @@ function ensureDeepSystems(person) {
   ensureNPCMemories(person);
   ensureMonthlySituations(person);
   return person;
+}
+
+function chargePerson(person, amount) {
+  const due = Math.max(0, Math.floor(Number(amount) || 0));
+  const cash = Math.max(0, Number(person.money) || 0);
+  const paid = Math.min(cash, due);
+  person.money = cash - paid;
+  if (paid < due) {
+    person.personalDebt = Math.max(0, Number(person.personalDebt) || 0) + due - paid;
+  }
+}
+
+function applyCountryTaxAdjustment(person) {
+  if (person.age < 18 || !person.job || person.job.isRetired || person.job.isMafia) return 0;
+  const salary = Math.max(0, Number(person.job.salary) || 0);
+  if (salary <= 0) return 0;
+  const rules = getCountryRules(person, GameEngine.getCountryForPerson?.(person) || null);
+  const baselineTax = calculateIncomeTax(salary);
+  const targetTax = Math.max(0, Math.floor(salary * rules.incomeTaxRate));
+  const difference = targetTax - baselineTax;
+
+  if (difference > 0) {
+    chargePerson(person, difference);
+  } else if (difference < 0) {
+    person.money = (Number(person.money) || 0) + Math.abs(difference);
+  }
+  if (person.lifeStats) {
+    person.lifeStats.totalTaxes = Math.max(0, (Number(person.lifeStats.totalTaxes) || 0) + difference);
+  }
+  person.countryLife.lastIncomeTax = targetTax;
+  person.countryLife.lastTaxAdjustment = difference;
+  if ((person.age === 18 || person.age % 10 === 0) && difference !== 0) {
+    person.logEvent(
+      `${person.country}'s tax rules adjusted your annual income tax to $${targetTax.toLocaleString()}.`,
+      difference > 0 ? 'neutral' : 'good'
+    );
+  }
+  return difference;
 }
 
 const originalEnsureDefaults = Person.prototype.ensureDefaults;
@@ -128,6 +166,62 @@ Person.prototype.setJob = function setJobWithReputation(jobData) {
   return hired;
 };
 
+const originalVisitDoctor = Person.prototype.visitDoctor;
+Person.prototype.visitDoctor = function visitDoctorWithCountryCosts(treatment) {
+  ensureDeepSystems(this);
+  if (!treatment || typeof treatment !== 'object') return originalVisitDoctor.call(this, treatment);
+  const rules = getCountryRules(this, GameEngine.getCountryForPerson?.(this) || null);
+  const adjusted = {
+    ...treatment,
+    cost: Math.max(0, Math.floor((Number(treatment.cost) || 0) * rules.healthcareCost)),
+  };
+  return originalVisitDoctor.call(this, adjusted);
+};
+
+const originalEnrollInSchool = Person.prototype.enrollInSchool;
+Person.prototype.enrollInSchool = function enrollWithCountryTuition(school) {
+  ensureDeepSystems(this);
+  if (!school || typeof school !== 'object') return originalEnrollInSchool.call(this, school);
+  const rules = getCountryRules(this, GameEngine.getCountryForPerson?.(this) || null);
+  const isHigherEducation = ['university', 'grad_school'].includes(school.type);
+  const adjusted = {
+    ...school,
+    cost: isHigherEducation
+      ? Math.max(0, Math.floor((Number(school.cost) || 0) * rules.universityCost))
+      : Number(school.cost) || 0,
+  };
+  return originalEnrollInSchool.call(this, adjusted);
+};
+
+const originalCalculateEstateTax = Person.prototype.calculateEstateTax;
+Person.prototype.calculateEstateTax = function calculateCountryEstateTax(totalValue) {
+  ensureDeepSystems(this);
+  const rules = getCountryRules(this, GameEngine.getCountryForPerson?.(this) || null);
+  if (!Number.isFinite(Number(rules.inheritanceTaxRate))) {
+    return originalCalculateEstateTax.call(this, totalValue);
+  }
+  return Math.max(0, Number(totalValue) || 0) * Math.max(0, rules.inheritanceTaxRate);
+};
+
+const originalRetire = Person.prototype.retire;
+Person.prototype.retire = function retireWithCountryRules() {
+  ensureDeepSystems(this);
+  const rules = getCountryRules(this, GameEngine.getCountryForPerson?.(this) || null);
+  const retirementWealth = Object.values(this.retirementAccounts || {}).reduce(
+    (sum, account) => sum + Math.max(0, Number(account?.balance) || 0),
+    0
+  ) + Math.max(0, Number(this.finance?.savingsAccount) || 0);
+  const earlyRetirementFunded = retirementWealth >= Math.max(100000, (Number(this.job?.salary) || 30000) * 5);
+  if (this.age < rules.retirementAge && !earlyRetirementFunded) {
+    this.logEvent(
+      `The standard retirement age in ${this.country} is ${rules.retirementAge}. You need much more savings to retire early.`,
+      'bad'
+    );
+    return false;
+  }
+  return originalRetire.call(this);
+};
+
 // Convert the legacy instant-birth relationship action into a nine-month pregnancy.
 const originalInteractWithRel = Person.prototype.interactWithRel;
 if (typeof originalInteractWithRel === 'function') {
@@ -148,8 +242,6 @@ if (typeof originalInteractWithRel === 'function') {
         if (this.history?.[0]?.text && /You had a baby/i.test(this.history[0].text)) {
           this.history.shift();
         }
-        // The legacy branch already granted +30 happiness for the instant birth.
-        // Remove that reward before applying the smaller pregnancy-start reward.
         this.happiness = Math.max(0, (Number(this.happiness) || 0) - 30);
         beginPregnancy(this, child, relId);
       }
@@ -172,10 +264,7 @@ GameEngine.processLivingExpenses = function processCountryAdjustedLivingExpenses
   const difference = adjustedCost - originalCost;
 
   if (difference > 0) {
-    const cash = Math.max(0, Number(person.money) || 0);
-    const paid = Math.min(cash, difference);
-    person.money = cash - paid;
-    person.personalDebt = Math.max(0, Number(person.personalDebt) || 0) + difference - paid;
+    chargePerson(person, difference);
   } else if (difference < 0) {
     let saving = Math.abs(difference);
     const debtReduction = Math.min(Math.max(0, Number(person.personalDebt) || 0), saving);
@@ -201,8 +290,7 @@ GameEngine.simulateYear = function simulateYearWithDeepSystems(person) {
   ensureDeepSystems(person);
   if (!person.isAlive) return result;
 
-  // These systems intentionally run after the legacy yearly pipeline so they can
-  // react to that year's jobs, bills, relationships, world events, and decisions.
+  applyCountryTaxAdjustment(person);
   processCountryLifeYear(person, person.geopoliticalState);
   processPersonalFinanceYear(person);
   processReputationYear(person);
@@ -221,7 +309,6 @@ GameEngine.ageUp = function ageUpWithMonthlyDepth(person, amount = 1) {
   if (amount === 'month' && person.isAlive) {
     const crossedYearBoundary = (Number(person.age) || 0) > ageBefore;
     processMonthlySituation(person);
-    // The yearly wrapper already processed finance and chains on month 12.
     if (!crossedYearBoundary) {
       processPersonalFinanceMonth(person);
       tickEventChainsMonth(person);

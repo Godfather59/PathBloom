@@ -15,6 +15,7 @@ import './components/DestinationScreens.css';
 import './components/SystemMenuRedesign.css';
 import './components/PhaseTwoScreens.css';
 import './components/PhaseTwoFeatureStyles.css';
+import './components/PhaseTwoMusicStyles.css';
 
 const rootElement = document.getElementById('root');
 

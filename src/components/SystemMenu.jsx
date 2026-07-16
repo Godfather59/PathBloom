@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { LANGUAGES } from '../logic/i18n';
 import { THEMES } from '../logic/themes';
+import { getCurrentTimePerson } from '../logic/TimeProgression';
+import SimulationDashboard from './SimulationDashboard';
 import './Modal.css';
 
 export function SystemMenu({
@@ -37,10 +39,25 @@ export function SystemMenu({
   onCountryProfile,
   onSimulationDashboard,
 }) {
+  const [showSimulation, setShowSimulation] = useState(false);
+  const currentPerson = getCurrentTimePerson();
+  const openSimulation = onSimulationDashboard || (() => setShowSimulation(true));
+
+  if (showSimulation && currentPerson) {
+    return (
+      <SimulationDashboard
+        person={currentPerson}
+        onClose={() => setShowSimulation(false)}
+        language={language}
+        t={t}
+      />
+    );
+  }
+
   const navigation = [
     [onStats, '📊', 'system.stats', 'Lifetime Stats'],
     [onHistory, '📈', 'system.history', 'Current Life Trends'],
-    [onSimulationDashboard, '🧩', 'system.simulation', 'Simulation Overview'],
+    [openSimulation, '🧩', 'system.simulation', 'Simulation Overview'],
     [onFamilyTree, '🌳', 'system.familyTree', 'Family Dynasty'],
     [onWorldNews, '📰', 'system.worldNews', 'World News'],
     [onWorldOverview, '🌍', 'system.worldOverview', 'World Overview'],
@@ -55,11 +72,7 @@ export function SystemMenu({
 
   return (
     <div className="modal-overlay">
-      <div
-        className="modal-content"
-        style={{ maxWidth: '340px' }}
-        dir={language === 'ar' ? 'rtl' : 'ltr'}
-      >
+      <div className="modal-content" style={{ maxWidth: '340px' }} dir={language === 'ar' ? 'rtl' : 'ltr'}>
         <div className="modal-header">
           <h2 className="modal-title">⏸️ {t('system.paused', 'Paused')}</h2>
           <button className="close-btn" onClick={onResume}>&times;</button>
@@ -72,24 +85,18 @@ export function SystemMenu({
           <button className="btn-secondary" onClick={onSave} style={{ padding: '16px', fontSize: '1.1rem' }}>
             💾 {t('system.save', 'Save Game')}
           </button>
-          <button
-            className="list-item"
-            onClick={onGodMode}
-            style={{
-              padding: '16px', fontSize: '1.1rem', background: 'linear-gradient(45deg, #ffd700, #ffa500)',
-              color: 'black', fontWeight: 'bold', border: 'none', marginBottom: 0, textAlign: 'center',
-            }}
-          >
+          <button className="list-item" onClick={onGodMode} style={{
+            padding: '16px', fontSize: '1.1rem', background: 'linear-gradient(45deg, #ffd700, #ffa500)',
+            color: 'black', fontWeight: 'bold', border: 'none', marginBottom: 0, textAlign: 'center',
+          }}>
             ⚡ {t('system.godMode', 'God Mode')}
           </button>
 
-          {navigation.map(([handler, icon, key, fallback]) =>
-            handler ? (
-              <button key={key} className="btn-secondary" onClick={handler} style={{ padding: '12px' }}>
-                {icon} {t(key, fallback)}
-              </button>
-            ) : null
-          )}
+          {navigation.map(([handler, icon, key, fallback]) => handler ? (
+            <button key={key} className="btn-secondary" onClick={handler} style={{ padding: '12px' }}>
+              {icon} {t(key, fallback)}
+            </button>
+          ) : null)}
 
           {onDebug && (
             <button className="btn-secondary" onClick={onDebug} style={{ padding: '12px', fontSize: '0.85rem', color: '#888' }}>
@@ -97,11 +104,8 @@ export function SystemMenu({
             </button>
           )}
 
-          <button
-            className="btn-secondary"
-            onClick={onResetTutorial}
-            style={{ padding: '12px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}
-          >
+          <button className="btn-secondary" onClick={onResetTutorial}
+            style={{ padding: '12px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
             🔄 {t('system.resetTutorial', 'Reset Tutorial')}
           </button>
 
@@ -153,11 +157,8 @@ export function SystemMenu({
             <div className="settings-language-label">🌐 {t('system.language', 'Language')}</div>
             <div className="settings-language-options">
               {LANGUAGES.map(option => (
-                <button key={option.id} type="button"
-                  className={`language-chip ${language === option.id ? 'active' : ''}`}
-                  onClick={() => onLanguageChange?.(option.id)}>
-                  {option.nativeName}
-                </button>
+                <button key={option.id} type="button" className={`language-chip ${language === option.id ? 'active' : ''}`}
+                  onClick={() => onLanguageChange?.(option.id)}>{option.nativeName}</button>
               ))}
             </div>
           </div>
@@ -167,23 +168,15 @@ export function SystemMenu({
             <div className="settings-language-options" style={{ flexWrap: 'wrap', gap: '4px' }}>
               {Object.entries(THEMES).map(([id, theme]) => (
                 <button key={id} type="button" className={`language-chip ${currentTheme === id ? 'active' : ''}`}
-                  onClick={() => onThemeChange?.(id)}>
-                  {theme.icon} {theme.name}
-                </button>
+                  onClick={() => onThemeChange?.(id)}>{theme.icon} {theme.name}</button>
               ))}
             </div>
           </div>
 
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', margin: '8px 0' }} />
-          <button
-            className="btn-danger"
-            onClick={() => {
-              if (confirm(t('system.exitConfirm', 'Are you sure you want to exit? Unsaved progress will be lost.'))) {
-                onExit();
-              }
-            }}
-            style={{ padding: '16px', fontSize: '1.1rem' }}
-          >
+          <button className="btn-danger" onClick={() => {
+            if (confirm(t('system.exitConfirm', 'Are you sure you want to exit? Unsaved progress will be lost.'))) onExit();
+          }} style={{ padding: '16px', fontSize: '1.1rem' }}>
             🚪 {t('system.exit', 'Exit to Main Menu')}
           </button>
         </div>

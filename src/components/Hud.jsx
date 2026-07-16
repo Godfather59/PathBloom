@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import { MiniAvatar } from './MiniAvatar';
 import { translateGameText } from '../logic/i18n';
+import { ensureTimeProgress, setCurrentTimePerson } from '../logic/TimeProgression';
 import './Hud.css';
 
 export const Hud = memo(
@@ -15,14 +16,15 @@ export const Hud = memo(
       return null;
     }
 
+    const timeState = ensureTimeProgress(person);
+    setCurrentTimePerson(person);
+
     const formatMoney = amt => {
       const value = Math.round(Number(amt) || 0);
       const absValue = Math.abs(value).toLocaleString('en-US');
       const sign = value < 0 ? '-' : '';
 
-      return language === 'ar'
-        ? `${sign}${absValue} دولار`
-        : `${sign}$${absValue}`;
+      return language === 'ar' ? `${sign}${absValue} دولار` : `${sign}$${absValue}`;
     };
 
     const getAvatar = () => {
@@ -55,6 +57,11 @@ export const Hud = memo(
       .filter(Boolean)
       .map(value => translateGameText(language, value))
       .join(', ');
+    const month = Math.max(0, Math.min(11, Number(timeState?.month) || 0));
+    const ageLabel =
+      language === 'ar'
+        ? `${person.age} ${t('hud.yearsOld', 'سنة')}${month > 0 ? ` و${month} شهر` : ''}`
+        : `${person.age} ${t('hud.yearsOld', 'years old')}${month > 0 ? `, ${month} month${month === 1 ? '' : 's'}` : ''}`;
 
     return (
       <div className="hud-container" dir={language === 'ar' ? 'rtl' : 'ltr'}>
@@ -68,10 +75,12 @@ export const Hud = memo(
           <div className="person-info">
             <h2 className="person-name">{person.getFullName()}</h2>
             <div className="person-details">
-              {genderLabel} - 🎂 {person.age} {t('hud.yearsOld', 'years old')}
+              {genderLabel} - 🎂 {ageLabel}
               <div className="hud-money">💵 {formatMoney(person.money)}</div>
               {totalDebt > 0 && (
-                <div className="hud-debt">💳 {t('hud.debt', 'Debt')}: {formatMoney(totalDebt)}</div>
+                <div className="hud-debt">
+                  💳 {t('hud.debt', 'Debt')}: {formatMoney(totalDebt)}
+                </div>
               )}
               <div className="hud-role">{roleLabel}</div>
               <div className="hud-location">📍 {locationLabel}</div>

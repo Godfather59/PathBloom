@@ -120,6 +120,35 @@
   border: 1px solid rgba(57, 217, 138, 0.12);
 }
 
+/* The yellow numbered control is PathBloom's World News button. Hud.css used
+   a three-column mobile grid for four HUD sections, which forced this fourth
+   section into a new row at the top-left in RTL. Preserve four columns so the
+   control stays inside the identity row and below the safe area. */
+@media (max-width: 420px) {
+  .hud-identity-row {
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    gap: 6px;
+  }
+
+  .hud-top-btns {
+    grid-row: 1;
+    min-width: 34px;
+    align-self: center;
+    justify-self: end;
+  }
+
+  .news-btn {
+    width: 34px;
+    height: 34px;
+    min-height: 34px;
+  }
+
+  .news-btn-count {
+    inset-inline-end: -3px;
+    top: -4px;
+  }
+}
+
 @media (max-width: 360px) {
   .event-log[dir='rtl'] {
     padding-inline-start: 12px;
@@ -143,5 +172,17 @@
 
   .time-smart-copy small {
     font-size: 0.48rem;
+  }
+}
+
+@media (max-width: 340px) {
+  .hud-finance-block {
+    min-width: 58px;
+  }
+
+  .news-btn {
+    width: 32px;
+    height: 32px;
+    min-height: 32px;
   }
 }

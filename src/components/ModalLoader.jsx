@@ -52,6 +52,7 @@ const LazyModalLoader = ({ modalType, modalData, onClose, ...props }) => {
     gameOver: lazy(() => import('./GameOver')),
     annualRecap: lazy(() => import('./AnnualRecapModal')),
     geopolitics: lazy(() => import('./GeopoliticsModal')),
+    simulation: lazy(() => import('./SimulationDashboard')),
   };
 
   const ModalComponent = modalComponents[modalType];

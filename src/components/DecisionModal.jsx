@@ -2,6 +2,7 @@ import React from 'react';
 import { translateGameMessage, translateGameText } from '../logic/i18n';
 import { cleanLocalizedText } from '../logic/localizationSanitizer';
 import { translateDeepSimulationText } from '../logic/DeepLocalization';
+import { localizeArabicCandidate } from '../logic/ArabicLocalization';
 import './Modal.css';
 
 const TYPE_EMOJIS = {
@@ -34,17 +35,26 @@ export function DecisionModal({
   language = 'en',
   t = (key, fallback) => fallback || key,
 }) {
-  const localize = (value, messageKey, messageParams, localizedText) => {
-    const packText = localizedText && typeof localizedText === 'object'
-      ? localizedText[language] || localizedText.en
-      : null;
-    if (packText) return String(packText);
+  const localize = (value, messageKey, messageParams, localizedText, context) => {
+    const packText =
+      localizedText && typeof localizedText === 'object'
+        ? localizedText[language] || localizedText.en
+        : null;
+
+    if (packText) {
+      return language === 'ar'
+        ? localizeArabicCandidate(packText, localizedText.en || value, context)
+        : String(packText);
+    }
 
     const localized = messageKey
       ? translateGameMessage(language, messageKey, messageParams || {}, value)
       : translateGameText(language, value);
     const cleaned = cleanLocalizedText(localized, value, language);
-    return translateDeepSimulationText(cleaned, language);
+    const deepLocalized = translateDeepSimulationText(cleaned, language);
+    return language === 'ar'
+      ? localizeArabicCandidate(deepLocalized, value, context)
+      : deepLocalized;
   };
 
   return (
@@ -59,8 +69,17 @@ export function DecisionModal({
         </div>
 
         <div className="modal-body">
-          <p style={{ fontSize: '1.2em', lineHeight: '1.5', margin: '0 0 24px 0' }}>
-            {localize(event.text, event.messageKey, event.messageParams, event.localizedText)}
+          <p
+            dir="auto"
+            style={{ fontSize: '1.2em', lineHeight: '1.5', margin: '0 0 24px 0' }}
+          >
+            {localize(
+              event.text,
+              event.messageKey,
+              event.messageParams,
+              event.localizedText,
+              `decision:${event.type || 'event'}`
+            )}
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -81,8 +100,14 @@ export function DecisionModal({
                 <span className="choice-emoji" aria-hidden="true">
                   {getChoiceEmoji(choice)}
                 </span>
-                <span>
-                  {localize(choice.text, choice.messageKey, choice.messageParams, choice.localizedText)}
+                <span dir="auto">
+                  {localize(
+                    choice.text,
+                    choice.messageKey,
+                    choice.messageParams,
+                    choice.localizedText,
+                    `choice:${event.type || 'event'}`
+                  )}
                 </span>
               </button>
             ))}

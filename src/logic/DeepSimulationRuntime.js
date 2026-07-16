@@ -128,7 +128,7 @@ Person.prototype.setJob = function setJobWithReputation(jobData) {
   return hired;
 };
 
-// Convert the old instant-birth relationship action into a nine-month pregnancy.
+// Convert the legacy instant-birth relationship action into a nine-month pregnancy.
 const originalInteractWithRel = Person.prototype.interactWithRel;
 if (typeof originalInteractWithRel === 'function') {
   Person.prototype.interactWithRel = function interactWithRelationshipDepth(relId, action, payload) {
@@ -148,6 +148,9 @@ if (typeof originalInteractWithRel === 'function') {
         if (this.history?.[0]?.text && /You had a baby/i.test(this.history[0].text)) {
           this.history.shift();
         }
+        // The legacy branch already granted +30 happiness for the instant birth.
+        // Remove that reward before applying the smaller pregnancy-start reward.
+        this.happiness = Math.max(0, (Number(this.happiness) || 0) - 30);
         beginPregnancy(this, child, relId);
       }
     }
@@ -196,6 +199,7 @@ GameEngine.simulateYear = function simulateYearWithDeepSystems(person) {
   ensureDeepSystems(person);
   const result = originalSimulateYear(person);
   ensureDeepSystems(person);
+  if (!person.isAlive) return result;
 
   // These systems intentionally run after the legacy yearly pipeline so they can
   // react to that year's jobs, bills, relationships, world events, and decisions.
@@ -210,12 +214,18 @@ GameEngine.simulateYear = function simulateYearWithDeepSystems(person) {
 const originalAgeUp = GameEngine.ageUp.bind(GameEngine);
 GameEngine.ageUp = function ageUpWithMonthlyDepth(person, amount = 1) {
   ensureDeepSystems(person);
+  const ageBefore = Math.max(0, Number(person.age) || 0);
   const result = originalAgeUp(person, amount);
   ensureDeepSystems(person);
-  if (amount === 'month') {
+
+  if (amount === 'month' && person.isAlive) {
+    const crossedYearBoundary = (Number(person.age) || 0) > ageBefore;
     processMonthlySituation(person);
-    processPersonalFinanceMonth(person);
-    tickEventChainsMonth(person);
+    // The yearly wrapper already processed finance and chains on month 12.
+    if (!crossedYearBoundary) {
+      processPersonalFinanceMonth(person);
+      tickEventChainsMonth(person);
+    }
   }
   return result;
 };

@@ -19,6 +19,7 @@ import './components/PhaseTwoMusicStyles.css';
 import './components/ReleasePolish.css';
 import './components/ReleasePerformance.css';
 import './components/SaveRelease.css';
+import './components/ThemeCompatibility.css';
 
 const rootElement = document.getElementById('root');
 
@@ -66,6 +67,7 @@ async function bootstrap() {
     // Runtime order matters: foundational fixes first, connected personal simulation second,
     // country careers and the autonomous world next, data-driven content after that, smart
     // monthly controls next, and release/save polish last so it observes the final behavior.
+    await import('./logic/BrowserRequireBridge');
     await import('./logic/GameEngineRuntimeFixes');
     await import('./logic/DeepSimulationRuntime');
     await import('./logic/CountryJobRuntime');

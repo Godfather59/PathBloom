@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "id": "crime-core",
+  "name": { "en": "Crime Stories", "ar": "قصص الجريمة" },
+  "description": { "en": "Temptation, investigation, loyalty, and legal consequences.", "ar": "الإغراء والتحقيق والولاء والعواقب القانونية." },
+  "category": "crime",
+  "countries": ["*"],
+  "events": [
+    {
+      "id": "crime_suspicious_package",
+      "frequency": "year",
+      "weight": 5,
+      "cooldownMonths": 48,
+      "conditions": { "minAge": 16, "maxAge": 70, "requiresNotInPrison": true },
+      "text": { "en": "A stranger offered you cash to deliver a sealed package without asking questions.", "ar": "عرض عليك غريب مبلغا من المال لتوصيل طرد مغلق من دون أسئلة." },
+      "choices": [
+        { "id": "deliver", "text": { "en": "Deliver it", "ar": "وصله" }, "outcome": { "en": "You received the cash, but now dangerous people know your name.", "ar": "حصلت على المال، لكن أشخاصا خطرين أصبحوا يعرفون اسمك." }, "effects": { "money": 2500, "stress": 8, "karma": -6 }, "reputation": { "criminal": 9, "trust": -4 }, "setFlags": { "deliveredSuspiciousPackage": true }, "next": { "eventId": "crime_package_followup", "delayMonths": 5 } },
+        { "id": "police", "text": { "en": "Contact the police", "ar": "اتصل بالشرطة" }, "outcome": { "en": "Investigators took the package and asked you to stay available.", "ar": "أخذ المحققون الطرد وطلبوا منك البقاء متاحا." }, "effects": { "stress": 5, "karma": 5 }, "reputation": { "trust": 6, "criminal": -2 }, "setFlags": { "reportedSuspiciousPackage": true }, "next": { "eventId": "crime_package_followup", "delayMonths": 5 } },
+        { "id": "refuse", "text": { "en": "Walk away", "ar": "ابتعد" }, "outcome": { "en": "You refused to become involved.", "ar": "رفضت التورط." }, "effects": { "stress": -1 }, "reputation": { "trust": 1 } }
+      ]
+    },
+    {
+      "id": "crime_package_followup",
+      "hidden": true,
+      "frequency": "month",
+      "text": { "en": "The package case returned when investigators arrested several people connected to it.", "ar": "عادت قضية الطرد بعد اعتقال عدة أشخاص مرتبطين بها." },
+      "choices": [
+        { "id": "cooperate", "text": { "en": "Cooperate fully", "ar": "تعاون بالكامل" }, "outcome": { "en": "Your testimony helped the investigation.", "ar": "ساعدت شهادتك التحقيق." }, "effects": { "stress": 5, "karma": 4 }, "reputation": { "trust": 8, "criminal": -4 } },
+        { "id": "silent", "text": { "en": "Stay silent", "ar": "التزم الصمت" }, "outcome": { "en": "You avoided immediate attention, but suspicion remained.", "ar": "تجنبت الانتباه المباشر، لكن الشك بقي." }, "effects": { "stress": 7 }, "reputation": { "trust": -5, "criminal": 4 } }
+      ]
+    },
+    {
+      "id": "crime_informant_offer",
+      "frequency": "year",
+      "weight": 4,
+      "cooldownMonths": 60,
+      "conditions": { "minAge": 18, "minCriminalReputation": 20 },
+      "text": { "en": "A detective offered to reduce your legal risk if you provide information about other offenders.", "ar": "عرض محقق تقليل مخاطرك القانونية مقابل معلومات عن مجرمين آخرين." },
+      "choices": [
+        { "id": "inform", "text": { "en": "Become an informant", "ar": "اصبح مخبرا" }, "outcome": { "en": "The police became more helpful, but criminals may see you as a traitor.", "ar": "أصبحت الشرطة أكثر تعاونا، لكن المجرمين قد يعتبرونك خائنا." }, "effects": { "stress": 9 }, "reputation": { "criminal": -8, "trust": 3 }, "setFlags": { "policeInformant": true } },
+        { "id": "refuse", "text": { "en": "Refuse the offer", "ar": "ارفض العرض" }, "outcome": { "en": "You kept your reputation in the underworld.", "ar": "حافظت على سمعتك في عالم الجريمة." }, "effects": { "stress": 4 }, "reputation": { "criminal": 5, "trust": -3 } }
+      ]
+    },
+    {
+      "id": "crime_old_friend_request",
+      "frequency": "year",
+      "weight": 4,
+      "cooldownMonths": 48,
+      "conditions": { "minAge": 18, "requiresRelationshipType": "Friend" },
+      "text": { "en": "An old friend asked you to provide a false alibi after a robbery.", "ar": "طلب منك صديق قديم تقديم حجة غياب كاذبة بعد عملية سرقة." },
+      "choices": [
+        { "id": "lie", "text": { "en": "Provide the alibi", "ar": "قدم حجة الغياب" }, "outcome": { "en": "Your friend escaped suspicion, but you became part of the case.", "ar": "نجا صديقك من الشبهة، لكنك أصبحت جزءا من القضية." }, "effects": { "stress": 8, "karma": -8 }, "reputation": { "criminal": 7, "trust": -6 }, "relationshipEffects": { "type": "Friend", "stat": 8 } },
+        { "id": "refuse", "text": { "en": "Refuse to lie", "ar": "ارفض الكذب" }, "outcome": { "en": "Your friend felt betrayed, but you stayed out of the investigation.", "ar": "شعر صديقك بالخيانة، لكنك بقيت خارج التحقيق." }, "effects": { "stress": 2, "karma": 4 }, "reputation": { "trust": 5, "criminal": -2 }, "relationshipEffects": { "type": "Friend", "stat": -10 } },
+        { "id": "convince", "text": { "en": "Convince them to confess", "ar": "أقنعه بالاعتراف" }, "outcome": { "en": "Your friend considered accepting responsibility.", "ar": "فكر صديقك في تحمل المسؤولية." }, "effects": { "stress": 5, "smarts": 1 }, "reputation": { "trust": 7 }, "relationshipEffects": { "type": "Friend", "stat": 3 } }
+      ]
+    }
+  ]
+}

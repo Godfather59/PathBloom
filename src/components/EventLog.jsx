@@ -173,6 +173,7 @@ export const EventLog = memo(function EventLog({
   history = [],
   language = 'en',
   t = (key, fallback) => fallback || key,
+  headerContent = null,
 }) {
   const containerRef = useRef(null);
 
@@ -211,6 +212,8 @@ export const EventLog = memo(function EventLog({
         <span>{language === 'ar' ? 'قصتك' : 'Your story'}</span>
         <strong>{language === 'ar' ? 'أحدث الأحداث أولا' : 'Newest first'}</strong>
       </div>
+
+      {headerContent}
 
       {displayHistory.length === 0 && (
         <div className="timeline-empty">

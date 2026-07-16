@@ -7,6 +7,7 @@ import './components/NewFeatures.css';
 import './components/MobilePolish.css';
 import './components/ArabicRTL.css';
 import './components/DesignSystem.css';
+import './components/ShellExtensions.css';
 
 const rootElement = document.getElementById('root');
 

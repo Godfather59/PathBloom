@@ -1,0 +1,47 @@
+name: Hotfix screenshot patcher
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  hotfix:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v6
+        with:
+          ref: fix/screenshot-arabic-dock
+          persist-credentials: true
+
+      - name: Fix replacement callback
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('.github/workflows/apply-screenshot-fixes-v2.yml')
+          text = path.read_text(encoding='utf-8')
+          old = """                  replacement,
+                  event_text,"""
+          new = """                  lambda _match: replacement,
+                  event_text,"""
+          if old in text:
+              path.write_text(text.replace(old, new, 1), encoding='utf-8')
+          elif new not in text:
+              raise SystemExit('Could not locate v2 replacement call')
+          PY
+
+      - name: Commit hotfix
+        run: |
+          if git diff --quiet; then
+            exit 0
+          fi
+          git config user.name 'PathBloom Automation'
+          git config user.email 'actions@users.noreply.github.com'
+          git add .github/workflows/apply-screenshot-fixes-v2.yml
+          git commit -m 'Fix screenshot patcher replacement callback'
+          git push origin HEAD:fix/screenshot-arabic-dock

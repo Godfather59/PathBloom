@@ -10,6 +10,7 @@ import { ensureTimeProgress, setCurrentTimePerson } from '../logic/TimeProgressi
 import { AppIcon } from './AppIcon';
 import { BottomSheet } from './ShellPrimitives';
 import './Hud.css';
+import './HudSafeActions.css';
 
 const STAT_DEFINITIONS = [
   { id: 'health', icon: 'health', key: 'stat.health', en: 'Health' },
@@ -68,6 +69,41 @@ export const Hud = memo(
           }).format(numeric);
     };
 
+    const openEventHistory = () => {
+      onOpenMenu?.();
+      if (typeof document === 'undefined' || typeof window === 'undefined') {
+        return;
+      }
+
+      let attempts = 0;
+      const findAndOpenHistory = () => {
+        attempts += 1;
+        const menu = document.querySelector('.system-destination');
+        if (menu) {
+          const recordsTab = Array.from(menu.querySelectorAll('.system-tabs button')).find(button =>
+            /^(?:Life|الحياة)$/i.test(String(button.textContent || '').trim())
+          );
+          if (recordsTab && !recordsTab.classList.contains('is-active')) {
+            recordsTab.click();
+          } else {
+            const historyButton = Array.from(menu.querySelectorAll('.system-menu-tile')).find(
+              button => /(?:Event history|سجل الأحداث)/i.test(String(button.textContent || ''))
+            );
+            if (historyButton) {
+              historyButton.click();
+              return;
+            }
+          }
+        }
+
+        if (attempts < 40) {
+          window.setTimeout(findAndOpenHistory, 25);
+        }
+      };
+
+      window.setTimeout(findAndOpenHistory, 0);
+    };
+
     const roleLabel = person.job
       ? translateGameText(language, person.job.title)
       : person.currentSchool
@@ -120,32 +156,46 @@ export const Hud = memo(
                 </span>
               )}
             </div>
+          </div>
 
-            <div className="hud-top-btns">
-              {Array.isArray(person.worldNews) && person.worldNews.length > 0 && (
-                <button
-                  type="button"
-                  onClick={onWorldNews}
-                  className="hud-icon-button news-btn"
-                  aria-label={t('hud.news', 'World News')}
-                >
-                  <AppIcon name="news" size={19} />
-                  <span className="news-btn-count">
-                    {isArabic
-                      ? formatArabicNumber(person.worldNews.length, { maximumFractionDigits: 0 })
-                      : person.worldNews.length}
-                  </span>
-                </button>
-              )}
+          <div
+            className="hud-safe-actions"
+            aria-label={isArabic ? 'اختصارات الأخبار والسجل' : 'News and history shortcuts'}
+          >
+            {Array.isArray(person.worldNews) && person.worldNews.length > 0 && (
               <button
                 type="button"
-                className="hud-icon-button hud-menu-fallback"
-                onClick={onOpenMenu}
-                aria-label={t('hud.openMenu', 'Open Menu')}
+                onClick={onWorldNews}
+                className="hud-safe-action is-news"
+                aria-label={t('hud.news', 'World News')}
               >
-                <AppIcon name="menu" size={19} />
+                <AppIcon name="news" size={18} />
+                <span>{t('hud.news', 'World News')}</span>
+                <strong className="hud-safe-action-count">
+                  {isArabic
+                    ? formatArabicNumber(person.worldNews.length, { maximumFractionDigits: 0 })
+                    : person.worldNews.length}
+                </strong>
               </button>
-            </div>
+            )}
+            <button
+              type="button"
+              className="hud-safe-action is-history"
+              onClick={openEventHistory}
+              aria-label={t('hud.eventHistory', 'Event History')}
+            >
+              <AppIcon name="recent" size={18} />
+              <span>{t('hud.eventHistory', 'Event History')}</span>
+            </button>
+            <button
+              type="button"
+              className="hud-safe-action hud-menu-fallback is-menu"
+              onClick={onOpenMenu}
+              aria-label={t('hud.openMenu', 'Open Menu')}
+            >
+              <AppIcon name="menu" size={18} />
+              <span>{t('hud.openMenu', 'Menu')}</span>
+            </button>
           </div>
 
           <button

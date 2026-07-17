@@ -176,13 +176,18 @@ describe('physical Android RTL screenshot fixes', () => {
     expect(css).toContain('unicode-bidi: isolate');
   });
 
-  it('keeps the numbered World News control inside the first compact HUD row', () => {
-    const css = readComponentCss('ScreenshotRegressionFixes.css');
-    expect(css).toContain('@media (max-width: 420px)');
-    expect(css).toContain('grid-template-columns: auto minmax(0, 1fr) auto auto');
-    expect(css).toContain('.hud-top-btns');
-    expect(css).toContain('grid-row: 1');
-    expect(css).toContain('.news-btn-count');
+  it('moves News and Event History below the compact identity row', () => {
+    const css = readComponentCss('HudSafeActions.css');
+    const source = readComponentSource('Hud.jsx');
+
+    expect(css).toContain('.hud-safe-actions');
+    expect(css).toContain('grid-auto-columns: minmax(0, 1fr)');
+    expect(css).toContain('calc(env(safe-area-inset-top) + 10px)');
+    expect(css).toContain('min-height: 48px');
+    expect(source).toContain('className="hud-safe-actions"');
+    expect(source).toContain("t('hud.news', 'World News')");
+    expect(source).toContain("t('hud.eventHistory', 'Event History')");
+    expect(source).not.toContain('className="hud-top-btns"');
   });
 
   it('keeps automatic progression behind a separate confirmation control', () => {

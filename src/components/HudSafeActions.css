@@ -1,0 +1,108 @@
+/* Keep HUD shortcuts below the Android status and notification gesture region. */
+.hud-container {
+  padding-top: max(24px, calc(env(safe-area-inset-top) + 10px));
+}
+
+.hud-identity-row {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.hud-top-btns {
+  display: none !important;
+}
+
+.hud-safe-actions {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 7px;
+  margin-top: 9px;
+}
+
+.hud-safe-action {
+  min-width: 0;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 10px;
+  border: 1px solid var(--pb-border);
+  border-radius: 13px;
+  color: var(--pb-text-secondary);
+  background: rgba(204, 226, 255, 0.045);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.hud-safe-action:active {
+  transform: scale(0.98);
+}
+
+.hud-safe-action span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hud-safe-action.is-news {
+  color: var(--pb-gold);
+  border-color: rgba(243, 201, 105, 0.2);
+  background: rgba(243, 201, 105, 0.075);
+}
+
+.hud-safe-action.is-history {
+  color: var(--pb-blue);
+  border-color: rgba(103, 169, 255, 0.2);
+  background: rgba(103, 169, 255, 0.07);
+}
+
+.hud-safe-action.is-menu {
+  color: var(--pb-text-secondary);
+  border-color: var(--pb-border);
+  background: rgba(204, 226, 255, 0.045);
+}
+
+.hud-safe-action-count {
+  min-width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  padding-inline: 5px;
+  border-radius: 999px;
+  color: #251b05;
+  background: var(--pb-gold);
+  font-size: 0.62rem;
+  line-height: 1;
+  font-weight: 900;
+}
+
+/* Heart/stat glyphs stay clean. Only the avatar keeps its online status dot. */
+.compact-stat-icon,
+.stat-symbol {
+  background: transparent;
+}
+
+.compact-stat-icon::before,
+.compact-stat-icon::after,
+.stat-symbol::before,
+.stat-symbol::after,
+.timeline-dot::before,
+.timeline-dot::after {
+  content: none !important;
+  display: none !important;
+}
+
+@media (max-width: 360px) {
+  .hud-safe-action {
+    padding-inline: 7px;
+    font-size: 0.66rem;
+  }
+}
+
+@media (min-width: 700px) {
+  .hud-container {
+    padding-top: max(14px, env(safe-area-inset-top));
+  }
+}

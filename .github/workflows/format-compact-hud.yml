@@ -1,0 +1,43 @@
+name: Format compact HUD
+
+on:
+  push:
+    branches: [fix/compact-hud-physical-layout]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: format-compact-hud-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  format:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v6
+        with:
+          ref: fix/compact-hud-physical-layout
+          fetch-depth: 0
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Format source
+        run: npm run format
+      - name: Commit formatting
+        run: |
+          if git diff --quiet; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/components/HudSafeActions.css src/components/ScreenshotFollowup.css
+          git commit -m "Format compact Android HUD styles"
+          git push origin HEAD:fix/compact-hud-physical-layout

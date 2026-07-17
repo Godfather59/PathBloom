@@ -108,7 +108,11 @@ export function SystemMenu({
           </button>
 
           {onRelationshipDashboard && (
-            <button className="btn-secondary" onClick={onRelationshipDashboard} style={{ padding: '12px' }}>
+            <button
+              className="btn-secondary"
+              onClick={onRelationshipDashboard}
+              style={{ padding: '12px' }}
+            >
               📊 {t('system.relationships', 'Relationships')}
             </button>
           )}
@@ -126,13 +130,21 @@ export function SystemMenu({
           )}
 
           {onCountryProfile && (
-            <button className="btn-secondary" onClick={onCountryProfile} style={{ padding: '12px' }}>
+            <button
+              className="btn-secondary"
+              onClick={onCountryProfile}
+              style={{ padding: '12px' }}
+            >
               🗺️ {t('system.countryProfile', 'Country Profile')}
             </button>
           )}
 
           {onDebug && (
-            <button className="btn-secondary" onClick={onDebug} style={{ padding: '12px', fontSize: '0.85rem', color: '#888' }}>
+            <button
+              className="btn-secondary"
+              onClick={onDebug}
+              style={{ padding: '12px', fontSize: '0.85rem', color: '#888' }}
+            >
               🛠️ {t('system.debug', 'Debug Tools')}
             </button>
           )}
@@ -194,7 +206,9 @@ export function SystemMenu({
           </div>
 
           <div className="settings-language">
-            <div className="settings-language-label">🎶 {t('system.musicVolume', 'Music Volume')}</div>
+            <div className="settings-language-label">
+              🎶 {t('system.musicVolume', 'Music Volume')}
+            </div>
             <input
               type="range"
               min="0"

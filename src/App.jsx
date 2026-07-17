@@ -79,7 +79,10 @@ const LazyRelationshipsMenu = lazyNamed(
 const LazyMafiaMenu = lazyNamed(() => import('./components/MafiaMenu'), 'MafiaMenu');
 const LazyRoyaltyMenu = lazyNamed(() => import('./components/RoyaltyMenu'), 'RoyaltyMenu');
 const LazyPoliticsMenu = lazyNamed(() => import('./components/PoliticsMenu'), 'PoliticsMenu');
-const LazyGeopoliticsModal = lazyNamed(() => import('./components/GeopoliticsModal'), 'GeopoliticsModal');
+const LazyGeopoliticsModal = lazyNamed(
+  () => import('./components/GeopoliticsModal'),
+  'GeopoliticsModal'
+);
 const LazyGamblingMenu = lazyNamed(() => import('./components/GamblingMenu'), 'GamblingMenu');
 const LazyEducationMenu = lazyNamed(() => import('./components/EducationMenu'), 'EducationMenu');
 const LazyAssetsMenu = lazyNamed(() => import('./components/AssetsMenu'), 'AssetsMenu');
@@ -98,7 +101,10 @@ const LazyFamilyTreeMenu = lazyNamed(() => import('./components/FamilyTreeMenu')
 const LazyWorldOverview = lazyNamed(() => import('./components/WorldOverview'), 'WorldOverview');
 const LazyCountryProfile = lazyNamed(() => import('./components/CountryProfile'), 'CountryProfile');
 const LazyLifeTimeline = lazyNamed(() => import('./components/LifeTimeline'), 'LifeTimeline');
-const LazyEventHistoryModal = lazyNamed(() => import('./components/EventHistoryModal'), 'EventHistoryModal');
+const LazyEventHistoryModal = lazyNamed(
+  () => import('./components/EventHistoryModal'),
+  'EventHistoryModal'
+);
 const LazyTravelMap = lazyNamed(() => import('./components/TravelMap'), 'TravelMap');
 
 function ModalLoader() {
@@ -315,7 +321,9 @@ function App() {
 
         const newUnlocks = checkAchievements(person, achievements);
         if (newUnlocks.length > 0) {
-          if (hapticsEnabled) HAPTICS.achievement();
+          if (hapticsEnabled) {
+            HAPTICS.achievement();
+          }
           const updatedAch = [...achievements, ...newUnlocks];
           setAchievements(updatedAch);
           try {
@@ -345,7 +353,9 @@ function App() {
     if (!person.isAlive) {
       return;
     }
-    if (hapticsEnabled) HAPTICS.ageUp();
+    if (hapticsEnabled) {
+      HAPTICS.ageUp();
+    }
     runAction(p => GameEngine.ageUp(p));
   };
 
@@ -353,7 +363,9 @@ function App() {
     if (!person.isAlive) {
       return;
     }
-    if (hapticsEnabled) HAPTICS.ageUp();
+    if (hapticsEnabled) {
+      HAPTICS.ageUp();
+    }
     runAction(p => GameEngine.ageUp(p, years));
   };
 
@@ -484,7 +496,7 @@ function App() {
       }
       setModal('immigration');
       setModalData({
-        onEmigrate: (countryName) => {
+        onEmigrate: countryName => {
           runAction(p => {
             const mgr = new ImmigrationManager(p);
             const result = mgr.attemptEmigration(countryName);
@@ -698,12 +710,7 @@ function App() {
         />
       )}
 
-      {modal === 'debug' && (
-        <DebugMenu
-          onClose={() => setModal(null)}
-          t={t}
-        />
-      )}
+      {modal === 'debug' && <DebugMenu onClose={() => setModal(null)} t={t} />}
 
       {modal === 'travel' && (
         <Suspense fallback={<ModalLoader />}>
@@ -713,7 +720,10 @@ function App() {
               runAction(p => {
                 const result = travelToCity(p, city);
                 if (result.success) {
-                  showToast(`Traveled to ${city.name}. Cost: $${result.cost.toLocaleString()}`, 'good');
+                  showToast(
+                    `Traveled to ${city.name}. Cost: $${result.cost.toLocaleString()}`,
+                    'good'
+                  );
                 } else if (result.reason === 'no_money') {
                   showToast(`Need $${result.cost.toLocaleString()} to travel there.`, 'bad');
                 }
@@ -876,21 +886,13 @@ function App() {
 
       {modal === 'life_timeline' && (
         <Suspense fallback={<ModalLoader />}>
-          <LazyLifeTimeline
-            person={person}
-            onClose={() => setModal(null)}
-            t={t}
-          />
+          <LazyLifeTimeline person={person} onClose={() => setModal(null)} t={t} />
         </Suspense>
       )}
 
       {modal === 'event_history' && (
         <Suspense fallback={<ModalLoader />}>
-          <LazyEventHistoryModal
-            person={person}
-            onClose={() => setModal(null)}
-            t={t}
-          />
+          <LazyEventHistoryModal person={person} onClose={() => setModal(null)} t={t} />
         </Suspense>
       )}
 
@@ -1213,23 +1215,52 @@ function App() {
       )}
 
       {/* Generic modal loader for modals without custom rendering blocks */}
-      {modal && ![
-        'system','god_mode','occupation','activities','love','career_music','social',
-        'career','mafia','royalty','politics','geopolitics','gambling','education',
-        'assets','achievements','minigame_burglary','minesweeper','doctor','will',
-        'hobbies','pets','stats','familytree','world_news','world_overview','challenge',
-        'debug','relationships_dashboard','relationships','life_timeline','event_history',
-        'travel','country_profile',
-      ].includes(modal) && (
-        <LazyModalLoader
-          modalType={modal}
-          modalData={modalData}
-          person={person}
-          onClose={() => setModal(null)}
-          language={language}
-          t={t}
-        />
-      )}
+      {modal &&
+        ![
+          'system',
+          'god_mode',
+          'occupation',
+          'activities',
+          'love',
+          'career_music',
+          'social',
+          'career',
+          'mafia',
+          'royalty',
+          'politics',
+          'geopolitics',
+          'gambling',
+          'education',
+          'assets',
+          'achievements',
+          'minigame_burglary',
+          'minesweeper',
+          'doctor',
+          'will',
+          'hobbies',
+          'pets',
+          'stats',
+          'familytree',
+          'world_news',
+          'world_overview',
+          'challenge',
+          'debug',
+          'relationships_dashboard',
+          'relationships',
+          'life_timeline',
+          'event_history',
+          'travel',
+          'country_profile',
+        ].includes(modal) && (
+          <LazyModalLoader
+            modalType={modal}
+            modalData={modalData}
+            person={person}
+            onClose={() => setModal(null)}
+            language={language}
+            t={t}
+          />
+        )}
 
       {person.pendingEvent && (
         <DecisionModal
@@ -1251,7 +1282,9 @@ function App() {
               setPerson(heir);
               saveGameData(heir, currentSlotId);
             } else {
-              if (hapticsEnabled) HAPTICS.death();
+              if (hapticsEnabled) {
+                HAPTICS.death();
+              }
               setPerson(null);
               setCurrentSlotId(null);
             }

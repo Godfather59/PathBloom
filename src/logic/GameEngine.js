@@ -9,7 +9,6 @@ import {
   COMPANY_STOCKS,
   getInvestmentReturn,
   getDividendPayout,
-  getAllInvestableAssets,
   getSectorPerformance,
   getMarketNews,
   generateIPO,
@@ -45,7 +44,12 @@ import { CITIES, getCityByName } from './City';
 import { buildWorldState, simulateWorldYear } from './WorldSimulation';
 import { initializeGeopolitics, getCountryByName } from './GeoPolitics';
 import { startWar, processWarYears } from './WarSystem';
-import { proposeResolution, SECURITY_COUNCIL, RESOLUTION_TYPES, calculateUNInfluence } from './UnitedNations';
+import {
+  proposeResolution,
+  SECURITY_COUNCIL,
+  RESOLUTION_TYPES,
+  calculateUNInfluence,
+} from './UnitedNations';
 import { ImmigrationManager } from './ImmigrationSystem';
 import { captureYearStart, finalizeAnnualRecap } from './AnnualRecap';
 import { evaluateAmbition } from './LifeAmbitions';
@@ -139,9 +143,7 @@ export class GameEngine {
     const economy = ['Normal', 'Recession', 'Boom'].includes(savedWorld.economy)
       ? savedWorld.economy
       : 'Normal';
-    const conflict = ['Peace', 'War'].includes(savedWorld.conflict)
-      ? savedWorld.conflict
-      : 'Peace';
+    const conflict = ['Peace', 'War'].includes(savedWorld.conflict) ? savedWorld.conflict : 'Peace';
     const indexFund = Number(savedMarket.indexFund);
     const dogecoin = Number(savedMarket.dogecoin);
 
@@ -181,7 +183,9 @@ export class GameEngine {
    * family, NPC, health, career, and finance effects cascade properly.
    */
   static simulateYear(person) {
-    if (!person.isAlive) return;
+    if (!person.isAlive) {
+      return;
+    }
 
     person.age++;
     person.energy = 100;
@@ -190,7 +194,9 @@ export class GameEngine {
     // 1. World & geopolitical changes
     this.updateWorldState(person);
     this.processWorldEvents(person);
-    if (!person.isAlive) return;
+    if (!person.isAlive) {
+      return;
+    }
 
     this.processGeopoliticalYear(person);
     this.applyCountryEffects(person);
@@ -206,7 +212,9 @@ export class GameEngine {
     // 4. NPC simulation
     const npcEvents = NPCSimulator.simulateYear(person, person.geopoliticalState);
     if (Array.isArray(npcEvents)) {
-      if (!Array.isArray(person.worldNews)) person.worldNews = [];
+      if (!Array.isArray(person.worldNews)) {
+        person.worldNews = [];
+      }
       npcEvents.forEach(ev => {
         if (ev && ev.text) {
           person.worldNews.push({
@@ -220,13 +228,18 @@ export class GameEngine {
           });
         }
       });
-      if (person.worldNews.length > 100) person.worldNews = person.worldNews.slice(-100);
+      if (person.worldNews.length > 100) {
+        person.worldNews = person.worldNews.slice(-100);
+      }
     }
 
     // 5. Prison or career
     if (person.isInPrison) {
       person.prisonSentence--;
-      person.logEvent(`You spent the year in prison. ${person.prisonSentence} years remaining.`, 'bad');
+      person.logEvent(
+        `You spent the year in prison. ${person.prisonSentence} years remaining.`,
+        'bad'
+      );
       person.updateStats({ happiness: -5, health: -2 });
       if (person.prisonSentence <= 0) {
         person.isInPrison = false;
@@ -236,7 +249,9 @@ export class GameEngine {
     } else {
       this.processCareer(person);
     }
-    if (!person.isAlive) return;
+    if (!person.isAlive) {
+      return;
+    }
 
     // 6. Finances
     processRetirement(person);
@@ -248,7 +263,9 @@ export class GameEngine {
     // 7. Natural changes
     this.processNaturalChanges(person);
     this.processStatConsequences(person);
-    if (!person.isAlive) return;
+    if (!person.isAlive) {
+      return;
+    }
 
     // 8. Assets, businesses, pets
     this.processAssets(person);
@@ -257,45 +274,79 @@ export class GameEngine {
 
     // 9. Education & sports
     this.processEducation(person);
-    if (!person.isInPrison) processCollegeSports(person);
-    if (!person.isAlive) return;
+    if (!person.isInPrison) {
+      processCollegeSports(person);
+    }
+    if (!person.isAlive) {
+      return;
+    }
 
     // 10. Long-running systems
     processAddictions(person);
-    if (!person.isAlive) return;
+    if (!person.isAlive) {
+      return;
+    }
     processFitness(person);
-    if (!person.isAlive) return;
+    if (!person.isAlive) {
+      return;
+    }
     tryContractDisease(person);
     const diseaseEvents = processConditions(person);
     diseaseEvents.forEach(e => person.logEvent(e, e.includes('recovered') ? 'good' : 'bad'));
-    if (!person.isAlive) return;
+    if (!person.isAlive) {
+      return;
+    }
     processInsurance(person);
     processSpaceCareer(person);
     processClubs(person);
     processLawsuits(person);
 
     // 11. Research & patents
-    if (person.age >= 35 && person.smarts >= 85 && person.degrees.length >= 2 &&
-        person.job?.isResearch === true && Math.random() < 0.03) {
+    if (
+      person.age >= 35 &&
+      person.smarts >= 85 &&
+      person.degrees.length >= 2 &&
+      person.job?.isResearch === true &&
+      Math.random() < 0.03
+    ) {
       person.hasNobelPrize = true;
       person.logEvent('You won the Nobel Prize for your groundbreaking research!', 'good');
     }
     if (person.smarts >= 70 && person.job?.isResearch === true && Math.random() < 0.12) {
-      if (!Array.isArray(person.patents)) person.patents = [];
+      if (!Array.isArray(person.patents)) {
+        person.patents = [];
+      }
       person.patents.push({ name: `Patent #${person.patents.length + 1}`, year: person.age });
       person.logEvent(`You filed patent #${person.patents.length}.`, 'good');
     }
 
     // 12. Seasonal & political
     processSeasonalEvent(person);
-    if (!person.isAlive) return;
+    if (!person.isAlive) {
+      return;
+    }
     processPoliticalYear(person);
-    if (!person.isAlive) return;
+    if (!person.isAlive) {
+      return;
+    }
 
     // 13. Language learning
     if (person.age >= 10 && person.smarts >= 40 && Math.random() < 0.02) {
-      if (!Array.isArray(person.languages)) person.languages = ['English'];
-      const newLangs = ['Spanish', 'French', 'German', 'Mandarin', 'Japanese', 'Arabic', 'Portuguese', 'Russian', 'Italian', 'Korean'];
+      if (!Array.isArray(person.languages)) {
+        person.languages = ['English'];
+      }
+      const newLangs = [
+        'Spanish',
+        'French',
+        'German',
+        'Mandarin',
+        'Japanese',
+        'Arabic',
+        'Portuguese',
+        'Russian',
+        'Italian',
+        'Korean',
+      ];
       const available = newLangs.filter(l => !person.languages.includes(l));
       if (available.length > 0) {
         const learned = available[Math.floor(Math.random() * available.length)];
@@ -306,7 +357,9 @@ export class GameEngine {
 
     // 14. Status events
     this.processStatusEvents(person);
-    if (!person.isAlive) return;
+    if (!person.isAlive) {
+      return;
+    }
 
     // 15. Random event & ambition
     const event = this.generateEvent(person);
@@ -371,10 +424,14 @@ export class GameEngine {
 
       if (!person.isAlive) {
         person.recordStatSnapshot();
-        if (finishYear()) break;
+        if (finishYear()) {
+          break;
+        }
         continue;
       }
-      if (finishYear()) break;
+      if (finishYear()) {
+        break;
+      }
     }
 
     person.milestones = (person.milestones || []).slice(0, 500);
@@ -496,7 +553,16 @@ export class GameEngine {
       if (!Array.isArray(person.worldNews)) {
         person.worldNews = [];
       }
-      const MAJOR_EVENT_KEYWORDS = ['war', 'coup', 'assassinat', 'nuclear', 'erupts', 'disaster', 'pandemic', 'CIVIL'];
+      const MAJOR_EVENT_KEYWORDS = [
+        'war',
+        'coup',
+        'assassinat',
+        'nuclear',
+        'erupts',
+        'disaster',
+        'pandemic',
+        'CIVIL',
+      ];
       result.news.forEach(item => {
         if (item && item.text) {
           const countryState = state.countries[item.country];
@@ -526,13 +592,21 @@ export class GameEngine {
             const myCountryId = getCountryByName(person.country)?.id;
             if (myCountryId && (item.country === myCountryId || item.targetId === myCountryId)) {
               const targetId = item.country === myCountryId ? item.targetId : item.country;
-              if (!person.countryRelations) person.countryRelations = {};
+              if (!person.countryRelations) {
+                person.countryRelations = {};
+              }
               if (!person.countryRelations[targetId]) {
                 person.countryRelations[targetId] = { relation: 50, tradeLevel: 0, tension: 0 };
               }
               person.countryRelations[targetId].alliance = 'ally';
-              person.countryRelations[targetId].relation = Math.min(100, (person.countryRelations[targetId].relation || 50) + 30);
-              person.countryRelations[targetId].tension = Math.max(0, (person.countryRelations[targetId].tension || 0) - 20);
+              person.countryRelations[targetId].relation = Math.min(
+                100,
+                (person.countryRelations[targetId].relation || 50) + 30
+              );
+              person.countryRelations[targetId].tension = Math.max(
+                0,
+                (person.countryRelations[targetId].tension || 0) - 20
+              );
               person._breakingNews = person._breakingNews || [];
               person._breakingNews.push({ text: item.text, type: 'good' });
             }
@@ -541,7 +615,10 @@ export class GameEngine {
           const isBreaking = MAJOR_EVENT_KEYWORDS.some(kw => item.text.includes(kw));
           if (isBreaking && !item.action) {
             person._breakingNews = person._breakingNews || [];
-            person._breakingNews.push({ text: item.text, type: item.type === 'good' ? 'good' : 'bad' });
+            person._breakingNews.push({
+              text: item.text,
+              type: item.type === 'good' ? 'good' : 'bad',
+            });
           }
         }
       });
@@ -558,10 +635,16 @@ export class GameEngine {
   }
 
   static processUNYear(person, state) {
-    if (!state?.countries || !person.countryRelations) return;
+    if (!state?.countries || !person.countryRelations) {
+      return;
+    }
 
-    if (!person.unResolutions) person.unResolutions = [];
-    if (!person.policies) person.policies = { diplomacyBudget: 30, taxRate: 30, militarySpending: 30 };
+    if (!person.unResolutions) {
+      person.unResolutions = [];
+    }
+    if (!person.policies) {
+      person.policies = { diplomacyBudget: 30, taxRate: 30, militarySpending: 30 };
+    }
 
     // Auto-decay old resolutions
     person.unResolutions = person.unResolutions.map(r => {
@@ -573,22 +656,32 @@ export class GameEngine {
 
     // Random UN event for influential countries
     const myCountry = Object.values(state.countries).find(c => c.name === person.country);
-    if (!myCountry || myCountry.influence < 40) return;
-    if (Math.random() > 0.08) return;
+    if (!myCountry || myCountry.influence < 40) {
+      return;
+    }
+    if (Math.random() > 0.08) {
+      return;
+    }
 
     // Pick a random country with poor relations to target
     const targets = Object.entries(person.countryRelations)
       .filter(([id, rel]) => rel && (rel.relation || 50) < 40 && id !== myCountry.id)
       .map(([id]) => id);
 
-    if (targets.length === 0) return;
+    if (targets.length === 0) {
+      return;
+    }
     const targetId = targets[Math.floor(Math.random() * targets.length)];
 
     const influence = calculateUNInfluence(person);
-    if (influence < 30) return;
+    if (influence < 30) {
+      return;
+    }
 
     const types = RESOLUTION_TYPES.filter(t => influence >= t.minApproval);
-    if (types.length === 0) return;
+    if (types.length === 0) {
+      return;
+    }
     const type = types[Math.floor(Math.random() * types.length)];
 
     const result = proposeResolution(person, targetId, type.id);
@@ -650,7 +743,10 @@ export class GameEngine {
       countryData.unemployment > 12 &&
       Math.random() < 0.02
     ) {
-      person.logEvent('You have been drafted into the military due to national instability.', 'bad');
+      person.logEvent(
+        'You have been drafted into the military due to national instability.',
+        'bad'
+      );
       person.updateStats({ happiness: -15, stress: 20 });
       if (person.job && !person.job.isMilitary) {
         person.quitJob();
@@ -660,11 +756,20 @@ export class GameEngine {
     if (person.currentSchool && Math.random() < 0.1) {
       const eduBonus = Math.floor((countryData.education - 50) / 20);
       if (eduBonus !== 0) {
-        person.currentSchool.performance = Math.max(0, Math.min(100, (person.currentSchool.performance || 50) + eduBonus));
+        person.currentSchool.performance = Math.max(
+          0,
+          Math.min(100, (person.currentSchool.performance || 50) + eduBonus)
+        );
         if (eduBonus > 0) {
-          person.logEvent(`Quality education in ${countryData.name} is boosting your learning.`, 'good');
+          person.logEvent(
+            `Quality education in ${countryData.name} is boosting your learning.`,
+            'good'
+          );
         } else {
-          person.logEvent(`Poor education standards in ${countryData.name} are hindering your studies.`, 'bad');
+          person.logEvent(
+            `Poor education standards in ${countryData.name} are hindering your studies.`,
+            'bad'
+          );
         }
       }
     }
@@ -675,7 +780,10 @@ export class GameEngine {
         const bonus = Math.floor((person.job.salary || 0) * techMod * 0.1);
         if (bonus > 0) {
           person.money = (person.money || 0) + bonus;
-          person.logEvent(`Your tech skills are in high demand in ${countryData.name}. Earned $${bonus.toLocaleString()} bonus.`, 'good');
+          person.logEvent(
+            `Your tech skills are in high demand in ${countryData.name}. Earned $${bonus.toLocaleString()} bonus.`,
+            'good'
+          );
         }
       }
     }
@@ -692,65 +800,118 @@ export class GameEngine {
       const taxWaste = Math.floor((person.job.salary || 0) * 0.02);
       if (taxWaste > 0) {
         person.money = Math.max(0, (person.money || 0) - taxWaste);
-        person.logEvent(`Government corruption in ${countryData.name} cost you $${taxWaste.toLocaleString()} in wasted taxes.`, 'bad');
+        person.logEvent(
+          `Government corruption in ${countryData.name} cost you $${taxWaste.toLocaleString()} in wasted taxes.`,
+          'bad'
+        );
       }
     }
   }
 
   static applyPlayerPoliciesToWorld(person) {
     const state = person.geopoliticalState;
-    if (!state || !state.countries) return;
+    if (!state || !state.countries) {
+      return;
+    }
     const myCountry = Object.values(state.countries).find(c => c.name === person.country);
-    if (!myCountry) return;
-    if (!person.policies) return;
+    if (!myCountry) {
+      return;
+    }
+    if (!person.policies) {
+      return;
+    }
 
     const taxRate = person.policies.taxRate ?? 30;
     const militarySpending = person.policies.militarySpending ?? 30;
     const socialSpending = person.policies.socialSpending ?? 30;
 
-    myCountry.militaryPower = Math.max(10, Math.min(100, (myCountry.militaryPower || 60) + Math.floor((militarySpending - 30) / 5)));
-    myCountry.stability = Math.max(10, Math.min(100, (myCountry.stability || 50) + Math.floor((socialSpending - 30) / 8) - Math.floor((taxRate - 30) / 10)));
-    myCountry.happiness = Math.max(10, Math.min(100, (myCountry.happiness || 50) + Math.floor((socialSpending - 30) / 6) - Math.floor(taxRate / 8)));
-    myCountry.unemployment = Math.max(2, Math.min(40, (myCountry.unemployment || 8) + Math.floor((30 - socialSpending) / 5) - Math.floor((30 - militarySpending) / 10)));
+    myCountry.militaryPower = Math.max(
+      10,
+      Math.min(100, (myCountry.militaryPower || 60) + Math.floor((militarySpending - 30) / 5))
+    );
+    myCountry.stability = Math.max(
+      10,
+      Math.min(
+        100,
+        (myCountry.stability || 50) +
+          Math.floor((socialSpending - 30) / 8) -
+          Math.floor((taxRate - 30) / 10)
+      )
+    );
+    myCountry.happiness = Math.max(
+      10,
+      Math.min(
+        100,
+        (myCountry.happiness || 50) +
+          Math.floor((socialSpending - 30) / 6) -
+          Math.floor(taxRate / 8)
+      )
+    );
+    myCountry.unemployment = Math.max(
+      2,
+      Math.min(
+        40,
+        (myCountry.unemployment || 8) +
+          Math.floor((30 - socialSpending) / 5) -
+          Math.floor((30 - militarySpending) / 10)
+      )
+    );
   }
 
   static processMigrationEvents(person, state) {
-    if (!state || !state.countries) return;
-    if (person.age < 18) return;
+    if (!state || !state.countries) {
+      return;
+    }
+    if (person.age < 18) {
+      return;
+    }
 
     const myCountry = Object.values(state.countries).find(c => c.name === person.country);
-    if (!myCountry) return;
-    if (person.immigrationApplied) return;
+    if (!myCountry) {
+      return;
+    }
+    if (person.immigrationApplied) {
+      return;
+    }
 
     const atWar = person.countryRelations
       ? Object.values(person.countryRelations).some(rel => rel && rel.atWar)
       : false;
 
     const reason =
-      (atWar && Math.random() < 0.15) ? 'Your country is at war!'
-      : (myCountry.inflation > 50 && Math.random() < 0.08) ? `Hyperinflation (${Math.round(myCountry.inflation)}%) is destroying your savings.`
-      : (myCountry.stability < 30 && myCountry.unemployment > 15 && Math.random() < 0.06) ? `Life is getting tough in ${myCountry.name} (stability: ${Math.round(myCountry.stability)}%, unemployment: ${Math.round(myCountry.unemployment)}%).`
-      : null;
+      atWar && Math.random() < 0.15
+        ? 'Your country is at war!'
+        : myCountry.inflation > 50 && Math.random() < 0.08
+          ? `Hyperinflation (${Math.round(myCountry.inflation)}%) is destroying your savings.`
+          : myCountry.stability < 30 && myCountry.unemployment > 15 && Math.random() < 0.06
+            ? `Life is getting tough in ${myCountry.name} (stability: ${Math.round(myCountry.stability)}%, unemployment: ${Math.round(myCountry.unemployment)}%).`
+            : null;
 
-    if (!reason) return;
+    if (!reason) {
+      return;
+    }
 
-    const safeCountries = Object.values(state.countries)
-      .filter(c =>
-        c.stability > 55 &&
-        c.unemployment < 15 &&
-        c.inflation < 20 &&
-        c.name !== person.country
-      );
+    const safeCountries = Object.values(state.countries).filter(
+      c => c.stability > 55 && c.unemployment < 15 && c.inflation < 20 && c.name !== person.country
+    );
 
-    if (safeCountries.length === 0) return;
+    if (safeCountries.length === 0) {
+      return;
+    }
     const target = safeCountries[Math.floor(Math.random() * safeCountries.length)];
 
-    const visaCost = target.name === 'United States' ? 0
-      : target.name === 'Canada' ? 3000
-      : target.name === 'Australia' ? 4000
-      : target.name === 'Japan' ? 6000
-      : target.name === 'Russia' ? 5500
-      : 4000;
+    const visaCost =
+      target.name === 'United States'
+        ? 0
+        : target.name === 'Canada'
+          ? 3000
+          : target.name === 'Australia'
+            ? 4000
+            : target.name === 'Japan'
+              ? 6000
+              : target.name === 'Russia'
+                ? 5500
+                : 4000;
 
     const costSuffix = visaCost > 0 ? ` (Visa: $${visaCost.toLocaleString()})` : '';
 
@@ -765,18 +926,30 @@ export class GameEngine {
   }
 
   static processWarReactions(person, state) {
-    if (!state || !state.countries) return;
-    if (person.age < 18) return;
-    if (person.pendingEvent) return;
+    if (!state || !state.countries) {
+      return;
+    }
+    if (person.age < 18) {
+      return;
+    }
+    if (person.pendingEvent) {
+      return;
+    }
 
     const atWar = person.countryRelations
       ? Object.values(person.countryRelations).some(rel => rel && rel.atWar)
       : false;
-    if (!atWar) return;
-    if (person.warReactionChosen) return;
+    if (!atWar) {
+      return;
+    }
+    if (person.warReactionChosen) {
+      return;
+    }
 
     const myCountry = Object.values(state.countries).find(c => c.name === person.country);
-    if (!myCountry) return;
+    if (!myCountry) {
+      return;
+    }
 
     const inMilitary = person.job && person.job.isMilitary;
     const warDur = Object.values(person.wars || {}).reduce((s, w) => s + (w.years || 0), 0);
@@ -785,17 +958,41 @@ export class GameEngine {
       const choices = [];
 
       if (!inMilitary && person.age >= 18 && person.age <= 35) {
-        choices.push({ text: '⚔️ Enlist in the military', effect: 'enlist_war', effects: { happiness: -5, stress: 15 } });
+        choices.push({
+          text: '⚔️ Enlist in the military',
+          effect: 'enlist_war',
+          effects: { happiness: -5, stress: 15 },
+        });
       }
       if (person.money > 10000) {
-        choices.push({ text: '💼 Profit from war contracts (+$50k)', effect: 'war_profit', effects: { money: 50000, karma: -5 } });
+        choices.push({
+          text: '💼 Profit from war contracts (+$50k)',
+          effect: 'war_profit',
+          effects: { money: 50000, karma: -5 },
+        });
       }
-      choices.push({ text: '📰 Become a war journalist', effect: 'war_journalist', effects: { fame: 10, stress: 10 } });
-      choices.push({ text: '✊ Join the protests', effect: 'war_protest', effects: { fame: 5, stress: 10, notoriety: 5 } });
+      choices.push({
+        text: '📰 Become a war journalist',
+        effect: 'war_journalist',
+        effects: { fame: 10, stress: 10 },
+      });
+      choices.push({
+        text: '✊ Join the protests',
+        effect: 'war_protest',
+        effects: { fame: 5, stress: 10, notoriety: 5 },
+      });
       choices.push({ text: '🏃 Flee the country as a refugee', effect: 'war_refugee' });
-      choices.push({ text: '🤝 Volunteer to help refugees', effect: 'war_help_refugees', effects: { karma: 10, happiness: -3 } });
+      choices.push({
+        text: '🤝 Volunteer to help refugees',
+        effect: 'war_help_refugees',
+        effects: { karma: 10, happiness: -3 },
+      });
       if (warDur > 3) {
-        choices.push({ text: '🎖️ Attempt to become a general', effect: 'war_become_general', effects: { fame: 15, stress: 20 } });
+        choices.push({
+          text: '🎖️ Attempt to become a general',
+          effect: 'war_become_general',
+          effects: { fame: 15, stress: 20 },
+        });
       }
       choices.push({ text: 'Ignore it and continue life', effect: 'war_ignore' });
 
@@ -850,7 +1047,15 @@ export class GameEngine {
       const technologyMultiplier = isTechnologyJob(person.job) ? worldEffects.techJobMult : 1;
 
       const countryData = GameEngine.getCountryForPerson(person);
-      const countryMult = countryData ? Math.max(0.7, Math.min(1.3, 1 + (countryData.technology - 50) / 200 + (countryData.education - 50) / 200)) : 1;
+      const countryMult = countryData
+        ? Math.max(
+            0.7,
+            Math.min(
+              1.3,
+              1 + (countryData.technology - 50) / 200 + (countryData.education - 50) / 200
+            )
+          )
+        : 1;
 
       const careerMult = getSalaryMultiplier(person);
       const grossIncome = Math.floor(
@@ -1456,16 +1661,23 @@ export class GameEngine {
     const eduLevel = countryData?.education ?? 50;
 
     const jobAvailabilityMod = Math.max(0.2, Math.min(1.5, (20 - unemploymentRate) / 15));
-    const countrySalaryMod = Math.max(0.7, Math.min(1.3, 1 + (techLevel - 50) / 200 + (eduLevel - 50) / 200));
+    const countrySalaryMod = Math.max(
+      0.7,
+      Math.min(1.3, 1 + (techLevel - 50) / 200 + (eduLevel - 50) / 200)
+    );
 
     // Job Market (New: Persistent yearly listings)
     // We pick a subset or generated variations of JOBS
     const jobs = JOBS.filter(
-      () => worldEffects.jobChance >= 1 || Math.random() < Math.max(0.1, worldEffects.jobChance * jobAvailabilityMod)
+      () =>
+        worldEffects.jobChance >= 1 ||
+        Math.random() < Math.max(0.1, worldEffects.jobChance * jobAvailabilityMod)
     ).map(job => {
       // Randomly fluctuate base salary slightly + economy + country modifiers
       const variance = Math.random() * 0.1 - 0.05; // +/- 5%
-      const offeredSalary = Math.floor(job.salary * salaryMultiplier * countrySalaryMod * (1 + variance));
+      const offeredSalary = Math.floor(
+        job.salary * salaryMultiplier * countrySalaryMod * (1 + variance)
+      );
 
       return {
         ...job,

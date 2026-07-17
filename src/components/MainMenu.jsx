@@ -44,7 +44,6 @@ export function MainMenu({
   const [showAvatarCreator, setShowAvatarCreator] = useState(false);
   const [mode, setMode] = useState('normal');
   const isRtl = language === 'ar';
-  const fieldAlign = isRtl ? 'right' : 'left';
 
   const streak = getDailyStreak();
   const dailyPlayed = hasPlayedToday();
@@ -92,18 +91,11 @@ export function MainMenu({
         />
       )}
 
-      <div
-        className="main-menu animate-fade-in"
-        style={{ direction: isRtl ? 'rtl' : 'ltr' }}
-      >
-        <h1 className="main-menu-title">
-          🌱 {t('app.title', 'PathBloom')}
-        </h1>
+      <div className="main-menu animate-fade-in" style={{ direction: isRtl ? 'rtl' : 'ltr' }}>
+        <h1 className="main-menu-title">🌱 {t('app.title', 'PathBloom')}</h1>
 
         <div className="main-menu-card">
-          <h2 className="main-menu-subtitle">
-            ✨ {t('app.subtitle', 'Life Simulator')}
-          </h2>
+          <h2 className="main-menu-subtitle">✨ {t('app.subtitle', 'Life Simulator')}</h2>
 
           <div className="settings-language" style={{ marginBottom: '12px' }}>
             <div className="settings-language-label">🌐 {t('system.language', 'Language')}</div>
@@ -157,9 +149,7 @@ export function MainMenu({
             </button>
           )}
 
-          <h3 className="section-heading">
-            🌅 {t('main.startNewLife', 'Start New Life')}
-          </h3>
+          <h3 className="section-heading">🌅 {t('main.startNewLife', 'Start New Life')}</h3>
 
           <div className="main-menu-section" style={{ marginBottom: '8px' }}>
             <label className="main-menu-section-label">
@@ -176,9 +166,7 @@ export function MainMenu({
           </div>
 
           <div className="main-menu-section" style={{ marginBottom: '8px' }}>
-            <label className="main-menu-section-label">
-              🪪 {t('main.lastName', 'Last Name')}
-            </label>
+            <label className="main-menu-section-label">🪪 {t('main.lastName', 'Last Name')}</label>
             <input
               type="text"
               value={lastName}
@@ -194,9 +182,7 @@ export function MainMenu({
           </button>
 
           <div className="main-menu-section">
-            <label className="main-menu-section-label">
-              ⚧️ {t('main.gender', 'Gender')}
-            </label>
+            <label className="main-menu-section-label">⚧️ {t('main.gender', 'Gender')}</label>
             <div className="menu-btn-row">
               <button
                 onClick={() => setGender('Male')}
@@ -214,9 +200,7 @@ export function MainMenu({
           </div>
 
           <div className="main-menu-section">
-            <label className="main-menu-section-label">
-              🌍 {t('main.country', 'Country')}
-            </label>
+            <label className="main-menu-section-label">🌍 {t('main.country', 'Country')}</label>
             <select
               value={country}
               onChange={e => setCountry(e.target.value)}
@@ -231,9 +215,7 @@ export function MainMenu({
           </div>
 
           <div className="main-menu-section">
-            <label className="main-menu-section-label">
-              🎯 {t('main.mode', 'Mode')}
-            </label>
+            <label className="main-menu-section-label">🎯 {t('main.mode', 'Mode')}</label>
             <select
               value={challengeId}
               onChange={e => setChallengeId(e.target.value)}

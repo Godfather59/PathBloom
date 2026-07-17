@@ -51,66 +51,102 @@ const COPY = {
 };
 
 function getChoiceEmoji(choice) {
-  if (choice.emoji) return choice.emoji;
-  if (choice.type && TYPE_EMOJIS[choice.type]) return TYPE_EMOJIS[choice.type];
+  if (choice.emoji) {
+    return choice.emoji;
+  }
+  if (choice.type && TYPE_EMOJIS[choice.type]) {
+    return TYPE_EMOJIS[choice.type];
+  }
 
   const effects = choice.effects || {};
   const score = Object.entries(effects).reduce((total, [key, value]) => {
-    if (!Number.isFinite(Number(value))) return total;
-    if (key === 'stress') return total - Number(value);
+    if (!Number.isFinite(Number(value))) {
+      return total;
+    }
+    if (key === 'stress') {
+      return total - Number(value);
+    }
     return total + Number(value);
   }, 0);
 
-  if ((effects.money ?? 0) > 0) return '$';
-  if ((effects.money ?? 0) < 0) return '−';
-  if (score > 5) return '✓';
-  if (score < -5) return '!';
+  if ((effects.money ?? 0) > 0) {
+    return '$';
+  }
+  if ((effects.money ?? 0) < 0) {
+    return '−';
+  }
+  if (score > 5) {
+    return '✓';
+  }
+  if (score < -5) {
+    return '!';
+  }
   return '◇';
 }
 
 function getRisk(choice) {
   if (choice.risk) {
     const risk = String(choice.risk).toLowerCase();
-    if (['low', 'medium', 'high'].includes(risk)) return risk;
+    if (['low', 'medium', 'high'].includes(risk)) {
+      return risk;
+    }
   }
-  if (choice.type === 'bad') return 'high';
-  if (choice.type === 'good') return 'low';
+  if (choice.type === 'bad') {
+    return 'high';
+  }
+  if (choice.type === 'good') {
+    return 'low';
+  }
 
   const effects = choice.effects || {};
   let downside = 0;
   Object.entries(effects).forEach(([key, value]) => {
     const numeric = Number(value);
-    if (!Number.isFinite(numeric)) return;
-    if (key === 'stress' && numeric > 0) downside += numeric;
-    if (key !== 'stress' && numeric < 0) downside += Math.abs(numeric);
+    if (!Number.isFinite(numeric)) {
+      return;
+    }
+    if (key === 'stress' && numeric > 0) {
+      downside += numeric;
+    }
+    if (key !== 'stress' && numeric < 0) {
+      downside += Math.abs(numeric);
+    }
   });
-  if (downside >= 15) return 'high';
-  if (downside >= 5) return 'medium';
+  if (downside >= 15) {
+    return 'high';
+  }
+  if (downside >= 5) {
+    return 'medium';
+  }
   return 'low';
 }
 
 function getEffectPreview(choice, language) {
   return Object.entries(choice.effects || {})
-    .filter(([key, value]) => EFFECT_LABELS[key] && Number.isFinite(Number(value)) && Number(value) !== 0)
+    .filter(
+      ([key, value]) => EFFECT_LABELS[key] && Number.isFinite(Number(value)) && Number(value) !== 0
+    )
     .slice(0, 3)
     .map(([key, value]) => {
       const numeric = Number(value);
       const label = EFFECT_LABELS[key][language === 'ar' ? 'ar' : 'en'];
       let formatted;
       if (key === 'money') {
-        formatted = language === 'ar'
-          ? formatArabicMoney(numeric)
-          : new Intl.NumberFormat('en-US', {
-              style: 'currency',
-              currency: 'USD',
-              maximumFractionDigits: 0,
-              signDisplay: 'always',
-            }).format(numeric);
+        formatted =
+          language === 'ar'
+            ? formatArabicMoney(numeric)
+            : new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                maximumFractionDigits: 0,
+                signDisplay: 'always',
+              }).format(numeric);
       } else {
         const sign = numeric > 0 ? '+' : '';
-        const amount = language === 'ar'
-          ? formatArabicNumber(numeric, { maximumFractionDigits: 0 })
-          : Math.round(numeric);
+        const amount =
+          language === 'ar'
+            ? formatArabicNumber(numeric, { maximumFractionDigits: 0 })
+            : Math.round(numeric);
         formatted = `${sign}${amount}`;
       }
       return {
@@ -135,7 +171,6 @@ export function DecisionModal({
       localizedText && typeof localizedText === 'object'
         ? localizedText[language] || localizedText.en
         : null;
-
     if (packText) {
       return language === 'ar'
         ? localizeArabicCandidate(packText, localizedText.en || value, context)
@@ -207,9 +242,7 @@ export function DecisionModal({
                       `choice:${event.type || 'event'}`
                     )}
                   </strong>
-                  <span className="decision-risk-label">
-                    {copy[risk] || copy.certain}
-                  </span>
+                  <span className="decision-risk-label">{copy[risk] || copy.certain}</span>
                   {preview.length > 0 && (
                     <span className="decision-effect-preview">
                       {preview.map(effect => (

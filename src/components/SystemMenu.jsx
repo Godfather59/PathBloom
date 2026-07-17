@@ -79,14 +79,18 @@ const TABS = [
 ];
 
 function MenuTile({ item, language }) {
-  if (!item.handler) return null;
+  if (!item.handler) {
+    return null;
+  }
   return (
     <button
       type="button"
       className={`system-menu-tile tone-${item.tone || 'neutral'}`}
       onClick={item.handler}
     >
-      <span className="system-menu-tile-icon" aria-hidden="true">{item.emoji}</span>
+      <span className="system-menu-tile-icon" aria-hidden="true">
+        {item.emoji}
+      </span>
       <span className="system-menu-tile-copy">
         <strong>{language === 'ar' ? item.ar : item.en}</strong>
         {item.description && (
@@ -304,7 +308,9 @@ export function SystemMenu({
     );
   }
   if (showArabicAudit) {
-    return <ArabicLocalizationDashboard onClose={() => setShowArabicAudit(false)} language={language} />;
+    return (
+      <ArabicLocalizationDashboard onClose={() => setShowArabicAudit(false)} language={language} />
+    );
   }
 
   return (
@@ -312,13 +318,20 @@ export function SystemMenu({
       <section className="system-destination" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
         <header className="system-destination-header">
           <div className="system-destination-title">
-            <span className="system-pause-icon"><AppIcon name="menu" size={22} /></span>
+            <span className="system-pause-icon">
+              <AppIcon name="menu" size={22} />
+            </span>
             <div>
               <h1>{copy.paused}</h1>
               <p>{copy.subtitle}</p>
             </div>
           </div>
-          <button type="button" className="destination-close" onClick={onResume} aria-label={copy.resume}>
+          <button
+            type="button"
+            className="destination-close"
+            onClick={onResume}
+            aria-label={copy.resume}
+          >
             <AppIcon name="close" size={21} />
           </button>
         </header>
@@ -343,9 +356,13 @@ export function SystemMenu({
             <>
               <div className="system-primary-actions">
                 <button type="button" className="system-resume-card" onClick={onResume}>
-                  <span><AppIcon name="life" size={25} /></span>
+                  <span>
+                    <AppIcon name="life" size={25} />
+                  </span>
                   <strong>{copy.resume}</strong>
-                  <small>{locale === 'ar' ? 'ارجع مباشرة إلى قصتك.' : 'Return directly to your story.'}</small>
+                  <small>
+                    {locale === 'ar' ? 'ارجع مباشرة إلى قصتك.' : 'Return directly to your story.'}
+                  </small>
                 </button>
                 <button type="button" className="system-save-card" onClick={onSave}>
                   <span>💾</span>
@@ -367,13 +384,16 @@ export function SystemMenu({
 
               <div className="system-home-summary">
                 <button type="button" onClick={() => setActiveTab('records')}>
-                  <AppIcon name="trend" size={19} /><span>{copy.recordsTitle}</span>
+                  <AppIcon name="trend" size={19} />
+                  <span>{copy.recordsTitle}</span>
                 </button>
                 <button type="button" onClick={() => setActiveTab('world')}>
-                  <AppIcon name="world" size={19} /><span>{copy.worldTitle}</span>
+                  <AppIcon name="world" size={19} />
+                  <span>{copy.worldTitle}</span>
                 </button>
                 <button type="button" onClick={() => setActiveTab('settings')}>
-                  <AppIcon name="menu" size={19} /><span>{copy.settingsTitle}</span>
+                  <AppIcon name="menu" size={19} />
+                  <span>{copy.settingsTitle}</span>
                 </button>
               </div>
             </>
@@ -386,7 +406,9 @@ export function SystemMenu({
                 <strong>{records.filter(item => item.handler).length}</strong>
               </div>
               <div className="system-menu-grid">
-                {records.map(item => <MenuTile key={item.en} item={item} language={locale} />)}
+                {records.map(item => (
+                  <MenuTile key={item.en} item={item} language={locale} />
+                ))}
               </div>
             </section>
           )}
@@ -398,43 +420,94 @@ export function SystemMenu({
                 <strong>{worldItems.filter(item => item.handler).length}</strong>
               </div>
               <div className="system-menu-grid">
-                {worldItems.map(item => <MenuTile key={item.en} item={item} language={locale} />)}
+                {worldItems.map(item => (
+                  <MenuTile key={item.en} item={item} language={locale} />
+                ))}
               </div>
             </section>
           )}
 
           {activeTab === 'settings' && (
             <section className="system-section system-settings-section">
-              <div className="system-section-heading"><span>{copy.settingsTitle}</span></div>
+              <div className="system-section-heading">
+                <span>{copy.settingsTitle}</span>
+              </div>
 
               <div className="setting-card">
-                <div className="setting-card-heading"><span>🔊</span><strong>{copy.audio}</strong></div>
+                <div className="setting-card-heading">
+                  <span>🔊</span>
+                  <strong>{copy.audio}</strong>
+                </div>
                 <div className="segmented-control">
-                  <button type="button" className={audioEnabled ? 'is-active' : ''} onClick={() => onSoundToggle?.(true)}>{copy.on}</button>
-                  <button type="button" className={!audioEnabled ? 'is-active' : ''} onClick={() => onSoundToggle?.(false)}>{copy.off}</button>
+                  <button
+                    type="button"
+                    className={audioEnabled ? 'is-active' : ''}
+                    onClick={() => onSoundToggle?.(true)}
+                  >
+                    {copy.on}
+                  </button>
+                  <button
+                    type="button"
+                    className={!audioEnabled ? 'is-active' : ''}
+                    onClick={() => onSoundToggle?.(false)}
+                  >
+                    {copy.off}
+                  </button>
                 </div>
                 <label className="setting-slider">
                   <span>{copy.sfx}</span>
-                  <input type="range" min="0" max="1" step="0.05" value={sfxVolume} onChange={event => onSfxVolumeChange?.(Number(event.target.value))} />
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    value={sfxVolume}
+                    onChange={event => onSfxVolumeChange?.(Number(event.target.value))}
+                  />
                   <strong>{Math.round(sfxVolume * 100)}%</strong>
                 </label>
                 <label className="setting-slider">
                   <span>{copy.music}</span>
-                  <input type="range" min="0" max="1" step="0.05" value={musicVolume} onChange={event => onMusicVolumeChange?.(Number(event.target.value))} />
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    value={musicVolume}
+                    onChange={event => onMusicVolumeChange?.(Number(event.target.value))}
+                  />
                   <strong>{Math.round(musicVolume * 100)}%</strong>
                 </label>
               </div>
 
               <div className="setting-card setting-inline-card">
-                <div className="setting-card-heading"><span>📳</span><strong>{copy.vibration}</strong></div>
+                <div className="setting-card-heading">
+                  <span>📳</span>
+                  <strong>{copy.vibration}</strong>
+                </div>
                 <div className="segmented-control compact">
-                  <button type="button" className={hapticsEnabled ? 'is-active' : ''} onClick={() => onHapticsToggle?.(true)}>{copy.on}</button>
-                  <button type="button" className={!hapticsEnabled ? 'is-active' : ''} onClick={() => onHapticsToggle?.(false)}>{copy.off}</button>
+                  <button
+                    type="button"
+                    className={hapticsEnabled ? 'is-active' : ''}
+                    onClick={() => onHapticsToggle?.(true)}
+                  >
+                    {copy.on}
+                  </button>
+                  <button
+                    type="button"
+                    className={!hapticsEnabled ? 'is-active' : ''}
+                    onClick={() => onHapticsToggle?.(false)}
+                  >
+                    {copy.off}
+                  </button>
                 </div>
               </div>
 
               <div className="setting-card">
-                <div className="setting-card-heading"><span>🌐</span><strong>{copy.language}</strong></div>
+                <div className="setting-card-heading">
+                  <span>🌐</span>
+                  <strong>{copy.language}</strong>
+                </div>
                 <div className="choice-chip-grid">
                   {LANGUAGES.map(option => (
                     <button
@@ -453,7 +526,10 @@ export function SystemMenu({
               </div>
 
               <div className="setting-card">
-                <div className="setting-card-heading"><span>🎨</span><strong>{copy.appearance}</strong></div>
+                <div className="setting-card-heading">
+                  <span>🎨</span>
+                  <strong>{copy.appearance}</strong>
+                </div>
                 <div className="choice-chip-grid theme-chip-grid">
                   {Object.entries(THEMES).map(([id, theme]) => (
                     <button
@@ -462,28 +538,43 @@ export function SystemMenu({
                       className={currentTheme === id ? 'is-active' : ''}
                       onClick={() => onThemeChange?.(id)}
                     >
-                      {theme.icon}<span>{theme.name}</span>
+                      {theme.icon}
+                      <span>{theme.name}</span>
                     </button>
                   ))}
                 </div>
               </div>
 
               <div className="setting-card setting-actions-card">
-                <button type="button" onClick={onTutorial}>🧭 <span>{copy.tutorial}</span></button>
-                <button type="button" onClick={onResetTutorial}>↻ <span>{copy.resetTutorial}</span></button>
+                <button type="button" onClick={onTutorial}>
+                  🧭 <span>{copy.tutorial}</span>
+                </button>
+                <button type="button" onClick={onResetTutorial}>
+                  ↻ <span>{copy.resetTutorial}</span>
+                </button>
               </div>
 
               <button
                 type="button"
                 className="system-exit-card"
                 onClick={() => {
-                  if (confirm(t('system.exitConfirm', 'Are you sure you want to exit? Unsaved progress will be lost.'))) {
+                  if (
+                    confirm(
+                      t(
+                        'system.exitConfirm',
+                        'Are you sure you want to exit? Unsaved progress will be lost.'
+                      )
+                    )
+                  ) {
                     onExit?.();
                   }
                 }}
               >
                 <span>↪</span>
-                <span><strong>{copy.exit}</strong><small>{copy.exitHint}</small></span>
+                <span>
+                  <strong>{copy.exit}</strong>
+                  <small>{copy.exitHint}</small>
+                </span>
               </button>
             </section>
           )}
@@ -495,7 +586,9 @@ export function SystemMenu({
                 <strong>{tools.filter(item => item.handler).length}</strong>
               </div>
               <div className="system-menu-grid">
-                {tools.map(item => <MenuTile key={item.en} item={item} language={locale} />)}
+                {tools.map(item => (
+                  <MenuTile key={item.en} item={item} language={locale} />
+                ))}
               </div>
             </section>
           )}

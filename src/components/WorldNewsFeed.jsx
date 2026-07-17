@@ -29,7 +29,8 @@ const COPY = {
     latestHint: 'The newest events appear first and remain grouped by your age.',
     search: 'Search news…',
     noNews: 'No news yet',
-    noNewsHint: 'As the world turns and people around you live their lives, stories will appear here.',
+    noNewsHint:
+      'As the world turns and people around you live their lives, stories will appear here.',
     age: 'Age',
     year: 'Year',
     worldBadge: 'WORLD',
@@ -67,10 +68,14 @@ function formatNumber(value, language) {
 }
 
 function localizeNews(item, language) {
-  const fallback = typeof item?.text === 'string' ? item.text.replace(/^Your\s+\S+,\s+/, '') : String(item?.text || '');
-  const packText = item?.localizedText && typeof item.localizedText === 'object'
-    ? item.localizedText[language] || item.localizedText.en
-    : null;
+  const fallback =
+    typeof item?.text === 'string'
+      ? item.text.replace(/^Your\s+\S+,\s+/, '')
+      : String(item?.text || '');
+  const packText =
+    item?.localizedText && typeof item.localizedText === 'object'
+      ? item.localizedText[language] || item.localizedText.en
+      : null;
   if (packText) {
     return language === 'ar'
       ? localizeArabicCandidate(packText, item.localizedText.en || fallback, 'world-news')
@@ -86,12 +91,20 @@ function localizeNews(item, language) {
 
 function storyIcon(item) {
   if (item?.category === 'geopolitics') {
-    if (item.type === 'bad') return '⚔️';
-    if (item.type === 'good') return '🌍';
+    if (item.type === 'bad') {
+      return '⚔️';
+    }
+    if (item.type === 'good') {
+      return '🌍';
+    }
     return '🏛️';
   }
-  if (item?.type === 'bad') return '⚠️';
-  if (item?.type === 'good') return '✨';
+  if (item?.type === 'bad') {
+    return '⚠️';
+  }
+  if (item?.type === 'good') {
+    return '✨';
+  }
   return '📰';
 }
 
@@ -118,7 +131,10 @@ export function WorldNewsFeed({
           _text: localizeNews(item, language),
           _world: item?.category === 'geopolitics',
         }))
-        .sort((a, b) => b._age - a._age || Number(b._year || 0) - Number(a._year || 0) || b._index - a._index),
+        .sort(
+          (a, b) =>
+            b._age - a._age || Number(b._year || 0) - Number(a._year || 0) || b._index - a._index
+        ),
     [news, language]
   );
 
@@ -131,7 +147,8 @@ export function WorldNewsFeed({
         (activeTab === 'personal' && !item._world) ||
         (activeTab === 'positive' && item.type === 'good') ||
         (activeTab === 'critical' && item.type === 'bad');
-      const textMatch = !needle || `${item._text} ${item.relName || ''}`.toLocaleLowerCase().includes(needle);
+      const textMatch =
+        !needle || `${item._text} ${item.relName || ''}`.toLocaleLowerCase().includes(needle);
       return tabMatch && textMatch;
     });
   }, [activeTab, locale, normalized, query]);
@@ -139,7 +156,9 @@ export function WorldNewsFeed({
   const groups = useMemo(() => {
     const map = new Map();
     visible.forEach(item => {
-      if (!map.has(item._age)) map.set(item._age, []);
+      if (!map.has(item._age)) {
+        map.set(item._age, []);
+      }
       map.get(item._age).push(item);
     });
     return [...map.entries()].sort((a, b) => b[0] - a[0]);
@@ -168,13 +187,37 @@ export function WorldNewsFeed({
       className="world-news-destination"
     >
       <div className="phase-two-metrics">
-        <PhaseTwoMetric icon="📰" label={copy.stories} value={formatNumber(normalized.length, language)} />
-        <PhaseTwoMetric icon="🌍" label={copy.worldStories} value={formatNumber(worldCount, language)} tone="world" />
-        <PhaseTwoMetric icon="👥" label={copy.peopleStories} value={formatNumber(peopleCount, language)} tone="growth" />
-        <PhaseTwoMetric icon="🎂" label={copy.ages} value={formatNumber(ageCount, language)} tone="gold" />
+        <PhaseTwoMetric
+          icon="📰"
+          label={copy.stories}
+          value={formatNumber(normalized.length, language)}
+        />
+        <PhaseTwoMetric
+          icon="🌍"
+          label={copy.worldStories}
+          value={formatNumber(worldCount, language)}
+          tone="world"
+        />
+        <PhaseTwoMetric
+          icon="👥"
+          label={copy.peopleStories}
+          value={formatNumber(peopleCount, language)}
+          tone="growth"
+        />
+        <PhaseTwoMetric
+          icon="🎂"
+          label={copy.ages}
+          value={formatNumber(ageCount, language)}
+          tone="gold"
+        />
       </div>
 
-      <PhaseTwoTabs tabs={tabs} activeId={activeTab} onChange={setActiveTab} ariaLabel={copy.title} />
+      <PhaseTwoTabs
+        tabs={tabs}
+        activeId={activeTab}
+        onChange={setActiveTab}
+        ariaLabel={copy.title}
+      />
 
       <PhaseTwoSection title={copy.latest} subtitle={copy.latestHint}>
         <input
@@ -191,17 +234,30 @@ export function WorldNewsFeed({
             {groups.map(([age, items]) => (
               <section key={age} className="world-news-age-group">
                 <header>
-                  <span>{copy.age} {formatNumber(age, language)}</span>
-                  {items[0]?._year != null && <small>{copy.year} {formatNumber(items[0]._year, language)}</small>}
+                  <span>
+                    {copy.age} {formatNumber(age, language)}
+                  </span>
+                  {items[0]?._year != null && (
+                    <small>
+                      {copy.year} {formatNumber(items[0]._year, language)}
+                    </small>
+                  )}
                 </header>
                 <div className="world-news-story-list">
                   {items.map(item => (
-                    <article key={`${item._age}-${item._year}-${item._index}`} className={`world-news-story type-${item.type || 'neutral'}`}>
-                      <span className="world-news-story-icon" aria-hidden="true">{storyIcon(item)}</span>
+                    <article
+                      key={`${item._age}-${item._year}-${item._index}`}
+                      className={`world-news-story type-${item.type || 'neutral'}`}
+                    >
+                      <span className="world-news-story-icon" aria-hidden="true">
+                        {storyIcon(item)}
+                      </span>
                       <div className="world-news-story-copy">
                         <div className="world-news-story-meta">
                           {item.relName && <strong dir="auto">{item.relName}</strong>}
-                          {item._world && <span className="phase-two-pill world">{copy.worldBadge}</span>}
+                          {item._world && (
+                            <span className="phase-two-pill world">{copy.worldBadge}</span>
+                          )}
                         </div>
                         <p dir="auto">{item._text}</p>
                       </div>

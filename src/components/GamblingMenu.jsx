@@ -259,7 +259,9 @@ export function GamblingMenu({
     if (selectedHorse === winnerId) {
       const winnings = wager * winner.odds;
       onResult(winnings);
-      showGameToast(t('gambling.horseWon', `${winner.name} WON! You won $${winnings.toLocaleString()}!`));
+      showGameToast(
+        t('gambling.horseWon', `${winner.name} WON! You won $${winnings.toLocaleString()}!`)
+      );
     } else {
       showGameToast(t('gambling.horseLost', `${winner.name} won the race. You lost.`));
     }
@@ -403,7 +405,9 @@ export function GamblingMenu({
     onResult(-LOTTERY_TICKET_COST);
     if (playLottery()) {
       onResult(LOTTERY_JACKPOT);
-      showGameToast(t('gambling.jackpot', `JACKPOT!!! YOU WON $${LOTTERY_JACKPOT.toLocaleString()}!`));
+      showGameToast(
+        t('gambling.jackpot', `JACKPOT!!! YOU WON $${LOTTERY_JACKPOT.toLocaleString()}!`)
+      );
     } else {
       showGameToast(t('gambling.lotteryLost', `You lost the lottery. ($${LOTTERY_TICKET_COST})`));
     }

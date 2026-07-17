@@ -80,20 +80,28 @@ function createMetric(icon, label, value, tone = '') {
 }
 
 function enhanceAssets(overlay) {
-  if (!overlay || overlay.dataset.phaseTwoAssets === '1') return;
+  if (!overlay || overlay.dataset.phaseTwoAssets === '1') {
+    return;
+  }
   const title = overlay.querySelector('.modal-title');
   const tabs = [...overlay.querySelectorAll('button')]
     .map(button => button.textContent || '')
     .join(' ');
   const signature = `${title?.textContent || ''} ${tabs}`.toLowerCase();
-  if (!/(assets|shopping|my assets|real estate|investments|الأصول|العقارات|الاستثمارات)/i.test(signature)) {
+  if (
+    !/(assets|shopping|my assets|real estate|investments|الأصول|العقارات|الاستثمارات)/i.test(
+      signature
+    )
+  ) {
     return;
   }
 
   overlay.dataset.phaseTwoAssets = '1';
   overlay.classList.add('phase-two-assets-host');
   const content = overlay.querySelector('.modal-content');
-  if (!content) return;
+  if (!content) {
+    return;
+  }
   content.classList.add('phase-two-assets-content');
 
   const person = getCurrentTimePerson();
@@ -146,12 +154,17 @@ function enhanceAssets(overlay) {
   summary.append(heading, metrics);
 
   const header = content.querySelector('.modal-header');
-  if (header?.nextSibling) content.insertBefore(summary, header.nextSibling);
-  else content.append(summary);
+  if (header?.nextSibling) {
+    content.insertBefore(summary, header.nextSibling);
+  } else {
+    content.append(summary);
+  }
 }
 
 function enhanceRelationships(root) {
-  if (!root || root.dataset.phaseTwoRelationships === '1') return;
+  if (!root || root.dataset.phaseTwoRelationships === '1') {
+    return;
+  }
   root.dataset.phaseTwoRelationships = '1';
   root.classList.add('phase-two-relationships-host');
   const panel = root.querySelector(':scope > .animate-slide-up');
@@ -159,13 +172,19 @@ function enhanceRelationships(root) {
 }
 
 function scan(root = document) {
-  if (processing || !root) return;
+  if (processing || !root) {
+    return;
+  }
   processing = true;
   try {
-    if (root instanceof Element && root.matches('.relationships-menu')) enhanceRelationships(root);
+    if (root instanceof Element && root.matches('.relationships-menu')) {
+      enhanceRelationships(root);
+    }
     root.querySelectorAll?.('.relationships-menu').forEach(enhanceRelationships);
 
-    if (root instanceof Element && root.matches('.modal-overlay')) enhanceAssets(root);
+    if (root instanceof Element && root.matches('.modal-overlay')) {
+      enhanceAssets(root);
+    }
     root.querySelectorAll?.('.modal-overlay').forEach(enhanceAssets);
   } finally {
     processing = false;
@@ -173,12 +192,18 @@ function scan(root = document) {
 }
 
 export function installPhaseTwoScreenRuntime() {
-  if (typeof document === 'undefined' || observer) return () => {};
+  if (typeof document === 'undefined' || observer) {
+    return () => {};
+  }
   observer = new MutationObserver(mutations => {
-    if (processing) return;
+    if (processing) {
+      return;
+    }
     mutations.forEach(mutation => {
       mutation.addedNodes.forEach(node => {
-        if (node.nodeType === Node.ELEMENT_NODE) scan(node);
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          scan(node);
+        }
       });
     });
   });

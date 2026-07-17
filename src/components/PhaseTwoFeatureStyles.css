@@ -284,8 +284,7 @@
   padding: 12px 13px;
   border-radius: 17px;
   background:
-    linear-gradient(135deg, rgba(57, 217, 138, 0.12), transparent 55%),
-    rgba(204, 226, 255, 0.04);
+    linear-gradient(135deg, rgba(57, 217, 138, 0.12), transparent 55%), rgba(204, 226, 255, 0.04);
   border: 1px solid rgba(57, 217, 138, 0.18);
 }
 
@@ -350,9 +349,15 @@
   font-size: 0.63rem;
 }
 
-.phase-two-assets-runtime-metric.growth { border-color: rgba(57, 217, 138, 0.16); }
-.phase-two-assets-runtime-metric.world { border-color: rgba(103, 169, 255, 0.16); }
-.phase-two-assets-runtime-metric.danger { border-color: rgba(255, 107, 122, 0.18); }
+.phase-two-assets-runtime-metric.growth {
+  border-color: rgba(57, 217, 138, 0.16);
+}
+.phase-two-assets-runtime-metric.world {
+  border-color: rgba(103, 169, 255, 0.16);
+}
+.phase-two-assets-runtime-metric.danger {
+  border-color: rgba(255, 107, 122, 0.18);
+}
 
 .modal-overlay.phase-two-assets-host .modal-header {
   min-height: 76px;
@@ -406,7 +411,9 @@
   background: linear-gradient(180deg, #0c1a2c, #07111f 70%) !important;
 }
 
-.relationships-menu.phase-two-relationships-host > .phase-two-relationships-content > .flex:first-child {
+.relationships-menu.phase-two-relationships-host
+  > .phase-two-relationships-content
+  > .flex:first-child {
   position: sticky;
   top: 0;
   z-index: 4;

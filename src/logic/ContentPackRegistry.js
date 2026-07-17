@@ -7,7 +7,8 @@ const builtinModules =
     ? import.meta.glob('../content/packs/*.json', { eager: true, import: 'default' })
     : {};
 
-const asObject = value => (value && typeof value === 'object' && !Array.isArray(value) ? value : {});
+const asObject = value =>
+  value && typeof value === 'object' && !Array.isArray(value) ? value : {};
 const asArray = value => (Array.isArray(value) ? value : []);
 const hasText = value => typeof value === 'string' && value.trim().length > 0;
 
@@ -21,7 +22,9 @@ function safeStorage() {
 
 function parseStoredArray(key) {
   const storage = safeStorage();
-  if (!storage) return [];
+  if (!storage) {
+    return [];
+  }
   try {
     const parsed = JSON.parse(storage.getItem(key) || '[]');
     return Array.isArray(parsed) ? parsed : [];
@@ -98,13 +101,23 @@ export function validateContentPack(input) {
   const warnings = [];
 
   if (pack.schemaVersion !== SCHEMA_VERSION) {
-    addError(errors, 'schemaVersion', `Only schema version ${SCHEMA_VERSION} is supported.`, 'UNSUPPORTED_SCHEMA');
+    addError(
+      errors,
+      'schemaVersion',
+      `Only schema version ${SCHEMA_VERSION} is supported.`,
+      'UNSUPPORTED_SCHEMA'
+    );
   }
   if (!pack.id || !/^[a-z0-9][a-z0-9_-]*$/i.test(pack.id)) {
     addError(errors, 'id', 'Pack id must contain only letters, numbers, underscores, and hyphens.');
   }
   if (!pack.name.en || !pack.name.ar) {
-    addError(errors, 'name', 'Pack name requires both English and Arabic text.', 'MISSING_TRANSLATION');
+    addError(
+      errors,
+      'name',
+      'Pack name requires both English and Arabic text.',
+      'MISSING_TRANSLATION'
+    );
   }
   if (pack.events.length === 0) {
     addError(errors, 'events', 'A content pack must contain at least one event.');
@@ -121,20 +134,38 @@ export function validateContentPack(input) {
     eventIds.add(event.id);
 
     if (!event.text.en || !event.text.ar) {
-      addError(errors, `${base}.text`, 'Every event requires English and Arabic text.', 'MISSING_TRANSLATION');
+      addError(
+        errors,
+        `${base}.text`,
+        'Every event requires English and Arabic text.',
+        'MISSING_TRANSLATION'
+      );
     }
     if (event.choices.length < 2) {
-      addError(errors, `${base}.choices`, 'Every playable event requires at least two choices.', 'MISSING_CHOICES');
+      addError(
+        errors,
+        `${base}.choices`,
+        'Every playable event requires at least two choices.',
+        'MISSING_CHOICES'
+      );
     }
 
     const choiceIds = new Set();
     event.choices.forEach((choice, choiceIndex) => {
       const choicePath = `${base}.choices[${choiceIndex}]`;
-      if (!choice.id) addError(errors, `${choicePath}.id`, 'Choice id is required.');
-      else if (choiceIds.has(choice.id)) addError(errors, `${choicePath}.id`, `Duplicate choice id: ${choice.id}.`, 'DUPLICATE_ID');
+      if (!choice.id) {
+        addError(errors, `${choicePath}.id`, 'Choice id is required.');
+      } else if (choiceIds.has(choice.id)) {
+        addError(errors, `${choicePath}.id`, `Duplicate choice id: ${choice.id}.`, 'DUPLICATE_ID');
+      }
       choiceIds.add(choice.id);
       if (!choice.text.en || !choice.text.ar) {
-        addError(errors, `${choicePath}.text`, 'Every choice requires English and Arabic text.', 'MISSING_TRANSLATION');
+        addError(
+          errors,
+          `${choicePath}.text`,
+          'Every choice requires English and Arabic text.',
+          'MISSING_TRANSLATION'
+        );
       }
       if (!choice.outcome.en || !choice.outcome.ar) {
         addError(
@@ -145,7 +176,12 @@ export function validateContentPack(input) {
         );
       }
       if (choice.next && !hasText(choice.next.eventId)) {
-        addError(errors, `${choicePath}.next.eventId`, 'A follow-up must include an eventId.', 'BROKEN_FOLLOW_UP');
+        addError(
+          errors,
+          `${choicePath}.next.eventId`,
+          'A follow-up must include an eventId.',
+          'BROKEN_FOLLOW_UP'
+        );
       }
     });
   });
@@ -186,10 +222,15 @@ export function getDisabledContentPackIds() {
 
 export function setContentPackEnabled(packId, enabled) {
   const storage = safeStorage();
-  if (!storage || !hasText(packId)) return false;
+  if (!storage || !hasText(packId)) {
+    return false;
+  }
   const disabled = getDisabledContentPackIds();
-  if (enabled) disabled.delete(packId);
-  else disabled.add(packId);
+  if (enabled) {
+    disabled.delete(packId);
+  } else {
+    disabled.add(packId);
+  }
   storage.setItem(DISABLED_PACKS_KEY, JSON.stringify([...disabled]));
   return true;
 }
@@ -209,27 +250,36 @@ export function getEnabledContentPacks() {
 
 export function saveCustomContentPack(input) {
   const validation = validateContentPack(input);
-  if (!validation.valid) return validation;
+  if (!validation.valid) {
+    return validation;
+  }
   const storage = safeStorage();
   if (!storage) {
     return {
       ...validation,
       valid: false,
-      errors: [{ path: 'storage', code: 'STORAGE_UNAVAILABLE', message: 'Local storage is unavailable.' }],
+      errors: [
+        { path: 'storage', code: 'STORAGE_UNAVAILABLE', message: 'Local storage is unavailable.' },
+      ],
     };
   }
   const packs = parseStoredArray(CUSTOM_PACKS_KEY);
   const index = packs.findIndex(pack => pack?.id === validation.pack.id);
   const storedPack = { ...validation.pack, source: undefined };
-  if (index >= 0) packs[index] = storedPack;
-  else packs.push(storedPack);
+  if (index >= 0) {
+    packs[index] = storedPack;
+  } else {
+    packs.push(storedPack);
+  }
   storage.setItem(CUSTOM_PACKS_KEY, JSON.stringify(packs.slice(-50)));
   return validation;
 }
 
 export function deleteCustomContentPack(packId) {
   const storage = safeStorage();
-  if (!storage) return false;
+  if (!storage) {
+    return false;
+  }
   const packs = parseStoredArray(CUSTOM_PACKS_KEY).filter(pack => pack?.id !== packId);
   storage.setItem(CUSTOM_PACKS_KEY, JSON.stringify(packs));
   return true;

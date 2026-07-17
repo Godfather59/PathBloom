@@ -95,16 +95,18 @@ function getSituationPresentation(person, situation, summary, language) {
         : Math.max(0, Math.round((Number(person?.prisonSentence) || 0) * 12));
       const years = Math.floor(remaining / 12);
       const months = remaining % 12;
-      result.meta = language === 'ar'
-        ? `${years ? `${years} سنة` : ''}${years && months ? ' و' : ''}${months ? `${months} شهر` : ''} ${copy.remaining}`.trim()
-        : `${years ? `${years}y` : ''}${years && months ? ' ' : ''}${months ? `${months}m` : ''} ${copy.remaining}`.trim();
+      result.meta =
+        language === 'ar'
+          ? `${years ? `${years} سنة` : ''}${years && months ? ' و' : ''}${months ? `${months} شهر` : ''} ${copy.remaining}`.trim()
+          : `${years ? `${years}y` : ''}${years && months ? ' ' : ''}${months ? `${months}m` : ''} ${copy.remaining}`.trim();
       result.progressLabel = String(remaining);
       break;
     }
     case 'pregnancy': {
       const month = Math.max(0, Number(summary?.month) || 0);
       const due = Math.max(1, Number(summary?.dueMonth) || 9);
-      result.meta = language === 'ar' ? `${copy.month} ${month} من ${due}` : `${copy.month} ${month} of ${due}`;
+      result.meta =
+        language === 'ar' ? `${copy.month} ${month} من ${due}` : `${copy.month} ${month} of ${due}`;
       result.progress = clampPercent((month / due) * 100);
       result.progressLabel = `${month}/${due}`;
       break;
@@ -152,7 +154,10 @@ function getSituationPresentation(person, situation, summary, language) {
     case 'deployment': {
       const month = Math.max(1, Number(summary?.months) || Number(state.situationMonths) || 1);
       const missions = Math.max(0, Number(summary?.missions) || 0);
-      result.meta = language === 'ar' ? `${copy.month} ${month} · ${missions} مهمات` : `${copy.month} ${month} · ${missions} missions`;
+      result.meta =
+        language === 'ar'
+          ? `${copy.month} ${month} · ${missions} مهمات`
+          : `${copy.month} ${month} · ${missions} missions`;
       result.progressLabel = String(missions);
       break;
     }
@@ -169,144 +174,150 @@ function getSituationPresentation(person, situation, summary, language) {
   return result;
 }
 
-export const ActionMenu = memo(function ActionMenu({
-  onAgeUp,
-  onAction,
-  onAgeSkip,
-  onNavigate,
-  onOpenSituation,
-  language = 'en',
-}) {
-  const [localOverlay, setLocalOverlay] = useState(null);
-  const person = getCurrentTimePerson();
-  const activeSituation = getActiveMonthlySituation(person);
-  const isArabic = language === 'ar';
-  const locale = isArabic ? 'ar' : 'en';
-  const labels = PRIMARY_LABELS[locale];
-  const copy = TEXT[locale];
-  const summary = activeSituation && person ? getMonthlySituationSummary(person) : null;
-  const presentation = useMemo(
-    () => getSituationPresentation(person, activeSituation, summary, locale),
-    [person, activeSituation, summary, locale]
-  );
-
-  if (localOverlay === 'world' && person) {
-    return (
-      <WorldSimulation2Dashboard
-        person={person}
-        onClose={() => setLocalOverlay(null)}
-        language={locale}
-      />
+export const ActionMenu = memo(
+  ({ onAgeUp, onAction, onAgeSkip, onNavigate, onOpenSituation, language = 'en' }) => {
+    const [localOverlay, setLocalOverlay] = useState(null);
+    const person = getCurrentTimePerson();
+    const activeSituation = getActiveMonthlySituation(person);
+    const isArabic = language === 'ar';
+    const locale = isArabic ? 'ar' : 'en';
+    const labels = PRIMARY_LABELS[locale];
+    const copy = TEXT[locale];
+    const summary = activeSituation && person ? getMonthlySituationSummary(person) : null;
+    const presentation = useMemo(
+      () => getSituationPresentation(person, activeSituation, summary, locale),
+      [person, activeSituation, summary, locale]
     );
-  }
 
-  if (localOverlay === 'situation' && activeSituation) {
+    if (localOverlay === 'world' && person) {
+      return (
+        <WorldSimulation2Dashboard
+          person={person}
+          onClose={() => setLocalOverlay(null)}
+          language={locale}
+        />
+      );
+    }
+
+    if (localOverlay === 'situation' && activeSituation) {
+      return (
+        <SituationDetailsSheet
+          person={person}
+          situation={activeSituation}
+          summary={summary}
+          language={locale}
+          onClose={() => setLocalOverlay(null)}
+        />
+      );
+    }
+
+    const primaryLabel = activeSituation
+      ? labels[activeSituation.id] || labels.normal
+      : labels.normal;
+    const primaryHint = activeSituation ? copy.monthlyHint : copy.normalHint;
+    const smartLabel = activeSituation ? copy.smartMonths : copy.smartYears;
+
+    const handlePrimary = () => {
+      if (activeSituation) {
+        onAgeSkip?.('month');
+      } else {
+        onAgeUp?.();
+      }
+    };
+
+    const handleSmart = () => {
+      if (activeSituation) {
+        onAgeSkip?.('smart_months');
+      } else {
+        onAgeSkip?.(5);
+      }
+    };
+
+    const handleNavigate = destination => {
+      if (onNavigate) {
+        onNavigate(destination);
+        return;
+      }
+      if (destination === 'activities') {
+        onAction?.('activities');
+      } else if (destination === 'world') {
+        setLocalOverlay('world');
+      } else if (destination === 'menu') {
+        document.querySelector('.hud-menu-fallback')?.click();
+      }
+    };
+
+    const handleSituationOpen = () => {
+      if (onOpenSituation) {
+        onOpenSituation(activeSituation?.id);
+        return;
+      }
+      setLocalOverlay('situation');
+    };
+
     return (
-      <SituationDetailsSheet
-        person={person}
-        situation={activeSituation}
-        summary={summary}
-        language={locale}
-        onClose={() => setLocalOverlay(null)}
-      />
-    );
-  }
-
-  const primaryLabel = activeSituation ? labels[activeSituation.id] || labels.normal : labels.normal;
-  const primaryHint = activeSituation ? copy.monthlyHint : copy.normalHint;
-  const smartLabel = activeSituation ? copy.smartMonths : copy.smartYears;
-
-  const handlePrimary = () => {
-    if (activeSituation) onAgeSkip?.('month');
-    else onAgeUp?.();
-  };
-
-  const handleSmart = () => {
-    if (activeSituation) onAgeSkip?.('smart_months');
-    else onAgeSkip?.(5);
-  };
-
-  const handleNavigate = destination => {
-    if (onNavigate) {
-      onNavigate(destination);
-      return;
-    }
-    if (destination === 'activities') {
-      onAction?.('activities');
-    } else if (destination === 'world') {
-      setLocalOverlay('world');
-    } else if (destination === 'menu') {
-      document.querySelector('.hud-menu-fallback')?.click();
-    }
-  };
-
-  const handleSituationOpen = () => {
-    if (onOpenSituation) {
-      onOpenSituation(activeSituation?.id);
-      return;
-    }
-    setLocalOverlay('situation');
-  };
-
-  return (
-    <div className="action-menu" dir={isArabic ? 'rtl' : 'ltr'}>
-      <div className="life-shortcuts" aria-label={isArabic ? 'اختصارات الحياة' : 'Life shortcuts'}>
-        {LIFE_SHORTCUTS.map(shortcut => (
-          <button
-            key={shortcut.id}
-            type="button"
-            className="life-shortcut"
-            onClick={() => onAction?.(shortcut.id)}
-          >
-            <AppIcon name={shortcut.icon} size={17} />
-            <span>{isArabic ? shortcut.ar : shortcut.en}</span>
-          </button>
-        ))}
-      </div>
-
-      {activeSituation && (
-        <button
-          type="button"
-          className="active-situation-card"
-          onClick={handleSituationOpen}
-          title={copy.inspect}
+      <div className="action-menu" dir={isArabic ? 'rtl' : 'ltr'}>
+        <div
+          className="life-shortcuts"
+          aria-label={isArabic ? 'اختصارات الحياة' : 'Life shortcuts'}
         >
-          <span className="active-situation-icon" aria-hidden="true">
-            {activeSituation.icon}
-          </span>
-          <span className="active-situation-copy">
-            <span className="active-situation-kicker">{copy.situation}</span>
-            <span className="active-situation-title">
-              {getSituationLabel(activeSituation, locale)}
-            </span>
-            <span className="active-situation-meta">{presentation.meta}</span>
-          </span>
-          <span className="active-situation-progress" aria-hidden="true">
-            <strong>{presentation.progressLabel}</strong>
-            {presentation.progress !== null && (
-              <span className="active-situation-track">
-                <span
-                  className="active-situation-fill"
-                  style={{ width: `${presentation.progress}%` }}
-                />
-              </span>
-            )}
-          </span>
-        </button>
-      )}
+          {LIFE_SHORTCUTS.map(shortcut => (
+            <button
+              key={shortcut.id}
+              type="button"
+              className="life-shortcut"
+              onClick={() => onAction?.(shortcut.id)}
+            >
+              <AppIcon name={shortcut.icon} size={17} />
+              <span>{isArabic ? shortcut.ar : shortcut.en}</span>
+            </button>
+          ))}
+        </div>
 
-      <BottomNavigation
-        activeDestination="life"
-        onNavigate={handleNavigate}
-        onPrimaryAction={handlePrimary}
-        onSmartAdvance={handleSmart}
-        primaryLabel={primaryLabel}
-        primaryHint={primaryHint}
-        smartLabel={smartLabel}
-        isMonthly={Boolean(activeSituation)}
-        disabled={!person?.isAlive || Boolean(person?.pendingEvent)}
-        language={locale}
-      />
-    </div>
-  );
-});
+        {activeSituation && (
+          <button
+            type="button"
+            className="active-situation-card"
+            onClick={handleSituationOpen}
+            title={copy.inspect}
+          >
+            <span className="active-situation-icon" aria-hidden="true">
+              {activeSituation.icon}
+            </span>
+            <span className="active-situation-copy">
+              <span className="active-situation-kicker">{copy.situation}</span>
+              <span className="active-situation-title">
+                {getSituationLabel(activeSituation, locale)}
+              </span>
+              <span className="active-situation-meta">{presentation.meta}</span>
+            </span>
+            <span className="active-situation-progress" aria-hidden="true">
+              <strong>{presentation.progressLabel}</strong>
+              {presentation.progress !== null && (
+                <span className="active-situation-track">
+                  <span
+                    className="active-situation-fill"
+                    style={{ width: `${presentation.progress}%` }}
+                  />
+                </span>
+              )}
+            </span>
+          </button>
+        )}
+
+        <BottomNavigation
+          activeDestination="life"
+          onNavigate={handleNavigate}
+          onPrimaryAction={handlePrimary}
+          onSmartAdvance={handleSmart}
+          primaryLabel={primaryLabel}
+          primaryHint={primaryHint}
+          smartLabel={smartLabel}
+          isMonthly={Boolean(activeSituation)}
+          disabled={!person?.isAlive || Boolean(person?.pendingEvent)}
+          language={locale}
+        />
+      </div>
+    );
+  }
+);

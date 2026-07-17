@@ -49,11 +49,11 @@
   --radius-sm: var(--pb-radius-xs);
   --radius-md: var(--pb-radius-md);
   --radius-lg: var(--pb-radius-lg);
-  --font-main: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-main: Inter, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
 html[lang^='ar'] {
-  --font-main: "Noto Sans Arabic", "IBM Plex Sans Arabic", Tahoma, Arial, sans-serif;
+  --font-main: 'Noto Sans Arabic', 'IBM Plex Sans Arabic', Tahoma, Arial, sans-serif;
 }
 
 body {
@@ -145,7 +145,13 @@ body {
   overflow-x: auto;
   scrollbar-width: none;
   padding: 2px 2px 0;
-  mask-image: linear-gradient(90deg, transparent 0, #000 10px, #000 calc(100% - 10px), transparent 100%);
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    #000 10px,
+    #000 calc(100% - 10px),
+    transparent 100%
+  );
 }
 
 .life-shortcuts::-webkit-scrollbar {
@@ -188,8 +194,7 @@ body {
   border-radius: var(--pb-radius-md);
   border: 1px solid rgba(255, 180, 94, 0.22);
   background:
-    linear-gradient(135deg, rgba(255, 180, 94, 0.12), rgba(16, 31, 51, 0.96) 58%),
-    var(--pb-surface);
+    linear-gradient(135deg, rgba(255, 180, 94, 0.12), rgba(16, 31, 51, 0.96) 58%), var(--pb-surface);
   box-shadow: var(--pb-shadow-card);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
@@ -297,7 +302,10 @@ body {
   gap: 4px;
   border-radius: 14px;
   color: var(--pb-text-muted);
-  transition: color 160ms ease, background 160ms ease, transform 120ms ease;
+  transition:
+    color 160ms ease,
+    background 160ms ease,
+    transform 120ms ease;
 }
 
 .bottom-nav-item.is-active {

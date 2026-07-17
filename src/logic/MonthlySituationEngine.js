@@ -4,13 +4,17 @@ const clamp = (value, min = 0, max = 100) =>
   Math.max(min, Math.min(max, Math.round(Number(value) || 0)));
 
 export function ensureMonthlySituations(person) {
-  if (!person || typeof person !== 'object') return null;
-  const current = person.monthlySituations && typeof person.monthlySituations === 'object'
-    ? person.monthlySituations
-    : {};
+  if (!person || typeof person !== 'object') {
+    return null;
+  }
+  const current =
+    person.monthlySituations && typeof person.monthlySituations === 'object'
+      ? person.monthlySituations
+      : {};
   person.monthlySituations = {
     campaign: current.campaign && typeof current.campaign === 'object' ? current.campaign : {},
-    deployment: current.deployment && typeof current.deployment === 'object' ? current.deployment : {},
+    deployment:
+      current.deployment && typeof current.deployment === 'object' ? current.deployment : {},
     lawsuit: current.lawsuit && typeof current.lawsuit === 'object' ? current.lawsuit : {},
     sports: current.sports && typeof current.sports === 'object' ? current.sports : {},
     business: current.business && typeof current.business === 'object' ? current.business : {},
@@ -39,8 +43,10 @@ export function beginPregnancy(person, childData, partnerId = null) {
 }
 
 function resolveBirth(person) {
-  const pregnancy = person.pregnancy;
-  if (!pregnancy?.active) return false;
+  const { pregnancy } = person;
+  if (!pregnancy?.active) {
+    return false;
+  }
   const childData = pregnancy.childData || {
     id: `child_${Date.now()}`,
     name: Math.random() > 0.5 ? 'James' : 'Olivia',
@@ -56,18 +62,25 @@ function resolveBirth(person) {
   }
   pregnancy.active = false;
   person.pregnancy = null;
-  person.logEvent?.(`You welcomed a baby ${childData.gender || ''} named ${childData.name}!`, 'good');
+  person.logEvent?.(
+    `You welcomed a baby ${childData.gender || ''} named ${childData.name}!`,
+    'good'
+  );
   person.updateStats?.({ happiness: 25, stress: -6, health: -2 });
   return true;
 }
 
 function processPregnancy(person) {
-  const pregnancy = person.pregnancy;
-  if (!pregnancy?.active) return;
+  const { pregnancy } = person;
+  if (!pregnancy?.active) {
+    return;
+  }
   pregnancy.month = clamp(pregnancy.month, 0, 9);
   const partner = (person.relationships || []).find(rel => rel.id === pregnancy.partnerId);
   if (partner) {
-    pregnancy.partnerSupport = clamp((Number(partner.stat) || 50) + (partner.npcMemory?.support || 50) / 4);
+    pregnancy.partnerSupport = clamp(
+      (Number(partner.stat) || 50) + (partner.npcMemory?.support || 50) / 4
+    );
   }
 
   if (pregnancy.month >= 9) {
@@ -75,7 +88,10 @@ function processPregnancy(person) {
     return;
   }
 
-  const risk = Math.max(0.01, 0.08 - pregnancy.prenatalCare * 0.012 + (100 - pregnancy.health) / 1000);
+  const risk = Math.max(
+    0.01,
+    0.08 - pregnancy.prenatalCare * 0.012 + (100 - pregnancy.health) / 1000
+  );
   if (Math.random() < risk) {
     pregnancy.health = clamp(pregnancy.health - 8);
     pregnancy.complications.push({ month: pregnancy.month, type: 'health_scare' });
@@ -89,9 +105,21 @@ function processPregnancy(person) {
       situationType: 'pregnancy',
       text: `Pregnancy month ${pregnancy.month}: how will you prepare?`,
       choices: [
-        { text: 'Attend prenatal care ($300)', effect: 'pregnancy_prenatal', effects: { money: -300, stress: -2 } },
-        { text: 'Rest and prepare at home', effect: 'pregnancy_rest', effects: { health: 2, happiness: 2 } },
-        { text: 'Keep working normally', effect: 'pregnancy_work', effects: { money: 250, stress: 3 } },
+        {
+          text: 'Attend prenatal care ($300)',
+          effect: 'pregnancy_prenatal',
+          effects: { money: -300, stress: -2 },
+        },
+        {
+          text: 'Rest and prepare at home',
+          effect: 'pregnancy_rest',
+          effects: { health: 2, happiness: 2 },
+        },
+        {
+          text: 'Keep working normally',
+          effect: 'pregnancy_work',
+          effects: { money: 250, stress: 3 },
+        },
       ],
     };
   }
@@ -103,7 +131,9 @@ function findCampaign(person) {
 
 function processCampaign(person, state) {
   const campaign = findCampaign(person);
-  if (!campaign) return;
+  if (!campaign) {
+    return;
+  }
   state.polling = clamp(state.polling ?? campaign.polls ?? campaign.support ?? 45);
   state.funds = Math.max(0, Number(state.funds ?? campaign.funds ?? campaign.money) || 0);
   state.scandals = Math.max(0, Number(state.scandals) || 0);
@@ -111,7 +141,8 @@ function processCampaign(person, state) {
 
   const professional = Number(person.reputation?.professional) || 50;
   const publicRep = Number(person.reputation?.public) || 25;
-  const drift = Math.floor(Math.random() * 7) - 3 + (professional >= 70 ? 1 : 0) + (publicRep >= 60 ? 1 : 0);
+  const drift =
+    Math.floor(Math.random() * 7) - 3 + (professional >= 70 ? 1 : 0) + (publicRep >= 60 ? 1 : 0);
   state.polling = clamp(state.polling + drift);
   campaign.polls = state.polling;
   campaign.support = state.polling;
@@ -122,9 +153,21 @@ function processCampaign(person, state) {
       situationType: 'campaign',
       text: `Campaign month ${state.months}: polling is at ${state.polling}%. What is your strategy?`,
       choices: [
-        { text: 'Run positive advertisements ($5,000)', effect: 'campaign_positive', effects: { money: -5000, stress: 2 } },
-        { text: 'Attack your opponent', effect: 'campaign_attack', effects: { karma: -3, stress: 4 } },
-        { text: 'Hold town halls', effect: 'campaign_townhall', effects: { energy: -15, stress: 2 } },
+        {
+          text: 'Run positive advertisements ($5,000)',
+          effect: 'campaign_positive',
+          effects: { money: -5000, stress: 2 },
+        },
+        {
+          text: 'Attack your opponent',
+          effect: 'campaign_attack',
+          effects: { karma: -3, stress: 4 },
+        },
+        {
+          text: 'Hold town halls',
+          effect: 'campaign_townhall',
+          effects: { energy: -15, stress: 2 },
+        },
       ],
     };
   }
@@ -135,12 +178,18 @@ function processDeployment(person, state) {
   state.missions = Math.max(0, Number(state.missions) || 0);
   state.medals = Math.max(0, Number(state.medals) || 0);
   const skill = ((Number(person.health) || 50) + (Number(person.smarts) || 50)) / 2;
-  const danger = person.spaceProgram?.activeMission || person.spaceProgram?.currentMission ? 0.07 : 0.11;
+  const danger =
+    person.spaceProgram?.activeMission || person.spaceProgram?.currentMission ? 0.07 : 0.11;
 
   if (Math.random() < danger) {
     const severe = Math.random() > skill / 120;
     person.updateStats?.({ health: severe ? -18 : -7, stress: severe ? 12 : 6 });
-    person.logEvent?.(severe ? 'You were seriously injured during a deployment mission.' : 'You suffered a minor deployment injury.', 'bad');
+    person.logEvent?.(
+      severe
+        ? 'You were seriously injured during a deployment mission.'
+        : 'You suffered a minor deployment injury.',
+      'bad'
+    );
   } else {
     state.missions += 1;
     if (Math.random() < 0.12 + skill / 500) {
@@ -153,7 +202,9 @@ function processDeployment(person, state) {
 
 function processLawsuit(person, state) {
   const lawsuits = person.activeLawsuits || [];
-  if (lawsuits.length === 0) return;
+  if (lawsuits.length === 0) {
+    return;
+  }
   state.evidence = clamp(state.evidence ?? 45);
   state.legalCosts = Math.max(0, Number(state.legalCosts) || 0);
   state.months = Math.max(0, Number(state.months) || 0) + 1;
@@ -162,7 +213,9 @@ function processLawsuit(person, state) {
   const cash = Math.max(0, Number(person.money) || 0);
   const paid = Math.min(cash, legalBill);
   person.money = cash - paid;
-  if (paid < legalBill) person.personalDebt = (Number(person.personalDebt) || 0) + legalBill - paid;
+  if (paid < legalBill) {
+    person.personalDebt = (Number(person.personalDebt) || 0) + legalBill - paid;
+  }
 
   if (!person.pendingEvent && state.months % 3 === 0) {
     person.pendingEvent = {
@@ -170,7 +223,11 @@ function processLawsuit(person, state) {
       situationType: 'lawsuit',
       text: `The court case has lasted ${state.months} months. Evidence strength is ${state.evidence}%.`,
       choices: [
-        { text: 'Pay for an investigator ($2,000)', effect: 'lawsuit_investigate', effects: { money: -2000, stress: 2 } },
+        {
+          text: 'Pay for an investigator ($2,000)',
+          effect: 'lawsuit_investigate',
+          effects: { money: -2000, stress: 2 },
+        },
         { text: 'Offer a settlement', effect: 'lawsuit_settle', effects: { stress: -4 } },
         { text: 'Continue to trial', effect: 'lawsuit_trial', effects: { stress: 4 } },
       ],
@@ -179,7 +236,9 @@ function processLawsuit(person, state) {
 }
 
 function processSports(person, state) {
-  if (!person.collegeSport) return;
+  if (!person.collegeSport) {
+    return;
+  }
   state.months = Math.max(0, Number(state.months) || 0) + 1;
   state.performance = clamp(state.performance ?? person.collegeSport.performance ?? 50);
   state.wins = Math.max(0, Number(state.wins) || 0);
@@ -206,14 +265,23 @@ function processSports(person, state) {
 
 function processBusinessCrisis(person, state) {
   const companies = (person.companies || []).filter(
-    company => company?.crisis || company?.status === 'crisis' || company?.status === 'bankruptcy_risk' || Number(company?.health) <= 20
+    company =>
+      company?.crisis ||
+      company?.status === 'crisis' ||
+      company?.status === 'bankruptcy_risk' ||
+      Number(company?.health) <= 20
   );
-  if (companies.length === 0) return;
+  if (companies.length === 0) {
+    return;
+  }
   state.months = Math.max(0, Number(state.months) || 0) + 1;
   companies.forEach(company => {
     company.crisisSeverity = clamp(company.crisisSeverity ?? 60);
-    const management = ((Number(person.smarts) || 50) + (Number(person.reputation?.professional) || 50)) / 2;
-    company.crisisSeverity = clamp(company.crisisSeverity + (Math.random() * 12 - 5) - management / 25);
+    const management =
+      ((Number(person.smarts) || 50) + (Number(person.reputation?.professional) || 50)) / 2;
+    company.crisisSeverity = clamp(
+      company.crisisSeverity + (Math.random() * 12 - 5) - management / 25
+    );
     if (company.crisisSeverity <= 15) {
       company.crisis = false;
       company.status = 'active';
@@ -234,7 +302,10 @@ function processWar(person, state) {
     const cash = Math.max(0, Number(person.money) || 0);
     person.money = Math.max(0, cash - cost);
     person.updateStats?.({ happiness: -2, stress: 3 });
-    person.logEvent?.(`War shortages increased your monthly costs by $${cost.toLocaleString()}.`, 'bad');
+    person.logEvent?.(
+      `War shortages increased your monthly costs by $${cost.toLocaleString()}.`,
+      'bad'
+    );
   }
   if (Math.random() < 0.04) {
     person.updateStats?.({ health: -4, stress: 6 });
@@ -246,7 +317,9 @@ function processTreatment(person, state) {
   state.months = Math.max(0, Number(state.months) || 0) + 1;
   state.response = clamp(state.response ?? 45);
   const health = Number(person.health) || 50;
-  state.response = clamp(state.response + Math.floor(Math.random() * 9) - 3 + (health >= 70 ? 2 : 0));
+  state.response = clamp(
+    state.response + Math.floor(Math.random() * 9) - 3 + (health >= 70 ? 2 : 0)
+  );
   if (state.response >= 80) {
     person.inTreatment = false;
     person.updateStats?.({ health: 6, stress: -6, happiness: 4 });
@@ -261,24 +334,45 @@ export function processMonthlySituation(person) {
   ensureTimeProgress(person);
   const systems = ensureMonthlySituations(person);
   const situation = getActiveMonthlySituation(person);
-  if (!situation) return null;
+  if (!situation) {
+    return null;
+  }
 
   switch (situation.id) {
-    case 'pregnancy': processPregnancy(person); break;
-    case 'campaign': processCampaign(person, systems.campaign); break;
-    case 'deployment': processDeployment(person, systems.deployment); break;
-    case 'lawsuit': processLawsuit(person, systems.lawsuit); break;
-    case 'sports': processSports(person, systems.sports); break;
-    case 'business': processBusinessCrisis(person, systems.business); break;
-    case 'war': processWar(person, systems.war); break;
-    case 'treatment': processTreatment(person, systems.treatment); break;
-    default: break;
+    case 'pregnancy':
+      processPregnancy(person);
+      break;
+    case 'campaign':
+      processCampaign(person, systems.campaign);
+      break;
+    case 'deployment':
+      processDeployment(person, systems.deployment);
+      break;
+    case 'lawsuit':
+      processLawsuit(person, systems.lawsuit);
+      break;
+    case 'sports':
+      processSports(person, systems.sports);
+      break;
+    case 'business':
+      processBusinessCrisis(person, systems.business);
+      break;
+    case 'war':
+      processWar(person, systems.war);
+      break;
+    case 'treatment':
+      processTreatment(person, systems.treatment);
+      break;
+    default:
+      break;
   }
   return situation;
 }
 
 export function resolveMonthlySituationChoice(person, event, choice) {
-  if (event?.type !== 'monthly_situation') return false;
+  if (event?.type !== 'monthly_situation') {
+    return false;
+  }
   ensureMonthlySituations(person);
   const effects = { ...(choice?.effects || {}) };
   const moneyEffect = Number(effects.money);
@@ -287,7 +381,9 @@ export function resolveMonthlySituationChoice(person, event, choice) {
     const cash = Math.max(0, Number(person.money) || 0);
     const paid = Math.min(cash, cost);
     person.money = cash - paid;
-    if (paid < cost) person.personalDebt = (Number(person.personalDebt) || 0) + cost - paid;
+    if (paid < cost) {
+      person.personalDebt = (Number(person.personalDebt) || 0) + cost - paid;
+    }
     delete effects.money;
   }
   person.updateStats?.(effects);
@@ -301,21 +397,38 @@ export function resolveMonthlySituationChoice(person, event, choice) {
     person.money = (Number(person.money) || 0) + 250;
     person.pregnancy.health = clamp((person.pregnancy.health || 80) - 2);
   } else if (choice.effect === 'campaign_positive') {
-    person.monthlySituations.campaign.polling = clamp(person.monthlySituations.campaign.polling + 5);
+    person.monthlySituations.campaign.polling = clamp(
+      person.monthlySituations.campaign.polling + 5
+    );
   } else if (choice.effect === 'campaign_attack') {
     const success = Math.random() < 0.55;
-    person.monthlySituations.campaign.polling = clamp(person.monthlySituations.campaign.polling + (success ? 7 : -6));
-    if (!success) person.monthlySituations.campaign.scandals += 1;
+    person.monthlySituations.campaign.polling = clamp(
+      person.monthlySituations.campaign.polling + (success ? 7 : -6)
+    );
+    if (!success) {
+      person.monthlySituations.campaign.scandals += 1;
+    }
   } else if (choice.effect === 'campaign_townhall') {
-    person.monthlySituations.campaign.polling = clamp(person.monthlySituations.campaign.polling + 3);
-    if (person.reputation) person.reputation.trust = clamp(person.reputation.trust + 3);
+    person.monthlySituations.campaign.polling = clamp(
+      person.monthlySituations.campaign.polling + 3
+    );
+    if (person.reputation) {
+      person.reputation.trust = clamp(person.reputation.trust + 3);
+    }
   } else if (choice.effect === 'lawsuit_investigate') {
-    person.monthlySituations.lawsuit.evidence = clamp(person.monthlySituations.lawsuit.evidence + 18);
+    person.monthlySituations.lawsuit.evidence = clamp(
+      person.monthlySituations.lawsuit.evidence + 18
+    );
   } else if (choice.effect === 'lawsuit_settle') {
-    const settlement = Math.max(1000, Math.floor((person.monthlySituations.lawsuit.legalCosts || 1000) * 1.5));
+    const settlement = Math.max(
+      1000,
+      Math.floor((person.monthlySituations.lawsuit.legalCosts || 1000) * 1.5)
+    );
     const cash = Math.max(0, Number(person.money) || 0);
     person.money = Math.max(0, cash - settlement);
-    if (cash < settlement) person.personalDebt = (Number(person.personalDebt) || 0) + settlement - cash;
+    if (cash < settlement) {
+      person.personalDebt = (Number(person.personalDebt) || 0) + settlement - cash;
+    }
     person.activeLawsuits = [];
     person.logEvent?.(`You settled the lawsuit for $${settlement.toLocaleString()}.`, 'neutral');
   } else if (choice.effect === 'lawsuit_trial') {
@@ -339,8 +452,12 @@ export function resolveMonthlySituationChoice(person, event, choice) {
 
 export function getMonthlySituationSummary(person) {
   const situation = getActiveMonthlySituation(person);
-  if (!situation) return null;
+  if (!situation) {
+    return null;
+  }
   const systems = ensureMonthlySituations(person);
-  if (situation.id === 'pregnancy') return { type: 'pregnancy', ...person.pregnancy };
+  if (situation.id === 'pregnancy') {
+    return { type: 'pregnancy', ...person.pregnancy };
+  }
   return { type: situation.id, ...(systems[situation.id] || {}) };
 }

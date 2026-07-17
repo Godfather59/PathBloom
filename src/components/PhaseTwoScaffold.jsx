@@ -29,7 +29,12 @@ export function PhaseTwoScreen({
           </div>
           <div className="phase-two-header-actions">
             {headerActions}
-            <button type="button" className="phase-two-close" onClick={onClose} aria-label={closeLabel}>
+            <button
+              type="button"
+              className="phase-two-close"
+              onClick={onClose}
+              aria-label={closeLabel}
+            >
               <AppIcon name="close" size={21} />
             </button>
           </div>
@@ -136,7 +141,11 @@ export function PhaseTwoActionRow({
       onClick={onClick}
       disabled={disabled}
     >
-      {icon && <span className="phase-two-action-icon" aria-hidden="true">{icon}</span>}
+      {icon && (
+        <span className="phase-two-action-icon" aria-hidden="true">
+          {icon}
+        </span>
+      )}
       <span className="phase-two-action-copy">
         <strong dir="auto">{title}</strong>
         {subtitle && <small dir="auto">{subtitle}</small>}

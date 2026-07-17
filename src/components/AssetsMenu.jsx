@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { LUXURY_ASSETS } from '../logic/CuratedAssets';
-import { STOCKS, CRYPTO, COMPANY_STOCKS, getActiveIPOs, getMarketNews, getSectorPerformance } from '../logic/Investments';
+import { STOCKS, CRYPTO, COMPANY_STOCKS, getActiveIPOs } from '../logic/Investments';
 import './Modal.css';
 
 export function AssetsMenu({
@@ -404,16 +404,21 @@ export function AssetsMenu({
   };
 
   const renderPartialSellModal = () => {
-    if (!partialSell) return null;
+    if (!partialSell) {
+      return null;
+    }
     const { asset, position } = partialSell;
     const pct = partialSellPct;
 
     return (
       <div className="modal-overlay" style={{ zIndex: 230 }}>
         <div className="modal-content" style={{ maxWidth: '300px' }}>
-          <h3>{t('assets.partialSell', 'Sell')} {asset.name}</h3>
+          <h3>
+            {t('assets.partialSell', 'Sell')} {asset.name}
+          </h3>
           <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-            {t('assets.currentValue', 'Current:')} ${Math.floor(position.currentValue).toLocaleString()}
+            {t('assets.currentValue', 'Current:')} $
+            {Math.floor(position.currentValue).toLocaleString()}
           </p>
           <p>{t('assets.sellPct', 'Percentage to sell:')}</p>
           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '10px' }}>
@@ -437,7 +442,7 @@ export function AssetsMenu({
             style={{ width: '100%', accentColor: 'var(--accent-primary)' }}
           />
           <div style={{ textAlign: 'center', margin: '8px 0', fontWeight: 700 }}>
-            ${Math.floor(position.currentValue * pct / 100).toLocaleString()}
+            ${Math.floor((position.currentValue * pct) / 100).toLocaleString()}
           </div>
           <button
             className="btn-primary"
@@ -455,7 +460,10 @@ export function AssetsMenu({
           </button>
           <button
             className="btn-secondary"
-            onClick={() => { setPartialSellPct(50); setPartialSell(null); }}
+            onClick={() => {
+              setPartialSellPct(50);
+              setPartialSell(null);
+            }}
             style={{ marginTop: '10px' }}
           >
             {t('assets.cancel', '❌ Cancel')}
@@ -466,7 +474,9 @@ export function AssetsMenu({
   };
 
   const renderPortfolioSummary = () => {
-    if (!person.portfolio || person.portfolio.length === 0) return null;
+    if (!person.portfolio || person.portfolio.length === 0) {
+      return null;
+    }
 
     const totalInvested = person.portfolio.reduce((s, p) => s + (p.invested || 0), 0);
     const totalValue = person.portfolio.reduce((s, p) => s + (p.currentValue || 0), 0);
@@ -475,33 +485,45 @@ export function AssetsMenu({
     const gainPct = totalInvested > 0 ? ((totalGain / totalInvested) * 100).toFixed(1) : '0.0';
 
     return (
-      <div style={{
-        background: 'var(--bg-card)',
-        borderRadius: '10px',
-        padding: '14px',
-        marginBottom: '16px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '8px',
-      }}>
+      <div
+        style={{
+          background: 'var(--bg-card)',
+          borderRadius: '10px',
+          padding: '14px',
+          marginBottom: '16px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '8px',
+        }}
+      >
         <div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{t('assets.invested', 'Invested')}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+            {t('assets.invested', 'Invested')}
+          </div>
           <div style={{ fontWeight: 700 }}>${totalInvested.toLocaleString()}</div>
         </div>
         <div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{t('assets.currentValue', 'Current')}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+            {t('assets.currentValue', 'Current')}
+          </div>
           <div style={{ fontWeight: 700 }}>${totalValue.toLocaleString()}</div>
         </div>
         <div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{t('assets.gainLoss', 'Gain/Loss')}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+            {t('assets.gainLoss', 'Gain/Loss')}
+          </div>
           <div style={{ fontWeight: 700, color: totalGain >= 0 ? '#4caf50' : '#ef5350' }}>
             {totalGain >= 0 ? '+' : '-'}${Math.abs(totalGain).toLocaleString()} ({gainPct}%)
           </div>
         </div>
         <div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{t('assets.dividends', 'Dividends')}</div>
-          <div style={{ fontWeight: 700, color: '#4caf50' }}>${totalDividends.toLocaleString()}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+            {t('assets.dividends', 'Dividends')}
+          </div>
+          <div style={{ fontWeight: 700, color: '#4caf50' }}>
+            ${totalDividends.toLocaleString()}
+          </div>
         </div>
       </div>
     );
@@ -523,7 +545,10 @@ export function AssetsMenu({
                 <> &bull; {asset.sector.charAt(0).toUpperCase() + asset.sector.slice(1)}</>
               )}
               {asset.dividendYield > 0 && (
-                <> &bull; {t('assets.divYield', 'Div:')} {(asset.dividendYield * 100).toFixed(1)}%</>
+                <>
+                  {' '}
+                  &bull; {t('assets.divYield', 'Div:')} {(asset.dividendYield * 100).toFixed(1)}%
+                </>
               )}
             </div>
           </div>
@@ -543,7 +568,15 @@ export function AssetsMenu({
         </div>
 
         {position.history?.length > 1 && (
-          <div style={{ display: 'flex', alignItems: 'end', gap: '3px', height: '34px', marginTop: '12px' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'end',
+              gap: '3px',
+              height: '34px',
+              marginTop: '12px',
+            }}
+          >
             {position.history.map((point, index) => {
               const max = Math.max(...position.history.map(item => item.value), 1);
               const h = Math.max(4, Math.round((point.value / max) * 32));
@@ -563,7 +596,9 @@ export function AssetsMenu({
           </div>
         )}
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '12px' }}>
+        <div
+          style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '12px' }}
+        >
           <button className="btn-primary" onClick={() => setInvestModal({ type: 'buy', asset })}>
             {t('assets.invest', '📈 Invest')}
           </button>
@@ -601,7 +636,9 @@ export function AssetsMenu({
 
         {allAssets.map(asset => {
           const position = person.portfolio?.find(pos => pos.id === asset.id);
-          if (position) return null;
+          if (position) {
+            return null;
+          }
           return (
             <div key={asset.id} className="list-item" style={{ opacity: 0.85 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
@@ -613,7 +650,11 @@ export function AssetsMenu({
                       <> &bull; {asset.sector.charAt(0).toUpperCase() + asset.sector.slice(1)}</>
                     )}
                     {asset.dividendYield > 0 && (
-                      <> &bull; {t('assets.divYield', 'Div:')} {(asset.dividendYield * 100).toFixed(1)}%</>
+                      <>
+                        {' '}
+                        &bull; {t('assets.divYield', 'Div:')}{' '}
+                        {(asset.dividendYield * 100).toFixed(1)}%
+                      </>
                     )}
                   </div>
                 </div>
@@ -636,25 +677,39 @@ export function AssetsMenu({
 
         {activeIPOs.length > 0 && (
           <>
-            <h4 style={{ margin: '20px 0 8px', fontSize: '0.95em', color: 'var(--accent-primary)' }}>
+            <h4
+              style={{ margin: '20px 0 8px', fontSize: '0.95em', color: 'var(--accent-primary)' }}
+            >
               🚀 {t('assets.ipos', 'New IPOs')}
             </h4>
             {activeIPOs.map(ipo => (
-              <div key={ipo.id} className="list-item" style={{ borderLeft: '3px solid var(--accent-primary)' }}>
+              <div
+                key={ipo.id}
+                className="list-item"
+                style={{ borderLeft: '3px solid var(--accent-primary)' }}
+              >
                 <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
                   <div>
                     <div className="list-item-title">{ipo.name}</div>
                     <div className="list-item-subtitle">
-                      IPO &bull; ${Math.floor(ipo.ipoPrice).toLocaleString()} &bull; {t('assets.risk', 'Risk:')} {ipo.risk}
+                      IPO &bull; ${Math.floor(ipo.ipoPrice).toLocaleString()} &bull;{' '}
+                      {t('assets.risk', 'Risk:')} {ipo.risk}
                       {ipo.dividendYield > 0 && (
-                        <> &bull; {t('assets.divYield', 'Div:')} {(ipo.dividendYield * 100).toFixed(1)}%</>
+                        <>
+                          {' '}
+                          &bull; {t('assets.divYield', 'Div:')}{' '}
+                          {(ipo.dividendYield * 100).toFixed(1)}%
+                        </>
                       )}
                     </div>
                   </div>
                   <div>
                     {person.portfolio?.find(p => p.id === ipo.id) ? (
                       <span style={{ color: '#4caf50', fontWeight: 700 }}>
-                        ${Math.floor(person.portfolio.find(p => p.id === ipo.id).currentValue).toLocaleString()}
+                        $
+                        {Math.floor(
+                          person.portfolio.find(p => p.id === ipo.id).currentValue
+                        ).toLocaleString()}
                       </span>
                     ) : (
                       <button

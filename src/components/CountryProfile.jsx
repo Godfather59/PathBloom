@@ -105,12 +105,16 @@ function formatNumber(value, language, options = {}) {
 
 function percent(value, language, digits = 0) {
   const numeric = Number(value) || 0;
-  return language === 'ar'
-    ? formatArabicPercent(numeric)
-    : `${numeric.toFixed(digits)}%`;
+  return language === 'ar' ? formatArabicPercent(numeric) : `${numeric.toFixed(digits)}%`;
 }
 
-export function CountryProfile({ countryId, onClose, person, language = getStoredLanguage(), t = (key, fallback) => fallback || key }) {
+export function CountryProfile({
+  countryId,
+  onClose,
+  person,
+  language = getStoredLanguage(),
+  t = (key, fallback) => fallback || key,
+}) {
   const locale = language === 'ar' ? 'ar' : 'en';
   const copy = COPY[locale];
   const [activeTab, setActiveTab] = useState('overview');
@@ -156,24 +160,52 @@ export function CountryProfile({ countryId, onClose, person, language = getStore
       className="country-profile-destination"
     >
       <div className="phase-two-metrics">
-        <PhaseTwoMetric icon="🏙️" label={copy.capital} value={translateGameText(language, country.capital)} />
-        <PhaseTwoMetric icon="👥" label={copy.population} value={`${formatNumber(country.population, language, { maximumFractionDigits: 1 })}M`} />
-        <PhaseTwoMetric icon="💵" label={copy.gdp} value={`$${formatNumber(country.gdp, language, { maximumFractionDigits: 0 })}B`} tone="growth" />
-        <PhaseTwoMetric icon="🌐" label={copy.influence} value={percent(country.influence, language)} tone="world" />
+        <PhaseTwoMetric
+          icon="🏙️"
+          label={copy.capital}
+          value={translateGameText(language, country.capital)}
+        />
+        <PhaseTwoMetric
+          icon="👥"
+          label={copy.population}
+          value={`${formatNumber(country.population, language, { maximumFractionDigits: 1 })}M`}
+        />
+        <PhaseTwoMetric
+          icon="💵"
+          label={copy.gdp}
+          value={`$${formatNumber(country.gdp, language, { maximumFractionDigits: 0 })}B`}
+          tone="growth"
+        />
+        <PhaseTwoMetric
+          icon="🌐"
+          label={copy.influence}
+          value={percent(country.influence, language)}
+          tone="world"
+        />
       </div>
 
-      <PhaseTwoTabs tabs={tabs} activeId={activeTab} onChange={setActiveTab} ariaLabel={countryName} />
+      <PhaseTwoTabs
+        tabs={tabs}
+        activeId={activeTab}
+        onChange={setActiveTab}
+        ariaLabel={countryName}
+      />
 
       {activeTab === 'overview' && (
         <>
           <PhaseTwoSection title={copy.leader}>
             <div className="phase-two-card phase-two-card-highlight country-leader-card">
-              <span className="country-leader-avatar" aria-hidden="true">🏛️</span>
+              <span className="country-leader-avatar" aria-hidden="true">
+                🏛️
+              </span>
               <div className="country-leader-copy">
-                <span className="phase-two-eyebrow">{translateGameText(language, country.leaderTitle)}</span>
+                <span className="phase-two-eyebrow">
+                  {translateGameText(language, country.leaderTitle)}
+                </span>
                 <h2 dir="auto">{country.leaderName}</h2>
                 <p>
-                  {translateGameText(language, country.leaderPersonality)} · {formatNumber(country.leaderYearsInPower, language)} {copy.yearsPower}
+                  {translateGameText(language, country.leaderPersonality)} ·{' '}
+                  {formatNumber(country.leaderYearsInPower, language)} {copy.yearsPower}
                 </p>
               </div>
               <span className={`phase-two-pill ${leaderApproval >= 50 ? 'good' : 'danger'}`}>
@@ -184,16 +216,45 @@ export function CountryProfile({ countryId, onClose, person, language = getStore
 
           <PhaseTwoSection title={copy.nationalSnapshot} subtitle={copy.nationalSnapshotHint}>
             <div className="phase-two-card">
-              <PhaseTwoProgress label={copy.stability} value={country.stability} tone={country.stability >= 60 ? 'growth' : country.stability >= 35 ? 'warning' : 'danger'} />
-              <PhaseTwoProgress label={copy.happiness} value={country.happiness} tone={country.happiness >= 60 ? 'growth' : country.happiness >= 35 ? 'warning' : 'danger'} />
+              <PhaseTwoProgress
+                label={copy.stability}
+                value={country.stability}
+                tone={
+                  country.stability >= 60
+                    ? 'growth'
+                    : country.stability >= 35
+                      ? 'warning'
+                      : 'danger'
+                }
+              />
+              <PhaseTwoProgress
+                label={copy.happiness}
+                value={country.happiness}
+                tone={
+                  country.happiness >= 60
+                    ? 'growth'
+                    : country.happiness >= 35
+                      ? 'warning'
+                      : 'danger'
+                }
+              />
               <PhaseTwoProgress label={copy.influence} value={country.influence} tone="world" />
             </div>
           </PhaseTwoSection>
 
           <div className="phase-two-data-grid">
-            <div className="phase-two-data-item"><span>{copy.capital}</span><strong>{translateGameText(language, country.capital)}</strong></div>
-            <div className="phase-two-data-item"><span>{copy.continent}</span><strong>{translateGameText(language, country.continent)}</strong></div>
-            <div className="phase-two-data-item"><span>{copy.government}</span><strong>{governmentLabel}</strong></div>
+            <div className="phase-two-data-item">
+              <span>{copy.capital}</span>
+              <strong>{translateGameText(language, country.capital)}</strong>
+            </div>
+            <div className="phase-two-data-item">
+              <span>{copy.continent}</span>
+              <strong>{translateGameText(language, country.continent)}</strong>
+            </div>
+            <div className="phase-two-data-item">
+              <span>{copy.government}</span>
+              <strong>{governmentLabel}</strong>
+            </div>
           </div>
         </>
       )}
@@ -201,12 +262,37 @@ export function CountryProfile({ countryId, onClose, person, language = getStore
       {activeTab === 'economy' && (
         <PhaseTwoSection title={copy.economicConditions} subtitle={copy.economicHint}>
           <div className="phase-two-metrics country-economy-metrics">
-            <PhaseTwoMetric icon="📈" label={copy.growth} value={`${Number(country.gdpGrowth) >= 0 ? '+' : ''}${percent(country.gdpGrowth, language, 1)}`} tone={Number(country.gdpGrowth) >= 0 ? 'growth' : 'danger'} />
-            <PhaseTwoMetric icon="💼" label={copy.unemployment} value={percent(country.unemployment, language, 1)} tone={Number(country.unemployment) > 10 ? 'danger' : 'neutral'} />
-            <PhaseTwoMetric icon="🛒" label={copy.inflation} value={percent(country.inflation, language, 1)} tone={Number(country.inflation) > 10 ? 'danger' : 'neutral'} />
+            <PhaseTwoMetric
+              icon="📈"
+              label={copy.growth}
+              value={`${Number(country.gdpGrowth) >= 0 ? '+' : ''}${percent(country.gdpGrowth, language, 1)}`}
+              tone={Number(country.gdpGrowth) >= 0 ? 'growth' : 'danger'}
+            />
+            <PhaseTwoMetric
+              icon="💼"
+              label={copy.unemployment}
+              value={percent(country.unemployment, language, 1)}
+              tone={Number(country.unemployment) > 10 ? 'danger' : 'neutral'}
+            />
+            <PhaseTwoMetric
+              icon="🛒"
+              label={copy.inflation}
+              value={percent(country.inflation, language, 1)}
+              tone={Number(country.inflation) > 10 ? 'danger' : 'neutral'}
+            />
             <PhaseTwoMetric icon="🧾" label={copy.tax} value={percent(country.taxRate, language)} />
-            <PhaseTwoMetric icon="🏚️" label={copy.poverty} value={percent(country.poverty, language, 1)} tone={Number(country.poverty) > 30 ? 'danger' : 'neutral'} />
-            <PhaseTwoMetric icon="🏦" label={copy.debt} value={percent(country.debt, language)} tone={Number(country.debt) > 60 ? 'danger' : 'gold'} />
+            <PhaseTwoMetric
+              icon="🏚️"
+              label={copy.poverty}
+              value={percent(country.poverty, language, 1)}
+              tone={Number(country.poverty) > 30 ? 'danger' : 'neutral'}
+            />
+            <PhaseTwoMetric
+              icon="🏦"
+              label={copy.debt}
+              value={percent(country.debt, language)}
+              tone={Number(country.debt) > 60 ? 'danger' : 'gold'}
+            />
           </div>
         </PhaseTwoSection>
       )}
@@ -217,8 +303,18 @@ export function CountryProfile({ countryId, onClose, person, language = getStore
             <PhaseTwoProgress label={copy.happiness} value={country.happiness} />
             <PhaseTwoProgress label={copy.education} value={country.education} tone="world" />
             <PhaseTwoProgress label={copy.healthcare} value={country.healthcare} tone="growth" />
-            <PhaseTwoProgress label={copy.corruption} value={country.corruption} inverse tone={Number(country.corruption) > 55 ? 'danger' : 'warning'} />
-            <PhaseTwoProgress label={copy.crime} value={country.crime} inverse tone={Number(country.crime) > 55 ? 'danger' : 'warning'} />
+            <PhaseTwoProgress
+              label={copy.corruption}
+              value={country.corruption}
+              inverse
+              tone={Number(country.corruption) > 55 ? 'danger' : 'warning'}
+            />
+            <PhaseTwoProgress
+              label={copy.crime}
+              value={country.crime}
+              inverse
+              tone={Number(country.crime) > 55 ? 'danger' : 'warning'}
+            />
           </div>
         </PhaseTwoSection>
       )}
@@ -226,7 +322,13 @@ export function CountryProfile({ countryId, onClose, person, language = getStore
       {activeTab === 'security' && (
         <PhaseTwoSection title={copy.securityConditions} subtitle={copy.securityHint}>
           <div className="phase-two-card">
-            <PhaseTwoProgress label={copy.stability} value={country.stability} tone={country.stability >= 60 ? 'growth' : country.stability >= 35 ? 'warning' : 'danger'} />
+            <PhaseTwoProgress
+              label={copy.stability}
+              value={country.stability}
+              tone={
+                country.stability >= 60 ? 'growth' : country.stability >= 35 ? 'warning' : 'danger'
+              }
+            />
             <PhaseTwoProgress label={copy.military} value={country.militaryPower} tone="danger" />
             <PhaseTwoProgress label={copy.technology} value={country.technology} tone="purple" />
             <PhaseTwoProgress label={copy.influence} value={country.influence} tone="world" />

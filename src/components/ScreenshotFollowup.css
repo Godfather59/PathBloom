@@ -1,8 +1,10 @@
-/* Follow-up fixes from the physical Android RTL screenshot review. */
+/* Follow-up fixes from physical Android screenshot reviews. */
 
-/* The timeline owns its scroll area, but the native WebView scrollbar was
-   rendered as a thick grey bar on the left edge in RTL. */
+/* Hide the native WebView scrollbar and keep timeline rail icons fully inside
+   both LTR and RTL safe areas. */
 .event-log {
+  padding-left: calc(var(--pb-safe-left) + 18px) !important;
+  padding-right: calc(var(--pb-safe-right) + 18px) !important;
   scrollbar-gutter: auto;
   scrollbar-width: none;
 }
@@ -13,18 +15,54 @@
   height: 0;
 }
 
-/* The previous Smart +5 design reserved a 54px lane above the navigation.
-   The action now opens from a compact confirmation control, so reclaim that
-   space for the story timeline. */
+.timeline-event {
+  grid-template-columns: 30px minmax(0, 1fr);
+}
+
+.timeline-dot {
+  margin-inline: 2px;
+}
+
+/* Show all four life shortcuts at once instead of cutting the final item off
+   at the screen edge. */
+.life-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  overflow: visible;
+  margin-bottom: 8px;
+  padding: 0 2px;
+  mask-image: none;
+  -webkit-mask-image: none;
+}
+
+.life-shortcut {
+  min-width: 0;
+  min-height: 48px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  padding: 6px 3px;
+  border-radius: 14px;
+  font-size: 0.64rem;
+  line-height: 1.05;
+}
+
+.life-shortcut span {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The previous Smart +5 design reserved an oversized lane above navigation.
+   Keep the secondary control separate without wasting story space. */
 .bottom-navigation {
   margin-top: 0;
 }
 
-.life-shortcuts {
-  margin-bottom: 20px;
-}
-
-/* Keep automatic progression secondary and separate from the Age Up button. */
 .time-more-action {
   position: absolute;
   inset-inline-end: 14px;
@@ -49,8 +87,19 @@
 }
 
 @media (max-width: 360px) {
+  .event-log {
+    padding-left: calc(var(--pb-safe-left) + 14px) !important;
+    padding-right: calc(var(--pb-safe-right) + 14px) !important;
+  }
+
   .life-shortcuts {
-    margin-bottom: 18px;
+    gap: 4px;
+    margin-bottom: 7px;
+  }
+
+  .life-shortcut {
+    padding-inline: 2px;
+    font-size: 0.59rem;
   }
 
   .time-more-action {

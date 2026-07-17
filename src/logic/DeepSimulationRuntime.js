@@ -38,7 +38,9 @@ import {
 } from './MonthlySituationEngine';
 
 function copy(value) {
-  if (value === undefined) return undefined;
+  if (value === undefined) {
+    return undefined;
+  }
   if (typeof structuredClone === 'function') {
     try {
       return structuredClone(value);
@@ -70,9 +72,13 @@ function chargePerson(person, amount) {
 }
 
 function applyCountryTaxAdjustment(person) {
-  if (person.age < 18 || !person.job || person.job.isRetired || person.job.isMafia) return 0;
+  if (person.age < 18 || !person.job || person.job.isRetired || person.job.isMafia) {
+    return 0;
+  }
   const salary = Math.max(0, Number(person.job.salary) || 0);
-  if (salary <= 0) return 0;
+  if (salary <= 0) {
+    return 0;
+  }
   const rules = getCountryRules(person, GameEngine.getCountryForPerson?.(person) || null);
   const baselineTax = calculateIncomeTax(salary);
   const targetTax = Math.max(0, Math.floor(salary * rules.incomeTaxRate));
@@ -84,7 +90,10 @@ function applyCountryTaxAdjustment(person) {
     person.money = (Number(person.money) || 0) + Math.abs(difference);
   }
   if (person.lifeStats) {
-    person.lifeStats.totalTaxes = Math.max(0, (Number(person.lifeStats.totalTaxes) || 0) + difference);
+    person.lifeStats.totalTaxes = Math.max(
+      0,
+      (Number(person.lifeStats.totalTaxes) || 0) + difference
+    );
   }
   person.countryLife.lastIncomeTax = targetTax;
   person.countryLife.lastTaxAdjustment = difference;
@@ -128,7 +137,11 @@ Person.prototype.clone = function cloneWithDeepSimulation() {
 };
 
 const originalLogEvent = Person.prototype.logEvent;
-Person.prototype.logEvent = function logEventWithConsequences(text, type = 'neutral', metadata = {}) {
+Person.prototype.logEvent = function logEventWithConsequences(
+  text,
+  type = 'neutral',
+  metadata = {}
+) {
   const result = originalLogEvent.call(this, text, type, metadata);
   ensureDeepSystems(this);
   observeEventForChains(this, text);
@@ -141,10 +154,18 @@ const originalResolveEvent = Person.prototype.resolveEvent;
 Person.prototype.resolveEvent = function resolveDeepSimulationEvent(choice) {
   ensureDeepSystems(this);
   const event = this.pendingEvent;
-  if (resolveEventChainChoice(this, event, choice)) return;
-  if (resolveMonthlySituationChoice(this, event, choice)) return;
-  if (resolveNPCRequest(this, event, choice)) return;
-  if (resolveCountryServiceChoice(this, event, choice)) return;
+  if (resolveEventChainChoice(this, event, choice)) {
+    return;
+  }
+  if (resolveMonthlySituationChoice(this, event, choice)) {
+    return;
+  }
+  if (resolveNPCRequest(this, event, choice)) {
+    return;
+  }
+  if (resolveCountryServiceChoice(this, event, choice)) {
+    return;
+  }
   return originalResolveEvent.call(this, choice);
 };
 
@@ -169,7 +190,9 @@ Person.prototype.setJob = function setJobWithReputation(jobData) {
 const originalVisitDoctor = Person.prototype.visitDoctor;
 Person.prototype.visitDoctor = function visitDoctorWithCountryCosts(treatment) {
   ensureDeepSystems(this);
-  if (!treatment || typeof treatment !== 'object') return originalVisitDoctor.call(this, treatment);
+  if (!treatment || typeof treatment !== 'object') {
+    return originalVisitDoctor.call(this, treatment);
+  }
   const rules = getCountryRules(this, GameEngine.getCountryForPerson?.(this) || null);
   const adjusted = {
     ...treatment,
@@ -181,7 +204,9 @@ Person.prototype.visitDoctor = function visitDoctorWithCountryCosts(treatment) {
 const originalEnrollInSchool = Person.prototype.enrollInSchool;
 Person.prototype.enrollInSchool = function enrollWithCountryTuition(school) {
   ensureDeepSystems(this);
-  if (!school || typeof school !== 'object') return originalEnrollInSchool.call(this, school);
+  if (!school || typeof school !== 'object') {
+    return originalEnrollInSchool.call(this, school);
+  }
   const rules = getCountryRules(this, GameEngine.getCountryForPerson?.(this) || null);
   const isHigherEducation = ['university', 'grad_school'].includes(school.type);
   const adjusted = {
@@ -207,11 +232,13 @@ const originalRetire = Person.prototype.retire;
 Person.prototype.retire = function retireWithCountryRules() {
   ensureDeepSystems(this);
   const rules = getCountryRules(this, GameEngine.getCountryForPerson?.(this) || null);
-  const retirementWealth = Object.values(this.retirementAccounts || {}).reduce(
-    (sum, account) => sum + Math.max(0, Number(account?.balance) || 0),
-    0
-  ) + Math.max(0, Number(this.finance?.savingsAccount) || 0);
-  const earlyRetirementFunded = retirementWealth >= Math.max(100000, (Number(this.job?.salary) || 30000) * 5);
+  const retirementWealth =
+    Object.values(this.retirementAccounts || {}).reduce(
+      (sum, account) => sum + Math.max(0, Number(account?.balance) || 0),
+      0
+    ) + Math.max(0, Number(this.finance?.savingsAccount) || 0);
+  const earlyRetirementFunded =
+    retirementWealth >= Math.max(100000, (Number(this.job?.salary) || 30000) * 5);
   if (this.age < rules.retirementAge && !earlyRetirementFunded) {
     this.logEvent(
       `The standard retirement age in ${this.country} is ${rules.retirementAge}. You need much more savings to retire early.`,
@@ -225,7 +252,11 @@ Person.prototype.retire = function retireWithCountryRules() {
 // Convert the legacy instant-birth relationship action into a nine-month pregnancy.
 const originalInteractWithRel = Person.prototype.interactWithRel;
 if (typeof originalInteractWithRel === 'function') {
-  Person.prototype.interactWithRel = function interactWithRelationshipDepth(relId, action, payload) {
+  Person.prototype.interactWithRel = function interactWithRelationshipDepth(
+    relId,
+    action,
+    payload
+  ) {
     ensureDeepSystems(this);
     const childIdsBefore = new Set(
       (this.relationships || []).filter(rel => rel.type === 'Child').map(rel => rel.id)
@@ -254,13 +285,18 @@ const originalProcessLivingExpenses = GameEngine.processLivingExpenses.bind(Game
 GameEngine.processLivingExpenses = function processCountryAdjustedLivingExpenses(person) {
   ensureDeepSystems(person);
   const originalCost = Math.max(0, Number(originalProcessLivingExpenses(person)) || 0);
-  if (originalCost <= 0) return originalCost;
+  if (originalCost <= 0) {
+    return originalCost;
+  }
 
   const countryState = GameEngine.getCountryForPerson?.(person) || null;
   const rules = getCountryRules(person, countryState);
   const discipline = Math.max(0, Math.min(100, Number(person.finance?.budgetDiscipline) || 45));
   const budgetMultiplier = 1 - Math.max(0, discipline - 50) / 500;
-  const adjustedCost = Math.max(0, Math.floor(originalCost * rules.costOfLiving * budgetMultiplier));
+  const adjustedCost = Math.max(
+    0,
+    Math.floor(originalCost * rules.costOfLiving * budgetMultiplier)
+  );
   const difference = adjustedCost - originalCost;
 
   if (difference > 0) {
@@ -288,7 +324,9 @@ GameEngine.simulateYear = function simulateYearWithDeepSystems(person) {
   ensureDeepSystems(person);
   const result = originalSimulateYear(person);
   ensureDeepSystems(person);
-  if (!person.isAlive) return result;
+  if (!person.isAlive) {
+    return result;
+  }
 
   applyCountryTaxAdjustment(person);
   processCountryLifeYear(person, person.geopoliticalState);

@@ -12,19 +12,33 @@ const TYPE_EMOJIS = {
 };
 
 function getChoiceEmoji(choice) {
-  if (choice.emoji) return choice.emoji;
-  if (choice.type && TYPE_EMOJIS[choice.type]) return TYPE_EMOJIS[choice.type];
+  if (choice.emoji) {
+    return choice.emoji;
+  }
+  if (choice.type && TYPE_EMOJIS[choice.type]) {
+    return TYPE_EMOJIS[choice.type];
+  }
 
   const effects = choice.effects || {};
   const score = Object.entries(effects).reduce((total, [key, value]) => {
-    if (key === 'stress') return total - value;
+    if (key === 'stress') {
+      return total - value;
+    }
     return total + value;
   }, 0);
 
-  if ((effects.money ?? 0) > 0) return '💰';
-  if ((effects.money ?? 0) < 0) return '💸';
-  if (score > 5) return '✅';
-  if (score < -5) return '⚠️';
+  if ((effects.money ?? 0) > 0) {
+    return '💰';
+  }
+  if ((effects.money ?? 0) < 0) {
+    return '💸';
+  }
+  if (score > 5) {
+    return '✅';
+  }
+  if (score < -5) {
+    return '⚠️';
+  }
   return '💭';
 }
 
@@ -35,10 +49,13 @@ export function DecisionModal({
   t = (key, fallback) => fallback || key,
 }) {
   const localize = (value, messageKey, messageParams, localizedText) => {
-    const packText = localizedText && typeof localizedText === 'object'
-      ? localizedText[language] || localizedText.en
-      : null;
-    if (packText) return String(packText);
+    const packText =
+      localizedText && typeof localizedText === 'object'
+        ? localizedText[language] || localizedText.en
+        : null;
+    if (packText) {
+      return String(packText);
+    }
 
     const localized = messageKey
       ? translateGameMessage(language, messageKey, messageParams || {}, value)
@@ -82,7 +99,12 @@ export function DecisionModal({
                   {getChoiceEmoji(choice)}
                 </span>
                 <span>
-                  {localize(choice.text, choice.messageKey, choice.messageParams, choice.localizedText)}
+                  {localize(
+                    choice.text,
+                    choice.messageKey,
+                    choice.messageParams,
+                    choice.localizedText
+                  )}
                 </span>
               </button>
             ))}

@@ -57,20 +57,19 @@ export function SystemMenu({
   }
 
   if (showContentStudio) {
-    return (
-      <ContentStudio
-        onClose={() => setShowContentStudio(false)}
-        language={language}
-        t={t}
-      />
-    );
+    return <ContentStudio onClose={() => setShowContentStudio(false)} language={language} t={t} />;
   }
 
   const navigation = [
     [onStats, '📊', 'system.stats', 'Lifetime Stats'],
     [onHistory, '📈', 'system.history', 'Current Life Trends'],
     [openSimulation, '🧩', 'system.simulation', 'Simulation Overview'],
-    [() => setShowContentStudio(true), '🧰', 'system.contentStudio', language === 'ar' ? 'استوديو المحتوى' : 'Content Studio'],
+    [
+      () => setShowContentStudio(true),
+      '🧰',
+      'system.contentStudio',
+      language === 'ar' ? 'استوديو المحتوى' : 'Content Studio',
+    ],
     [onFamilyTree, '🌳', 'system.familyTree', 'Family Dynasty'],
     [onWorldNews, '📰', 'system.worldNews', 'World News'],
     [onWorldOverview, '🌍', 'system.worldOverview', 'World Overview'],
@@ -85,50 +84,99 @@ export function SystemMenu({
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content" style={{ maxWidth: '340px' }} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+      <div
+        className="modal-content"
+        style={{ maxWidth: '340px' }}
+        dir={language === 'ar' ? 'rtl' : 'ltr'}
+      >
         <div className="modal-header">
           <h2 className="modal-title">⏸️ {t('system.paused', 'Paused')}</h2>
-          <button className="close-btn" onClick={onResume}>&times;</button>
+          <button className="close-btn" onClick={onResume}>
+            &times;
+          </button>
         </div>
 
-        <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <button className="btn-primary" onClick={onResume} style={{ padding: '16px', fontSize: '1.1rem' }}>
+        <div
+          className="modal-body"
+          style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
+        >
+          <button
+            className="btn-primary"
+            onClick={onResume}
+            style={{ padding: '16px', fontSize: '1.1rem' }}
+          >
             ▶️ {t('system.resume', 'Resume Game')}
           </button>
-          <button className="btn-secondary" onClick={onSave} style={{ padding: '16px', fontSize: '1.1rem' }}>
+          <button
+            className="btn-secondary"
+            onClick={onSave}
+            style={{ padding: '16px', fontSize: '1.1rem' }}
+          >
             💾 {t('system.save', 'Save Game')}
           </button>
-          <button className="list-item" onClick={onGodMode} style={{
-            padding: '16px', fontSize: '1.1rem', background: 'linear-gradient(45deg, #ffd700, #ffa500)',
-            color: 'black', fontWeight: 'bold', border: 'none', marginBottom: 0, textAlign: 'center',
-          }}>
+          <button
+            className="list-item"
+            onClick={onGodMode}
+            style={{
+              padding: '16px',
+              fontSize: '1.1rem',
+              background: 'linear-gradient(45deg, #ffd700, #ffa500)',
+              color: 'black',
+              fontWeight: 'bold',
+              border: 'none',
+              marginBottom: 0,
+              textAlign: 'center',
+            }}
+          >
             ⚡ {t('system.godMode', 'God Mode')}
           </button>
 
-          {navigation.map(([handler, icon, key, fallback]) => handler ? (
-            <button key={key} className="btn-secondary" onClick={handler} style={{ padding: '12px' }}>
-              {icon} {t(key, fallback)}
-            </button>
-          ) : null)}
+          {navigation.map(([handler, icon, key, fallback]) =>
+            handler ? (
+              <button
+                key={key}
+                className="btn-secondary"
+                onClick={handler}
+                style={{ padding: '12px' }}
+              >
+                {icon} {t(key, fallback)}
+              </button>
+            ) : null
+          )}
 
           {onDebug && (
-            <button className="btn-secondary" onClick={onDebug} style={{ padding: '12px', fontSize: '0.85rem', color: '#888' }}>
+            <button
+              className="btn-secondary"
+              onClick={onDebug}
+              style={{ padding: '12px', fontSize: '0.85rem', color: '#888' }}
+            >
               🛠️ {t('system.debug', 'Debug Tools')}
             </button>
           )}
 
-          <button className="btn-secondary" onClick={onResetTutorial}
-            style={{ padding: '12px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+          <button
+            className="btn-secondary"
+            onClick={onResetTutorial}
+            style={{ padding: '12px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}
+          >
             🔄 {t('system.resetTutorial', 'Reset Tutorial')}
           </button>
 
           <div className="settings-language">
             <div className="settings-language-label">🔊 {t('system.sound', 'Sound')}</div>
             <div className="settings-language-options">
-              <button type="button" className={`language-chip ${audioEnabled ? 'active' : ''}`} onClick={() => onSoundToggle?.(true)}>
+              <button
+                type="button"
+                className={`language-chip ${audioEnabled ? 'active' : ''}`}
+                onClick={() => onSoundToggle?.(true)}
+              >
                 🔊 {t('common.on', 'On')}
               </button>
-              <button type="button" className={`language-chip ${!audioEnabled ? 'active' : ''}`} onClick={() => onSoundToggle?.(false)}>
+              <button
+                type="button"
+                className={`language-chip ${!audioEnabled ? 'active' : ''}`}
+                onClick={() => onSoundToggle?.(false)}
+              >
                 🔇 {t('common.off', 'Off')}
               </button>
             </div>
@@ -136,19 +184,33 @@ export function SystemMenu({
 
           <div className="settings-language">
             <div className="settings-language-label">🎵 {t('system.sfxVolume', 'SFX Volume')}</div>
-            <input type="range" min="0" max="1" step="0.05" value={sfxVolume}
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.05"
+              value={sfxVolume}
               onChange={event => onSfxVolumeChange?.(Number(event.target.value))}
-              style={{ width: '100%', accentColor: 'var(--accent-primary)' }} />
+              style={{ width: '100%', accentColor: 'var(--accent-primary)' }}
+            />
             <div style={{ textAlign: 'end', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
               {Math.round(sfxVolume * 100)}%
             </div>
           </div>
 
           <div className="settings-language">
-            <div className="settings-language-label">🎶 {t('system.musicVolume', 'Music Volume')}</div>
-            <input type="range" min="0" max="1" step="0.05" value={musicVolume}
+            <div className="settings-language-label">
+              🎶 {t('system.musicVolume', 'Music Volume')}
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.05"
+              value={musicVolume}
               onChange={event => onMusicVolumeChange?.(Number(event.target.value))}
-              style={{ width: '100%', accentColor: 'var(--accent-primary)' }} />
+              style={{ width: '100%', accentColor: 'var(--accent-primary)' }}
+            />
             <div style={{ textAlign: 'end', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
               {Math.round(musicVolume * 100)}%
             </div>
@@ -157,10 +219,18 @@ export function SystemMenu({
           <div className="settings-language">
             <div className="settings-language-label">📳 {t('system.haptics', 'Vibration')}</div>
             <div className="settings-language-options">
-              <button type="button" className={`language-chip ${hapticsEnabled ? 'active' : ''}`} onClick={() => onHapticsToggle?.(true)}>
+              <button
+                type="button"
+                className={`language-chip ${hapticsEnabled ? 'active' : ''}`}
+                onClick={() => onHapticsToggle?.(true)}
+              >
                 {t('common.on', 'On')}
               </button>
-              <button type="button" className={`language-chip ${!hapticsEnabled ? 'active' : ''}`} onClick={() => onHapticsToggle?.(false)}>
+              <button
+                type="button"
+                className={`language-chip ${!hapticsEnabled ? 'active' : ''}`}
+                onClick={() => onHapticsToggle?.(false)}
+              >
                 {t('common.off', 'Off')}
               </button>
             </div>
@@ -170,8 +240,14 @@ export function SystemMenu({
             <div className="settings-language-label">🌐 {t('system.language', 'Language')}</div>
             <div className="settings-language-options">
               {LANGUAGES.map(option => (
-                <button key={option.id} type="button" className={`language-chip ${language === option.id ? 'active' : ''}`}
-                  onClick={() => onLanguageChange?.(option.id)}>{option.nativeName}</button>
+                <button
+                  key={option.id}
+                  type="button"
+                  className={`language-chip ${language === option.id ? 'active' : ''}`}
+                  onClick={() => onLanguageChange?.(option.id)}
+                >
+                  {option.nativeName}
+                </button>
               ))}
             </div>
           </div>
@@ -180,16 +256,35 @@ export function SystemMenu({
             <div className="settings-language-label">🎨 {t('system.theme', 'Theme')}</div>
             <div className="settings-language-options" style={{ flexWrap: 'wrap', gap: '4px' }}>
               {Object.entries(THEMES).map(([id, theme]) => (
-                <button key={id} type="button" className={`language-chip ${currentTheme === id ? 'active' : ''}`}
-                  onClick={() => onThemeChange?.(id)}>{theme.icon} {theme.name}</button>
+                <button
+                  key={id}
+                  type="button"
+                  className={`language-chip ${currentTheme === id ? 'active' : ''}`}
+                  onClick={() => onThemeChange?.(id)}
+                >
+                  {theme.icon} {theme.name}
+                </button>
               ))}
             </div>
           </div>
 
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', margin: '8px 0' }} />
-          <button className="btn-danger" onClick={() => {
-            if (confirm(t('system.exitConfirm', 'Are you sure you want to exit? Unsaved progress will be lost.'))) onExit();
-          }} style={{ padding: '16px', fontSize: '1.1rem' }}>
+          <button
+            className="btn-danger"
+            onClick={() => {
+              if (
+                confirm(
+                  t(
+                    'system.exitConfirm',
+                    'Are you sure you want to exit? Unsaved progress will be lost.'
+                  )
+                )
+              ) {
+                onExit();
+              }
+            }}
+            style={{ padding: '16px', fontSize: '1.1rem' }}
+          >
             🚪 {t('system.exit', 'Exit to Main Menu')}
           </button>
         </div>

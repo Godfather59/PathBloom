@@ -27,9 +27,7 @@ export function PrisonMenu({
     <div className="modal-overlay">
       <div className="modal-content prison-modal" dir={isArabic ? 'rtl' : 'ltr'}>
         <div className="modal-header">
-          <h2 className="modal-title prison-title">
-            🚔 {t('prison.title', 'State Penitentiary')}
-          </h2>
+          <h2 className="modal-title prison-title">🚔 {t('prison.title', 'State Penitentiary')}</h2>
           <button
             className="close-btn"
             onClick={onSystem}
@@ -54,7 +52,10 @@ export function PrisonMenu({
           </div>
 
           <div className="prison-time-actions">
-            <button className="age-skip-btn month-btn" onClick={() => handleAction('__advance_month__')}>
+            <button
+              className="age-skip-btn month-btn"
+              onClick={() => handleAction('__advance_month__')}
+            >
               🗓️ {isArabic ? 'اقضِ شهرا' : 'Serve 1 Month'}
             </button>
             <button className="age-up-btn" onClick={() => handleAction('__advance_year__')}>

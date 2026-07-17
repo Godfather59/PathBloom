@@ -10,7 +10,9 @@ import {
 import './Modal.css';
 
 function localText(value, language) {
-  if (!value || typeof value !== 'object') return String(value || '');
+  if (!value || typeof value !== 'object') {
+    return String(value || '');
+  }
   return String(value[language] || value.en || '');
 }
 
@@ -36,22 +38,60 @@ export default function ContentStudio({
 
   const labels = isArabic
     ? {
-        title: 'استوديو المحتوى', close: 'إغلاق', packs: 'حزم القصص', editor: 'محرر JSON',
-        enabled: 'مفعلة', disabled: 'معطلة', builtin: 'مدمجة', custom: 'مخصصة', events: 'أحداث',
-        validate: 'تحقق', save: 'احفظ الحزمة المخصصة', reset: 'قالب جديد', import: 'استيراد JSON',
-        export: 'تصدير JSON', delete: 'حذف', valid: 'الحزمة صالحة', invalid: 'توجد أخطاء',
-        description: 'أضف قصصا جديدة من دون تعديل محرك اللعبة. يجب توفير النص الإنجليزي والعربي لكل حدث وخيار.',
-        total: 'إجمالي الأحداث', noSelection: 'اختر حزمة لعرض تفاصيلها.', source: 'المصدر',
-        followups: 'روابط المتابعة', warning: 'تحذير', error: 'خطأ', copyBuiltin: 'انسخ إلى المحرر',
+        title: 'استوديو المحتوى',
+        close: 'إغلاق',
+        packs: 'حزم القصص',
+        editor: 'محرر JSON',
+        enabled: 'مفعلة',
+        disabled: 'معطلة',
+        builtin: 'مدمجة',
+        custom: 'مخصصة',
+        events: 'أحداث',
+        validate: 'تحقق',
+        save: 'احفظ الحزمة المخصصة',
+        reset: 'قالب جديد',
+        import: 'استيراد JSON',
+        export: 'تصدير JSON',
+        delete: 'حذف',
+        valid: 'الحزمة صالحة',
+        invalid: 'توجد أخطاء',
+        description:
+          'أضف قصصا جديدة من دون تعديل محرك اللعبة. يجب توفير النص الإنجليزي والعربي لكل حدث وخيار.',
+        total: 'إجمالي الأحداث',
+        noSelection: 'اختر حزمة لعرض تفاصيلها.',
+        source: 'المصدر',
+        followups: 'روابط المتابعة',
+        warning: 'تحذير',
+        error: 'خطأ',
+        copyBuiltin: 'انسخ إلى المحرر',
       }
     : {
-        title: 'Content Studio', close: 'Close', packs: 'Story packs', editor: 'JSON editor',
-        enabled: 'Enabled', disabled: 'Disabled', builtin: 'Built-in', custom: 'Custom', events: 'events',
-        validate: 'Validate', save: 'Save custom pack', reset: 'New template', import: 'Import JSON',
-        export: 'Export JSON', delete: 'Delete', valid: 'Pack is valid', invalid: 'Validation errors found',
-        description: 'Add new stories without modifying the game engine. Every event and choice requires English and Arabic text.',
-        total: 'Total events', noSelection: 'Select a pack to inspect it.', source: 'Source',
-        followups: 'Follow-up links', warning: 'Warning', error: 'Error', copyBuiltin: 'Copy into editor',
+        title: 'Content Studio',
+        close: 'Close',
+        packs: 'Story packs',
+        editor: 'JSON editor',
+        enabled: 'Enabled',
+        disabled: 'Disabled',
+        builtin: 'Built-in',
+        custom: 'Custom',
+        events: 'events',
+        validate: 'Validate',
+        save: 'Save custom pack',
+        reset: 'New template',
+        import: 'Import JSON',
+        export: 'Export JSON',
+        delete: 'Delete',
+        valid: 'Pack is valid',
+        invalid: 'Validation errors found',
+        description:
+          'Add new stories without modifying the game engine. Every event and choice requires English and Arabic text.',
+        total: 'Total events',
+        noSelection: 'Select a pack to inspect it.',
+        source: 'Source',
+        followups: 'Follow-up links',
+        warning: 'Warning',
+        error: 'Error',
+        copyBuiltin: 'Copy into editor',
       };
 
   const parseAndValidate = text => {
@@ -95,9 +135,13 @@ export default function ContentStudio({
   };
 
   const removePack = pack => {
-    if (pack.source !== 'custom') return;
+    if (pack.source !== 'custom') {
+      return;
+    }
     deleteCustomContentPack(pack.id);
-    if (selectedPackId === pack.id) setSelectedPackId(null);
+    if (selectedPackId === pack.id) {
+      setSelectedPackId(null);
+    }
     refresh();
   };
 
@@ -136,7 +180,9 @@ export default function ContentStudio({
   const importFile = async event => {
     const file = event.target.files?.[0];
     event.target.value = '';
-    if (!file) return;
+    if (!file) {
+      return;
+    }
     try {
       const text = await file.text();
       setEditorText(text);
@@ -166,7 +212,9 @@ export default function ContentStudio({
       >
         <div className="modal-header">
           <h2 className="modal-title">🧰 {labels.title}</h2>
-          <button className="close-btn" onClick={onClose} aria-label={labels.close}>&times;</button>
+          <button className="close-btn" onClick={onClose} aria-label={labels.close}>
+            &times;
+          </button>
         </div>
 
         <div className="modal-body" style={{ display: 'grid', gap: '14px' }}>
@@ -181,10 +229,14 @@ export default function ContentStudio({
             }}
           >
             <div className="list-item" style={{ margin: 0, textAlign: 'center' }}>
-              <strong>{packs.length}</strong><br />{labels.packs}
+              <strong>{packs.length}</strong>
+              <br />
+              {labels.packs}
             </div>
             <div className="list-item" style={{ margin: 0, textAlign: 'center' }}>
-              <strong>{totalEvents}</strong><br />{labels.total}
+              <strong>{totalEvents}</strong>
+              <br />
+              {labels.total}
             </div>
           </div>
 
@@ -198,11 +250,19 @@ export default function ContentStudio({
                   style={{ margin: 0, padding: '11px', cursor: 'pointer' }}
                   onClick={() => setSelectedPackId(pack.id)}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', alignItems: 'center' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      gap: '8px',
+                      alignItems: 'center',
+                    }}
+                  >
                     <div>
                       <strong>{localText(pack.name, language)}</strong>
                       <div style={{ color: 'var(--text-secondary)', fontSize: '0.78rem' }}>
-                        {pack.events.length} {labels.events} · {pack.source === 'custom' ? labels.custom : labels.builtin}
+                        {pack.events.length} {labels.events} ·{' '}
+                        {pack.source === 'custom' ? labels.custom : labels.builtin}
                       </div>
                     </div>
                     <button
@@ -222,14 +282,23 @@ export default function ContentStudio({
                         {localText(pack.description, language) || labels.noSelection}
                       </div>
                       <div style={{ fontSize: '0.8rem' }}>
-                        {labels.source}: {pack.source === 'custom' ? labels.custom : labels.builtin} · {labels.followups}: {followUpCount}
+                        {labels.source}: {pack.source === 'custom' ? labels.custom : labels.builtin}{' '}
+                        · {labels.followups}: {followUpCount}
                       </div>
                       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                        <button className="btn-secondary" style={{ padding: '8px' }} onClick={() => loadPackIntoEditor(pack)}>
+                        <button
+                          className="btn-secondary"
+                          style={{ padding: '8px' }}
+                          onClick={() => loadPackIntoEditor(pack)}
+                        >
                           📋 {labels.copyBuiltin}
                         </button>
                         {pack.source === 'custom' && (
-                          <button className="btn-danger" style={{ padding: '8px' }} onClick={() => removePack(pack)}>
+                          <button
+                            className="btn-danger"
+                            style={{ padding: '8px' }}
+                            onClick={() => removePack(pack)}
+                          >
                             🗑️ {labels.delete}
                           </button>
                         )}
@@ -267,8 +336,12 @@ export default function ContentStudio({
               }}
             />
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '10px' }}>
-              <button className="btn-secondary" onClick={validateEditor}>✅ {labels.validate}</button>
-              <button className="btn-primary" onClick={saveEditor}>💾 {labels.save}</button>
+              <button className="btn-secondary" onClick={validateEditor}>
+                ✅ {labels.validate}
+              </button>
+              <button className="btn-primary" onClick={saveEditor}>
+                💾 {labels.save}
+              </button>
               <button
                 className="btn-secondary"
                 onClick={() => {
@@ -281,7 +354,9 @@ export default function ContentStudio({
               <button className="btn-secondary" onClick={() => fileInputRef.current?.click()}>
                 📥 {labels.import}
               </button>
-              <button className="btn-secondary" onClick={exportJson}>📤 {labels.export}</button>
+              <button className="btn-secondary" onClick={exportJson}>
+                📤 {labels.export}
+              </button>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -315,7 +390,9 @@ export default function ContentStudio({
             </section>
           )}
 
-          <button className="btn-primary" onClick={onClose}>{labels.close}</button>
+          <button className="btn-primary" onClick={onClose}>
+            {labels.close}
+          </button>
         </div>
       </div>
     </div>

@@ -8,7 +8,9 @@ import {
 } from './ContentEventEngine';
 
 function copy(value) {
-  if (value === undefined) return undefined;
+  if (value === undefined) {
+    return undefined;
+  }
   if (typeof structuredClone === 'function') {
     try {
       return structuredClone(value);
@@ -38,7 +40,9 @@ Person.prototype.clone = function cloneWithContentPacks() {
 const originalResolveEvent = Person.prototype.resolveEvent;
 Person.prototype.resolveEvent = function resolveDataDrivenContent(choice) {
   ensureContentState(this);
-  if (resolveContentEventChoice(this, this.pendingEvent, choice)) return;
+  if (resolveContentEventChoice(this, this.pendingEvent, choice)) {
+    return;
+  }
   return originalResolveEvent.call(this, choice);
 };
 
@@ -49,7 +53,9 @@ GameEngine.simulateYear = function simulateYearWithContentPacks(person) {
   ensureContentState(person);
   if (person.isAlive && !person.pendingEvent) {
     tickScheduledContent(person);
-    if (!person.pendingEvent) maybeGenerateContentEvent(person, 'year');
+    if (!person.pendingEvent) {
+      maybeGenerateContentEvent(person, 'year');
+    }
   }
   return result;
 };
@@ -61,7 +67,9 @@ GameEngine.ageUp = function ageUpWithContentPacks(person, amount = 1) {
   ensureContentState(person);
   if (amount === 'month' && person.isAlive && !person.pendingEvent) {
     tickScheduledContent(person);
-    if (!person.pendingEvent) maybeGenerateContentEvent(person, 'month');
+    if (!person.pendingEvent) {
+      maybeGenerateContentEvent(person, 'month');
+    }
   }
   return result;
 };

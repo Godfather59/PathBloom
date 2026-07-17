@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "id": "country-morocco",
+  "name": { "en": "Life in Morocco", "ar": "الحياة في المغرب" },
+  "description": { "en": "Country-specific education, family, work, and community stories.", "ar": "قصص مغربية خاصة بالتعليم والعائلة والعمل والمجتمع." },
+  "category": "country",
+  "countries": ["Morocco"],
+  "events": [
+    {
+      "id": "morocco_baccalaureate_pressure",
+      "frequency": "year",
+      "weight": 10,
+      "cooldownMonths": 36,
+      "conditions": { "minAge": 16, "maxAge": 20, "requiresSchool": true, "countries": ["Morocco"] },
+      "text": { "en": "The baccalaureate exams are approaching and everyone in your family is discussing your future.", "ar": "تقترب امتحانات البكالوريا وأصبحت عائلتك كلها تناقش مستقبلك." },
+      "choices": [
+        { "id": "prepare", "text": { "en": "Follow a strict revision plan", "ar": "اتبع خطة مراجعة صارمة" }, "outcome": { "en": "Your preparation improved, but the pressure remained intense.", "ar": "تحسن استعدادك، لكن الضغط بقي شديدا." }, "effects": { "smarts": 5, "stress": 6, "energy": -12 }, "reputation": { "family": 3, "professional": 2 } },
+        { "id": "tutor", "text": { "en": "Pay for extra tutoring", "ar": "ادفع لدروس إضافية" }, "outcome": { "en": "The extra lessons helped you understand difficult subjects.", "ar": "ساعدتك الدروس الإضافية على فهم المواد الصعبة." }, "effects": { "money": -800, "smarts": 4, "stress": 3 }, "reputation": { "family": 2 } },
+        { "id": "relax", "text": { "en": "Trust your current preparation", "ar": "ثق في استعدادك الحالي" }, "outcome": { "en": "You protected your energy, but took a larger academic risk.", "ar": "حافظت على طاقتك، لكنك تحملت مخاطرة دراسية أكبر." }, "effects": { "stress": -4, "smarts": -1 } }
+      ]
+    },
+    {
+      "id": "morocco_family_gathering",
+      "frequency": "year",
+      "weight": 7,
+      "cooldownMonths": 18,
+      "conditions": { "minAge": 6, "countries": ["Morocco"] },
+      "text": { "en": "Your extended family is gathering for a large meal, and several relatives expect you to attend.", "ar": "تجتمع عائلتك الكبيرة حول مائدة كبيرة ويتوقع منك عدة أقارب الحضور." },
+      "choices": [
+        { "id": "attend", "text": { "en": "Attend and help", "ar": "احضر وساعد" }, "outcome": { "en": "You spent a warm day with relatives and helped with the preparations.", "ar": "قضيت يوما دافئا مع الأقارب وساعدت في التحضير." }, "effects": { "happiness": 6, "stress": 2, "money": -150 }, "reputation": { "family": 6, "trust": 3 }, "relationshipEffects": { "type": "family", "stat": 5 } },
+        { "id": "visit_short", "text": { "en": "Visit briefly", "ar": "زرهم لفترة قصيرة" }, "outcome": { "en": "You maintained family ties without losing the entire day.", "ar": "حافظت على صلة الرحم من دون أن تقضي اليوم كله." }, "effects": { "happiness": 3 }, "reputation": { "family": 3 } },
+        { "id": "skip", "text": { "en": "Skip the gathering", "ar": "تغيب عن اللقاء" }, "outcome": { "en": "Some relatives understood, while others felt ignored.", "ar": "تفهم بعض الأقارب، بينما شعر آخرون بالتجاهل." }, "effects": { "stress": -2, "happiness": -1 }, "reputation": { "family": -4 } }
+      ]
+    },
+    {
+      "id": "morocco_small_business",
+      "frequency": "year",
+      "weight": 6,
+      "cooldownMonths": 36,
+      "conditions": { "minAge": 18, "countries": ["Morocco"], "minMoney": 1000 },
+      "text": { "en": "A relative suggested starting a small local business together using your savings.", "ar": "اقترح عليك قريب تأسيس مشروع محلي صغير معا باستخدام مدخراتك." },
+      "choices": [
+        { "id": "formal", "text": { "en": "Create a formal business plan", "ar": "ضع خطة عمل رسمية" }, "outcome": { "en": "You studied costs, licenses, customers, and risks before investing.", "ar": "درست التكاليف والتراخيص والعملاء والمخاطر قبل الاستثمار." }, "effects": { "money": -1000, "smarts": 3, "stress": 4 }, "reputation": { "professional": 5, "family": 2 }, "setFlags": { "moroccoBusinessPlan": true } },
+        { "id": "informal", "text": { "en": "Start informally and test demand", "ar": "ابدأ بشكل بسيط واختبر الطلب" }, "outcome": { "en": "The low-cost experiment found several early customers.", "ar": "وجدت التجربة منخفضة التكلفة عدة عملاء أوائل." }, "effects": { "money": 300, "stress": 3 }, "reputation": { "professional": 2 }, "setFlags": { "moroccoBusinessTrial": true } },
+        { "id": "decline", "text": { "en": "Keep your savings", "ar": "احتفظ بمدخراتك" }, "outcome": { "en": "You avoided the risk, though your relative was disappointed.", "ar": "تجنبت المخاطرة، رغم أن قريبك شعر بخيبة أمل." }, "effects": { "stress": -2 }, "reputation": { "family": -1 } }
+      ]
+    },
+    {
+      "id": "morocco_community_support",
+      "frequency": "year",
+      "weight": 5,
+      "cooldownMonths": 30,
+      "conditions": { "minAge": 16, "countries": ["Morocco"] },
+      "text": { "en": "Families in your area are collecting food, clothing, and money for neighbors facing hardship.", "ar": "تجمع عائلات منطقتك الطعام والملابس والمال لمساعدة جيران يمرون بضائقة." },
+      "choices": [
+        { "id": "donate_money", "text": { "en": "Donate money", "ar": "تبرع بالمال" }, "outcome": { "en": "Your contribution helped cover urgent needs.", "ar": "ساعدت مساهمتك في تغطية حاجات عاجلة." }, "effects": { "money": -500, "karma": 6, "happiness": 3 }, "reputation": { "public": 6, "trust": 6 } },
+        { "id": "volunteer", "text": { "en": "Volunteer your time", "ar": "تطوع بوقتك" }, "outcome": { "en": "You helped organize and distribute the donations.", "ar": "ساعدت في تنظيم التبرعات وتوزيعها." }, "effects": { "energy": -15, "karma": 7, "happiness": 4 }, "reputation": { "public": 7, "trust": 7 } },
+        { "id": "ignore", "text": { "en": "Do not participate", "ar": "لا تشارك" }, "outcome": { "en": "The campaign continued without your involvement.", "ar": "استمرت الحملة من دون مشاركتك." }, "effects": { "stress": -1 } }
+      ]
+    },
+    {
+      "id": "morocco_move_city",
+      "frequency": "year",
+      "weight": 4,
+      "cooldownMonths": 60,
+      "conditions": { "minAge": 20, "countries": ["Morocco"], "requiresJob": true },
+      "text": { "en": "A better job opportunity is available in another Moroccan city, but moving would separate you from family.", "ar": "تتوفر فرصة عمل أفضل في مدينة مغربية أخرى، لكن الانتقال سيبعدك عن العائلة." },
+      "choices": [
+        { "id": "move", "text": { "en": "Move for the opportunity", "ar": "انتقل من أجل الفرصة" }, "outcome": { "en": "You accepted the career opportunity and began rebuilding your routine.", "ar": "قبلت الفرصة المهنية وبدأت بناء روتين جديد." }, "effects": { "money": -1200, "stress": 6, "happiness": 3 }, "reputation": { "professional": 5, "family": -2 }, "jobEffects": { "salaryMultiplier": 1.1 }, "setFlags": { "movedForMoroccoJob": true } },
+        { "id": "stay", "text": { "en": "Stay close to family", "ar": "ابق قريبا من العائلة" }, "outcome": { "en": "You kept your support network, but declined faster advancement.", "ar": "حافظت على شبكة دعمك، لكنك رفضت تقدما أسرع." }, "effects": { "happiness": 2, "stress": -2 }, "reputation": { "family": 5, "professional": -1 } },
+        { "id": "negotiate_remote", "text": { "en": "Ask for a flexible arrangement", "ar": "اطلب ترتيبا مرنا" }, "outcome": { "en": "The employer offered a compromise with occasional travel.", "ar": "قدم صاحب العمل حلا وسطا يتضمن سفرا من حين لآخر." }, "effects": { "stress": 3, "money": -300 }, "reputation": { "professional": 4, "trust": 2 }, "jobEffects": { "salaryMultiplier": 1.05 } }
+      ]
+    }
+  ]
+}

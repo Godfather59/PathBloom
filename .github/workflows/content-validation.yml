@@ -1,0 +1,65 @@
+name: Content validation
+
+on:
+  pull_request:
+    paths:
+      - 'src/content/**'
+      - 'src/logic/Content*.js'
+      - 'src/logic/DataDrivenContentRuntime.js'
+      - 'src/logic/__tests__/contentPacks.test.js'
+      - 'src/components/ContentStudio.jsx'
+      - 'src/components/DecisionModal.jsx'
+      - 'src/components/EventLog.jsx'
+      - 'src/components/SystemMenu.jsx'
+      - 'src/main.jsx'
+      - 'scripts/validate-content-packs.mjs'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/content-validation.yml'
+  push:
+    branches:
+      - agent/data-driven-content
+    paths:
+      - 'src/content/**'
+      - 'src/logic/Content*.js'
+      - 'src/logic/DataDrivenContentRuntime.js'
+      - 'src/logic/__tests__/contentPacks.test.js'
+      - 'src/components/ContentStudio.jsx'
+      - 'src/components/DecisionModal.jsx'
+      - 'src/components/EventLog.jsx'
+      - 'src/components/SystemMenu.jsx'
+      - 'src/main.jsx'
+      - 'scripts/validate-content-packs.mjs'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/content-validation.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate JSON content packs
+        run: npm run validate:content
+
+      - name: Run content tests
+        run: npm run test:content
+
+      - name: Build production app
+        run: npm run build

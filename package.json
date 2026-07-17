@@ -12,6 +12,8 @@
     "test": "vitest run",
     "test:simulation": "vitest run src/logic/__tests__/simulation.test.js",
     "test:deep": "vitest run src/logic/__tests__/deepSimulation.test.js",
+    "test:content": "vitest run src/logic/__tests__/contentPacks.test.js",
+    "validate:content": "node scripts/validate-content-packs.mjs",
     "test:watch": "vitest",
     "simulate": "node scripts/run-life-simulations.mjs",
     "simulate:quick": "node scripts/run-life-simulations.mjs --lives 100",

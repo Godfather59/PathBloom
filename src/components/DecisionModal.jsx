@@ -48,7 +48,15 @@ export function DecisionModal({
   language = 'en',
   t = (key, fallback) => fallback || key,
 }) {
-  const localize = (value, messageKey, messageParams) => {
+  const localize = (value, messageKey, messageParams, localizedText) => {
+    const packText =
+      localizedText && typeof localizedText === 'object'
+        ? localizedText[language] || localizedText.en
+        : null;
+    if (packText) {
+      return String(packText);
+    }
+
     const localized = messageKey
       ? translateGameMessage(language, messageKey, messageParams || {}, value)
       : translateGameText(language, value);
@@ -69,7 +77,7 @@ export function DecisionModal({
 
         <div className="modal-body">
           <p style={{ fontSize: '1.2em', lineHeight: '1.5', margin: '0 0 24px 0' }}>
-            {localize(event.text, event.messageKey, event.messageParams)}
+            {localize(event.text, event.messageKey, event.messageParams, event.localizedText)}
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -90,7 +98,14 @@ export function DecisionModal({
                 <span className="choice-emoji" aria-hidden="true">
                   {getChoiceEmoji(choice)}
                 </span>
-                <span>{localize(choice.text, choice.messageKey, choice.messageParams)}</span>
+                <span>
+                  {localize(
+                    choice.text,
+                    choice.messageKey,
+                    choice.messageParams,
+                    choice.localizedText
+                  )}
+                </span>
               </button>
             ))}
           </div>

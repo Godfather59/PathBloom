@@ -6,6 +6,7 @@ import { DecisionModal } from '../../components/DecisionModal';
 import { ActivitiesMenu } from '../../components/ActivitiesMenu';
 import { SystemMenu } from '../../components/SystemMenu';
 import SituationDetailsSheet from '../../components/SituationDetailsSheet';
+import { ConfirmSheet } from '../../components/ShellPrimitives';
 
 const t = (key, fallback) => fallback || key;
 const noop = () => {};
@@ -15,7 +16,7 @@ function render(component) {
 }
 
 describe('redesigned gameplay shell', () => {
-  it('renders the four English destinations and clearly separated time actions', () => {
+  it('renders four destinations and keeps Age Up as the only primary time action', () => {
     const html = render(
       <BottomNavigation
         activeDestination="life"
@@ -33,15 +34,15 @@ describe('redesigned gameplay shell', () => {
     expect(html).toContain('Activities');
     expect(html).toContain('World');
     expect(html).toContain('Menu');
-    expect(html).toContain('+1 Year');
-    expect(html).toContain('One step');
-    expect(html).toContain('Auto: 5 Years');
-    expect(html).toContain('Stops for decisions');
-    expect(html).not.toContain('Smart +5');
+    expect(html).toContain('Age Up');
+    expect(html).toContain('One year');
+    expect(html).toContain('More time controls');
+    expect(html).not.toContain('Auto: 5 Years');
+    expect(html).not.toContain('Stops for decisions');
     expect(html).toContain('aria-current="page"');
   });
 
-  it('renders Arabic navigation and a monthly situation control', () => {
+  it('renders Arabic navigation and a single monthly progression control', () => {
     const html = render(
       <BottomNavigation
         activeDestination="life"
@@ -62,9 +63,29 @@ describe('redesigned gameplay shell', () => {
     expect(html).toContain('القائمة');
     expect(html).toContain('تابع الحملة شهرا');
     expect(html).toContain('شهر واحد');
-    expect(html).toContain('تلقائي: حتى 12 شهرا');
-    expect(html).toContain('يتوقف عند ظهور قرار');
+    expect(html).toContain('المزيد من أدوات الوقت');
+    expect(html).not.toContain('تلقائي: حتى 12 شهرا');
     expect(html).toContain('is-monthly');
+  });
+
+  it('renders the automatic progression confirmation as a bottom sheet', () => {
+    const html = render(
+      <ConfirmSheet
+        open
+        onClose={noop}
+        onConfirm={noop}
+        title="Advance automatically?"
+        description="This can move the story forward by up to five years."
+        warning="Automatic progression stops for decisions."
+        confirmLabel="Advance"
+        cancelLabel="Cancel"
+      />
+    );
+
+    expect(html).toContain('role="dialog"');
+    expect(html).toContain('Advance automatically?');
+    expect(html).toContain('Automatic progression stops for decisions.');
+    expect(html).toContain('Cancel');
   });
 
   it('shows decision risk and visible consequence previews', () => {
@@ -101,7 +122,7 @@ describe('redesigned gameplay shell', () => {
     expect(html).toContain('money');
   });
 
-  it('renders the searchable categorized activities destination in both languages', () => {
+  it('renders searchable, categorized, recent, and favorite activity views', () => {
     const person = { age: 25, royalty: null };
     const english = render(
       <ActivitiesMenu person={person} onDoActivity={noop} onClose={noop} language="en" t={t} />
@@ -113,9 +134,13 @@ describe('redesigned gameplay shell', () => {
     expect(english).toContain('Search activities');
     expect(english).toContain('Featured paths');
     expect(english).toContain('Quick actions');
+    expect(english).toContain('Favorites');
+    expect(english).toContain('Recent');
     expect(english).toContain('Wellness');
     expect(arabic).toContain('ابحث في الأنشطة');
     expect(arabic).toContain('مسارات مميزة');
+    expect(arabic).toContain('المفضلة');
+    expect(arabic).toContain('الأخيرة');
     expect(arabic).toContain('الصحة');
   });
 

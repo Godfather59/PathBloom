@@ -7,11 +7,7 @@ import {
 } from '../EventChainEngine';
 import { getCountryRules, ensureCountryLife } from '../CountryLifeSystem';
 import { ensurePersonalFinance, processPersonalFinanceYear } from '../PersonalFinanceSystem';
-import {
-  ensureNPCMemories,
-  observeNPCMemoryEvent,
-  processNPCMemoryYear,
-} from '../NPCMemorySystem';
+import { ensureNPCMemories, observeNPCMemoryEvent, processNPCMemoryYear } from '../NPCMemorySystem';
 import {
   beginPregnancy,
   processMonthlySituation,
@@ -92,13 +88,20 @@ describe('deep simulation systems', () => {
     person.age = 28;
     person.money = 5000;
     beginPregnancy(person, {
-      id: 'future-child', name: 'Sam', type: 'Child', age: 0, gender: 'female', traits: [],
+      id: 'future-child',
+      name: 'Sam',
+      type: 'Child',
+      age: 0,
+      gender: 'female',
+      traits: [],
     });
     person.pregnancy.month = 2;
     processMonthlySituation(person);
 
     expect(person.pendingEvent?.situationType).toBe('pregnancy');
-    const prenatal = person.pendingEvent.choices.find(choice => choice.effect === 'pregnancy_prenatal');
+    const prenatal = person.pendingEvent.choices.find(
+      choice => choice.effect === 'pregnancy_prenatal'
+    );
     resolveMonthlySituationChoice(person, person.pendingEvent, prenatal);
     expect(person.pregnancy.prenatalCare).toBe(1);
     expect(person.money).toBe(4700);

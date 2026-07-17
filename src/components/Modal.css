@@ -25,7 +25,7 @@
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .main-menu-card {
@@ -36,8 +36,8 @@
   border-radius: 14px;
   width: 100%;
   max-width: 400px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .main-menu-subtitle {
@@ -64,8 +64,8 @@
   width: 100%;
   padding: 12px;
   border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.2);
-  background-color: rgba(0,0,0,0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: rgba(0, 0, 0, 0.2);
   color: white;
   font-size: 0.9rem;
   box-sizing: border-box;
@@ -80,7 +80,7 @@
   width: 100%;
   padding: 10px;
   border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   background-color: #333;
   color: white;
   font-size: 0.9rem;
@@ -114,14 +114,14 @@
   justify-content: center;
   text-align: center;
   gap: 4px;
-  background-color: rgba(255,255,255,0.1);
+  background-color: rgba(255, 255, 255, 0.1);
   color: #888;
   transition: all 0.2s;
   min-height: 44px;
 }
 
 .menu-btn:hover:not(:disabled) {
-  background-color: rgba(255,255,255,0.18);
+  background-color: rgba(255, 255, 255, 0.18);
 }
 
 .menu-btn:active:not(:disabled) {
@@ -151,7 +151,7 @@
 .menu-btn.daily-disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  background-color: rgba(255,255,255,0.05);
+  background-color: rgba(255, 255, 255, 0.05);
   color: #888;
 }
 
@@ -167,7 +167,7 @@
 .save-summary {
   margin-bottom: 12px;
   padding-bottom: 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .save-summary-name {
@@ -221,7 +221,9 @@
   text-align: center;
   gap: 6px;
   min-height: 48px;
-  transition: transform 0.1s, box-shadow 0.2s;
+  transition:
+    transform 0.1s,
+    box-shadow 0.2s;
 }
 
 .start-btn:active {
@@ -259,15 +261,15 @@
 }
 
 /* MainMenu RTL overrides */
-[dir="rtl"] .main-menu-section {
+[dir='rtl'] .main-menu-section {
   text-align: right;
 }
 
-[dir="rtl"] .main-menu-input {
+[dir='rtl'] .main-menu-input {
   text-align: right;
 }
 
-[dir="rtl"] .main-menu-select {
+[dir='rtl'] .main-menu-select {
   text-align: right;
 }
 

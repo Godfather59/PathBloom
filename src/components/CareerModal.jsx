@@ -2,7 +2,13 @@ import React, { useState } from 'react';
 import { INSTRUMENTS, GENRES } from '../logic/SpecialCareers';
 import './Modal.css';
 
-export function CareerModal({ person, onAction, onClose, onBand, t = (key, fallback) => fallback || key }) {
+export function CareerModal({
+  person,
+  onAction,
+  onClose,
+  onBand,
+  t = (key, fallback) => fallback || key,
+}) {
   const [view, setView] = useState('menu'); // 'menu' | 'instruments'
 
   const renderInstruments = () => (

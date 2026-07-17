@@ -77,11 +77,7 @@ export default function ArabicLocalizationDashboard({ onClose, language = 'en' }
 
   return (
     <div className="modal-overlay">
-      <div
-        className="modal-content"
-        dir={isArabic ? 'rtl' : 'ltr'}
-        style={{ maxWidth: '520px' }}
-      >
+      <div className="modal-content" dir={isArabic ? 'rtl' : 'ltr'} style={{ maxWidth: '520px' }}>
         <div className="modal-header">
           <h2 className="modal-title">🌙 {labels.title}</h2>
           <button className="close-btn" onClick={onClose} aria-label={labels.close}>
@@ -158,7 +154,13 @@ export default function ArabicLocalizationDashboard({ onClose, language = 'en' }
                     <div dir="ltr" style={{ textAlign: 'left', overflowWrap: 'anywhere' }}>
                       {leak.text}
                     </div>
-                    <div style={{ marginTop: '6px', color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
+                    <div
+                      style={{
+                        marginTop: '6px',
+                        color: 'var(--text-secondary)',
+                        fontSize: '0.8rem',
+                      }}
+                    >
                       {labels.context}: {leak.context} · {labels.count}: {leak.count}
                     </div>
                   </article>

@@ -2,10 +2,7 @@ import React, { useRef, useState } from 'react';
 import { BottomNavigation } from './BottomNavigation';
 import { AppIcon } from './AppIcon';
 import WorldSimulation2Dashboard from './WorldSimulation2Dashboard';
-import {
-  formatArabicDuration,
-  formatArabicNumber,
-} from '../logic/ArabicLocalization';
+import { formatArabicDuration, formatArabicNumber } from '../logic/ArabicLocalization';
 import './Modal.css';
 
 export function PrisonMenu({
@@ -28,7 +25,9 @@ export function PrisonMenu({
     ? [
         remainingYears > 0 ? formatArabicDuration(remainingYears, 'year') : '',
         extraMonths > 0 ? formatArabicDuration(extraMonths, 'month') : '',
-      ].filter(Boolean).join(' و') || 'أقل من شهر'
+      ]
+        .filter(Boolean)
+        .join(' و') || 'أقل من شهر'
     : `${remainingYears > 0 ? `${remainingYears} year${remainingYears === 1 ? '' : 's'}` : ''}${remainingYears > 0 && extraMonths > 0 ? ', ' : ''}${extraMonths > 0 ? `${extraMonths} month${extraMonths === 1 ? '' : 's'}` : remainingYears === 0 ? 'Less than one month' : ''}`;
 
   if (showWorld) {
@@ -42,8 +41,11 @@ export function PrisonMenu({
   }
 
   const openSystem = () => {
-    if (onSystem) onSystem();
-    else document.querySelector('.hud-menu-fallback')?.click();
+    if (onSystem) {
+      onSystem();
+    } else {
+      document.querySelector('.hud-menu-fallback')?.click();
+    }
   };
 
   const handleNavigate = destination => {
@@ -64,25 +66,40 @@ export function PrisonMenu({
   return (
     <div className="prison-mode" dir={isArabic ? 'rtl' : 'ltr'}>
       <header className="prison-mode-header">
-        <div className="prison-mode-symbol" aria-hidden="true">🔒</div>
+        <div className="prison-mode-symbol" aria-hidden="true">
+          🔒
+        </div>
         <div className="prison-mode-heading">
           <span>{isArabic ? 'وضع السجن' : 'Prison mode'}</span>
           <h1>{t('prison.title', 'State Penitentiary')}</h1>
         </div>
-        <button type="button" className="prison-mode-menu" onClick={openSystem} aria-label={t('hud.openMenu', 'Open Menu')}>
+        <button
+          type="button"
+          className="prison-mode-menu"
+          onClick={openSystem}
+          aria-label={t('hud.openMenu', 'Open Menu')}
+        >
           <AppIcon name="menu" size={20} />
         </button>
       </header>
 
       <main className="prison-mode-scroll">
         <section className="prison-sentence-hero">
-          <span className="prison-sentence-kicker">{t('prison.sentence', 'Sentence Remaining')}</span>
+          <span className="prison-sentence-kicker">
+            {t('prison.sentence', 'Sentence Remaining')}
+          </span>
           <strong className="prison-sentence-value">{sentenceLabel}</strong>
           <div className="prison-sentence-meta">
-            <span>{t('prison.respect', 'Respect')} <strong>{displayRespect}%</strong></span>
+            <span>
+              {t('prison.respect', 'Respect')} <strong>{displayRespect}%</strong>
+            </span>
             <span>
               {t('prison.gang', 'Gang')}{' '}
-              <strong>{person.mafia?.family ? t('prison.affiliated', 'Affiliated') : t('prison.none', 'None')}</strong>
+              <strong>
+                {person.mafia?.family
+                  ? t('prison.affiliated', 'Affiliated')
+                  : t('prison.none', 'None')}
+              </strong>
             </span>
           </div>
           <div className="prison-sentence-track" aria-hidden="true">
@@ -96,12 +113,22 @@ export function PrisonMenu({
             <h2>{t('prison.yard', 'Prison Yard')}</h2>
           </div>
           <div className="prison-action-grid">
-            <button type="button" className="prison-action-card" onClick={() => onAction('workout')}>
+            <button
+              type="button"
+              className="prison-action-card"
+              onClick={() => onAction('workout')}
+            >
               <span className="prison-action-icon">💪</span>
               <strong>{t('prison.workout', 'Yard Workout')}</strong>
-              <small>{isArabic ? 'حافظ على صحتك واكسب الاحترام' : 'Build health and respect'}</small>
+              <small>
+                {isArabic ? 'حافظ على صحتك واكسب الاحترام' : 'Build health and respect'}
+              </small>
             </button>
-            <button type="button" className="prison-action-card" onClick={() => onAction('library')}>
+            <button
+              type="button"
+              className="prison-action-card"
+              onClick={() => onAction('library')}
+            >
               <span className="prison-action-icon">📚</span>
               <strong>{t('prison.library', 'Prison Library')}</strong>
               <small>{isArabic ? 'تعلم وخفف التوتر' : 'Learn and reduce stress'}</small>
@@ -123,17 +150,33 @@ export function PrisonMenu({
             <button type="button" className="prison-action-card" onClick={() => onAction('appeal')}>
               <span className="prison-action-icon">⚖️</span>
               <strong>{t('prison.appeal', 'Appeal Sentence ($5,000)')}</strong>
-              <small>{isArabic ? 'محاولة قانونية لتقليل العقوبة' : 'A legal chance to shorten the sentence'}</small>
+              <small>
+                {isArabic
+                  ? 'محاولة قانونية لتقليل العقوبة'
+                  : 'A legal chance to shorten the sentence'}
+              </small>
             </button>
-            <button type="button" className="prison-action-card is-danger" onClick={() => onAction('riot')}>
+            <button
+              type="button"
+              className="prison-action-card is-danger"
+              onClick={() => onAction('riot')}
+            >
               <span className="prison-action-icon">🔥</span>
               <strong>{t('prison.riot', 'Incite Riot')}</strong>
-              <small>{isArabic ? 'خطر شديد وعقوبة محتملة' : 'Extreme risk and possible punishment'}</small>
+              <small>
+                {isArabic ? 'خطر شديد وعقوبة محتملة' : 'Extreme risk and possible punishment'}
+              </small>
             </button>
-            <button type="button" className="prison-action-card is-danger" onClick={() => onAction('escape')}>
+            <button
+              type="button"
+              className="prison-action-card is-danger"
+              onClick={() => onAction('escape')}
+            >
               <span className="prison-action-icon">🏃</span>
               <strong>{t('prison.escape', 'Escape!')}</strong>
-              <small>{isArabic ? 'قد تنجو أو تطول عقوبتك' : 'Freedom or a much longer sentence'}</small>
+              <small>
+                {isArabic ? 'قد تنجو أو تطول عقوبتك' : 'Freedom or a much longer sentence'}
+              </small>
             </button>
           </div>
         </section>
@@ -146,7 +189,9 @@ export function PrisonMenu({
           onPrimaryAction={() => onAction('__advance_month__')}
           onSmartAdvance={() => onAction('__advance_year__')}
           primaryLabel={isArabic ? 'اقضِ شهرا' : 'Serve 1 Month'}
-          primaryHint={isArabic ? 'اقضِ شهرا واحدا من مدة السجن.' : 'Serve one month of the sentence.'}
+          primaryHint={
+            isArabic ? 'اقضِ شهرا واحدا من مدة السجن.' : 'Serve one month of the sentence.'
+          }
           smartLabel={isArabic ? 'اقضِ سنة' : 'Serve 1 Year'}
           isMonthly
           language={isArabic ? 'ar' : 'en'}

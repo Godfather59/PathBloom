@@ -1,7 +1,12 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Person } from '../Person';
 import { startWar, processWarYears, getMilitaryStrength, getWarExhaustion } from '../WarSystem';
-import { calculateUNInfluence, canProposeResolution, proposeResolution, RESOLUTION_TYPES } from '../UnitedNations';
+import {
+  calculateUNInfluence,
+  canProposeResolution,
+  proposeResolution,
+  RESOLUTION_TYPES,
+} from '../UnitedNations';
 import { getBaseCountries, getCountryByName, initializeGeopolitics } from '../GeoPolitics';
 import { buildWorldState, simulateWorldYear, getGlobalStats } from '../WorldSimulation';
 

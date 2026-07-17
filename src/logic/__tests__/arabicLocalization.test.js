@@ -21,9 +21,7 @@ describe('Arabic localization', () => {
   it('rejects legacy AR placeholders and selects real Arabic text', () => {
     expect(isArabicPlaceholder('Confront them AR', 'Confront them')).toBe(true);
     expect(isCompleteArabicTranslation('Confront them AR', 'Confront them')).toBe(false);
-    expect(localizeArabicCandidate('Confront them AR', 'Confront them', 'test')).toBe(
-      'واجه شريكك'
-    );
+    expect(localizeArabicCandidate('Confront them AR', 'Confront them', 'test')).toBe('واجه شريكك');
   });
 
   it('localizes a previously leaking generated event', () => {
@@ -40,9 +38,9 @@ describe('Arabic localization', () => {
 
   it('localizes dynamic war, tax and career messages', () => {
     expect(translateArabicText('Morocco declared war on Spain.')).toContain('المغرب');
-    expect(translateArabicText("Morocco's tax rules adjusted your annual income tax to $12,000.")).toContain(
-      'قوانين الضرائب'
-    );
+    expect(
+      translateArabicText("Morocco's tax rules adjusted your annual income tax to $12,000.")
+    ).toContain('قوانين الضرائب');
     expect(translateArabicText('You were promoted to Manager!')).toBe('تمت ترقيتك إلى مدير!');
   });
 

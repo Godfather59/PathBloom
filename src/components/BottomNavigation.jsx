@@ -111,21 +111,21 @@ export const BottomNavigation = memo(
               <span className="time-primary-label">{resolvedPrimaryLabel}</span>
               <span className="time-primary-caption">{primaryCaption}</span>
             </button>
-
-            <button
-              type="button"
-              className="time-more-action"
-              onClick={() => setSmartConfirmOpen(true)}
-              disabled={disabled}
-              title={`${labels.moreTime}: ${resolvedSmartLabel}`}
-              aria-label={`${labels.moreTime}: ${resolvedSmartLabel}`}
-              aria-haspopup="dialog"
-            >
-              <AppIcon name="more" size={20} />
-            </button>
           </div>
 
           <div className="bottom-nav-side bottom-nav-end">{secondHalf.map(renderDestination)}</div>
+
+          <button
+            type="button"
+            className="time-more-action"
+            onClick={() => setSmartConfirmOpen(true)}
+            disabled={disabled}
+            title={`${labels.moreTime}: ${resolvedSmartLabel}`}
+            aria-label={`${labels.moreTime}: ${resolvedSmartLabel}`}
+            aria-haspopup="dialog"
+          >
+            <AppIcon name="fast" size={18} />
+          </button>
         </nav>
 
         <ConfirmSheet

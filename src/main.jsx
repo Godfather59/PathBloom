@@ -22,6 +22,7 @@ import './components/SaveRelease.css';
 import './components/ThemeCompatibility.css';
 import './components/ScreenshotRegressionFixes.css';
 import './components/ShellRefresh.css';
+import './components/ScreenshotFollowup.css';
 
 const rootElement = document.getElementById('root');
 

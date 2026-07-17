@@ -1,0 +1,271 @@
+name: Apply screenshot fixes v2
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: screenshot-fixes-v2-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apply:
+    name: Patch screenshot regressions
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PUPPETEER_SKIP_DOWNLOAD: 'true'
+
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v6
+        with:
+          ref: fix/screenshot-arabic-dock
+          persist-credentials: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Patch source and tests
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          def read(path):
+              return Path(path).read_text(encoding='utf-8')
+
+          def write(path, text):
+              Path(path).write_text(text, encoding='utf-8')
+
+          event_path = 'src/components/EventLog.jsx'
+          event_text = read(event_path)
+          if 'export const localizeTimelineEvent' not in event_text:
+              replacement = r'''function unwrapHistoryText(value) {
+            const text = String(value || '').trim();
+            const eventMatch = text.match(/^(?:Event|الحدث)\s*:\s*(.+)$/i);
+            if (eventMatch) {
+              return { kind: 'event', text: eventMatch[1].trim() };
+            }
+
+            const choiceMatch = text.match(/^(?:You chose to|You chose|اخترت)\s*:\s*(.+)$/i);
+            if (choiceMatch) {
+              return {
+                kind: 'choice',
+                text: choiceMatch[1].replace(/[.!؟]+$/, '').trim(),
+              };
+            }
+
+            return { kind: null, text };
+          }
+
+          function stripRedundantAgePrefix(value) {
+            return String(value ?? '')
+              .replace(/^(?:Age|العمر)\s*[0-9٠-٩]+\s*:\s*/i, '')
+              .trim();
+          }
+
+          function wrapHistoryText(value, kind, language) {
+            const text = stripRedundantAgePrefix(value);
+            if (kind !== 'choice') {
+              return text;
+            }
+
+            const choice = text.replace(/[.!؟]+$/, '').trim();
+            return language === 'ar' ? `اخترت: ${choice}.` : `You chose: ${choice}.`;
+          }
+
+          export const localizeTimelineEvent = (event, language) => {
+            const source = unwrapHistoryText(event.text);
+            const packText =
+              event.localizedText && typeof event.localizedText === 'object'
+                ? event.localizedText[language] || event.localizedText.en
+                : null;
+            if (packText) {
+              const localizedPack =
+                language === 'ar'
+                  ? localizeArabicCandidate(
+                      packText,
+                      event.localizedText.en || source.text,
+                      `history:${event.type || 'event'}`
+                    )
+                  : String(packText);
+              return wrapHistoryText(localizedPack, source.kind, language);
+            }
+
+            const localized = event.messageKey
+              ? translateGameMessage(language, event.messageKey, event.messageParams || {}, source.text)
+              : translateGameText(language, source.text);
+            const cleaned = cleanLocalizedText(localized, source.text, language);
+            const deepLocalized = translateDeepSimulationText(cleaned, language);
+            const resolved =
+              language === 'ar'
+                ? localizeArabicCandidate(
+                    deepLocalized,
+                    source.text,
+                    `history:${event.type || 'event'}`
+                  )
+                : deepLocalized;
+            return wrapHistoryText(resolved, source.kind, language);
+          };
+
+          function detectCategory'''
+              event_text, count = re.subn(
+                  r'const localizeEvent = \(event, language\) => \{.*?\n\};\n\nfunction detectCategory',
+                  replacement,
+                  event_text,
+                  count=1,
+                  flags=re.S,
+              )
+              if count != 1:
+                  raise SystemExit('Could not replace EventLog localization block')
+              event_text = event_text.replace(
+                  '{localizeEvent(event, language)}',
+                  '{localizeTimelineEvent(event, language)}',
+                  1,
+              )
+              write(event_path, event_text)
+
+          nav_path = 'src/components/BottomNavigation.jsx'
+          nav_text = read(nav_path)
+          if '<AppIcon name="fast" size={18} />' not in nav_text:
+              nav_text, count = re.subn(
+                  r'\n\s*<button\n\s*type="button"\n\s*className="time-more-action".*?<AppIcon name="more" size=\{20\} />\n\s*</button>',
+                  '',
+                  nav_text,
+                  count=1,
+                  flags=re.S,
+              )
+              if count != 1:
+                  raise SystemExit('Could not remove overlapping time control')
+              anchor = '          <div className="bottom-nav-side bottom-nav-end">{secondHalf.map(renderDestination)}</div>'
+              direct = '''          <div className="bottom-nav-side bottom-nav-end">{secondHalf.map(renderDestination)}</div>
+
+          <button
+            type="button"
+            className="time-more-action"
+            onClick={() => setSmartConfirmOpen(true)}
+            disabled={disabled}
+            title={`${labels.moreTime}: ${resolvedSmartLabel}`}
+            aria-label={`${labels.moreTime}: ${resolvedSmartLabel}`}
+            aria-haspopup="dialog"
+          >
+            <AppIcon name="fast" size={18} />
+          </button>'''
+              if anchor not in nav_text:
+                  raise SystemExit('Could not locate bottom navigation end section')
+              nav_text = nav_text.replace(anchor, direct, 1)
+              write(nav_path, nav_text)
+
+          css_path = 'src/components/ShellRefresh.css'
+          css_text = read(css_path)
+          marker = '/* Screenshot follow-up: compact dock and hidden native scrollbar */'
+          if marker not in css_text:
+              css_text += '''
+
+          /* Screenshot follow-up: compact dock and hidden native scrollbar */
+          .event-log {
+            scrollbar-gutter: auto;
+            scrollbar-width: none;
+          }
+
+          .event-log::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
+          }
+
+          .life-shortcuts {
+            margin-bottom: 12px;
+          }
+
+          .bottom-navigation {
+            margin-top: 0;
+          }
+
+          .time-more-action {
+            inset-inline-end: 14px;
+            top: -20px;
+            z-index: 4;
+            width: 42px;
+            height: 42px;
+            color: var(--pb-blue);
+          }
+          '''
+              write(css_path, css_text)
+
+          android_test_path = 'src/logic/__tests__/androidThemeRegression.test.jsx'
+          android_test = read(android_test_path)
+          android_test = android_test.replace("expect(css).toContain('top: -35px');", "expect(css).toContain('top: -20px');")
+          if "expect(css).toContain('margin-top: 0');" not in android_test:
+              android_test = android_test.replace(
+                  "    expect(css).toContain('top: -20px');",
+                  "    expect(css).toContain('top: -20px');\n    expect(css).toContain('margin-top: 0');",
+                  1,
+              )
+          write(android_test_path, android_test)
+
+          arabic_test_path = 'src/logic/__tests__/arabicScreenshotRegression.test.jsx'
+          arabic_test = read(arabic_test_path)
+          if "localizeTimelineEvent" not in arabic_test:
+              arabic_test = arabic_test.replace(
+                  "import { BottomNavigation } from '../../components/BottomNavigation';",
+                  "import { BottomNavigation } from '../../components/BottomNavigation';\nimport { localizeTimelineEvent } from '../../components/EventLog';",
+                  1,
+              )
+              test_marker = "  it('translates the exact mixed Arabic relationship event from the phone screenshot', () => {"
+              test_block = '''  it('localizes prefixed health history and removes duplicate age prefixes', () => {
+            expect(
+              localizeTimelineEvent(
+                {
+                  type: 'neutral',
+                  text: 'Event: Your symptoms have not completely disappeared. What will you do?',
+                },
+                'ar'
+              )
+            ).toBe('لم تختف الأعراض تماما. ماذا ستفعل؟');
+            expect(
+              localizeTimelineEvent(
+                { type: 'neutral', text: 'You chose to: Visit a doctor ($500)' },
+                'ar'
+              )
+            ).toBe('اخترت: زر طبيبا (500 دولار).');
+            expect(
+              localizeTimelineEvent({ type: 'neutral', text: 'Age 2: Another year passed.' }, 'ar')
+            ).toBe('مر عام آخر.');
+          });
+
+          '''
+              if test_marker not in arabic_test:
+                  raise SystemExit('Could not locate Arabic screenshot test marker')
+              arabic_test = arabic_test.replace(test_marker, test_block + test_marker, 1)
+              write(arabic_test_path, arabic_test)
+          PY
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Format and lint
+        run: |
+          npm run lint:fix
+          npm run format
+
+      - name: Commit fixes
+        run: |
+          if git diff --quiet; then
+            echo 'Fixes already applied.'
+            exit 0
+          fi
+          git config user.name 'PathBloom Automation'
+          git config user.email 'actions@users.noreply.github.com'
+          git add src/components/EventLog.jsx src/components/BottomNavigation.jsx src/components/ShellRefresh.css src/logic/__tests__/androidThemeRegression.test.jsx src/logic/__tests__/arabicScreenshotRegression.test.jsx
+          git commit -m 'Fix Arabic timeline and Android bottom dock regressions'
+          git push origin HEAD:fix/screenshot-arabic-dock

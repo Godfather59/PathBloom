@@ -1,0 +1,62 @@
+name: Store screenshots
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'scripts/generate-screenshots.mjs'
+      - 'store-assets/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/store-assets.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: store-assets-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  screenshots:
+    name: Generate refreshed store screenshots
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PUPPETEER_SKIP_DOWNLOAD: 'true'
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate screenshots
+        run: npm run screenshots
+
+      - name: Verify screenshot set
+        run: |
+          test -f store-assets/screenshots/01-life-story.png
+          test -f store-assets/screenshots/02-decisions.png
+          test -f store-assets/screenshots/03-activities.png
+          test -f store-assets/screenshots/04-living-world.png
+          test -f store-assets/screenshots/05-arabic-rtl.png
+
+      - name: Upload store screenshots
+        uses: actions/upload-artifact@v7
+        with:
+          name: pathbloom-store-screenshots-${{ github.run_number }}
+          path: store-assets/screenshots/*.png
+          if-no-files-found: error
+          retention-days: 30

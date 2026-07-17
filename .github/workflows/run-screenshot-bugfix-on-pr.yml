@@ -1,0 +1,68 @@
+name: Run screenshot bug fixes on PR
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: screenshot-bugfix-pr-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apply:
+    name: Apply screenshot fixes to branch
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PUPPETEER_SKIP_DOWNLOAD: 'true'
+
+    steps:
+      - name: Check out bug-fix branch
+        uses: actions/checkout@v6
+        with:
+          ref: fix/screenshot-arabic-dock
+          persist-credentials: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Extract and run patch script
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          source = Path('.github/workflows/apply-screenshot-bugfix.yml').read_text(encoding='utf-8')
+          start = source.index("          python - <<'PY'\n") + len("          python - <<'PY'\n")
+          end = source.index("          PY\n", start)
+          lines = source[start:end].splitlines()
+          script = '\n'.join(line[10:] if line.startswith('          ') else line for line in lines)
+          Path('/tmp/apply_screenshot_bugfix.py').write_text(script + '\n', encoding='utf-8')
+          PY
+          python /tmp/apply_screenshot_bugfix.py
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Format changed files
+        run: |
+          npm run lint:fix
+          npm run format
+
+      - name: Commit fixes
+        run: |
+          if git diff --quiet; then
+            echo 'Bug fixes already applied.'
+            exit 0
+          fi
+          git config user.name 'PathBloom Automation'
+          git config user.email 'actions@users.noreply.github.com'
+          git add src/components/EventLog.jsx src/components/BottomNavigation.jsx src/components/ShellRefresh.css src/logic/__tests__/androidThemeRegression.test.jsx src/logic/__tests__/arabicScreenshotRegression.test.jsx
+          git commit -m 'Fix Arabic timeline and Android bottom dock regressions'
+          git push origin HEAD:fix/screenshot-arabic-dock

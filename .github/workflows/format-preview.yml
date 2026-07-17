@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: format-preview-${{ github.ref }}
@@ -14,17 +14,19 @@ concurrency:
 
 jobs:
   format:
-    name: Generate formatted source bundle
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    name: Apply deterministic formatting
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
       PUPPETEER_SKIP_DOWNLOAD: 'true'
 
     steps:
-      - name: Check out repository
+      - name: Check out PR branch
         uses: actions/checkout@v6
         with:
-          persist-credentials: false
+          ref: ${{ github.head_ref || github.ref_name }}
+          persist-credentials: true
 
       - name: Set up Node.js
         uses: actions/setup-node@v6
@@ -40,26 +42,14 @@ jobs:
           npm run lint:fix
           npm run format
 
-      - name: Package formatted files
+      - name: Commit formatted source
         run: |
-          tar -czf formatted-source.tgz \
-            src/components/ActivitiesMenu.jsx \
-            src/components/AppIcon.jsx \
-            src/components/BottomNavigation.jsx \
-            src/components/Hud.jsx \
-            src/components/MainMenu.jsx \
-            src/components/ShellPrimitives.jsx \
-            src/components/ShellRefresh.css \
-            src/logic/__tests__/androidThemeRegression.test.jsx \
-            src/logic/__tests__/arabicScreenshotRegression.test.jsx \
-            src/logic/__tests__/uiShell.test.jsx \
-            src/__tests__/appSmoke.test.jsx \
-            src/main.jsx
-
-      - name: Upload formatted source
-        uses: actions/upload-artifact@v7
-        with:
-          name: formatted-source-${{ github.run_number }}
-          path: formatted-source.tgz
-          if-no-files-found: error
-          retention-days: 2
+          if git diff --quiet; then
+            echo "Source is already formatted."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src
+          git commit -m "Format Android shell redesign"
+          git push origin HEAD:${{ github.head_ref || github.ref_name }}

@@ -1,21 +1,29 @@
-import { getBaseCountries, getCountryData, getCountryByName } from './GeoPolitics';
+import { getCountryData, getCountryByName } from './GeoPolitics';
 
 export function getMilitaryStrength(person) {
-  if (!person.policies) return 50;
+  if (!person.policies) {
+    return 50;
+  }
   const base = getCountryByName(person.country)?.power || 50;
   const spendBonus = Math.floor((person.policies.militarySpending || 30) / 10) * 8;
   const defMember = person.cabinet?.defense;
   const cabBonus = defMember ? Math.floor(defMember.effectiveness / 3) : 0;
-  const warDurationPenalty = Math.min(30, Object.keys(person.countryRelations || {})
-    .filter(id => person.countryRelations[id]?.atWar)
-    .length * 5);
+  const warDurationPenalty = Math.min(
+    30,
+    Object.keys(person.countryRelations || {}).filter(id => person.countryRelations[id]?.atWar)
+      .length * 5
+  );
   return Math.max(10, Math.min(100, base + spendBonus + cabBonus - warDurationPenalty));
 }
 
 export function getWarExhaustion(person, countryId) {
-  if (!person.wars) person.wars = {};
+  if (!person.wars) {
+    person.wars = {};
+  }
   const war = person.wars[countryId];
-  if (!war) return 0;
+  if (!war) {
+    return 0;
+  }
 
   const yearsExhaustion = (Number(war.years) || 0) * 8;
   const casualtyExhaustion = Math.floor((Number(war.casualties) || 0) / 10000);
@@ -24,11 +32,17 @@ export function getWarExhaustion(person, countryId) {
 
 export function startWar(person, targetId) {
   const target = getCountryData(targetId);
-  if (!target) return { success: false, message: 'Target not found.' };
+  if (!target) {
+    return { success: false, message: 'Target not found.' };
+  }
   const myCountry = getCountryByName(person.country);
-  if (!myCountry) return { success: false, message: 'Your country not found.' };
+  if (!myCountry) {
+    return { success: false, message: 'Your country not found.' };
+  }
 
-  if (!person.wars) person.wars = {};
+  if (!person.wars) {
+    person.wars = {};
+  }
   person.wars[targetId] = {
     targetId,
     targetName: target.name,
@@ -53,25 +67,64 @@ export function startWar(person, targetId) {
 
 export function getWarPhases(person, countryId) {
   const war = person.wars?.[countryId];
-  if (!war) return [];
+  if (!war) {
+    return [];
+  }
   const myStrength = getMilitaryStrength(person);
   const target = getCountryData(countryId);
   const targetPower = target?.power || 50;
   const relativePower = myStrength - targetPower;
 
   const phases = [
-    { id: 'offensive', name: 'Full Offensive', desc: 'All-out attack to crush enemy forces quickly', risk: 30 + relativePower, reward: 40 + relativePower, morale: 10 },
-    { id: 'defensive', name: 'Defensive Posture', desc: 'Hold positions, minimize casualties', risk: 10, reward: 10, morale: -5 },
-    { id: 'siege', name: 'Strategic Siege', desc: 'Cut supply lines and wait them out', risk: 15, reward: 25 + relativePower, morale: 0 },
-    { id: 'special_ops', name: 'Special Operations', desc: 'Elite strikes on key infrastructure', risk: 40, reward: 35, morale: 15 },
-    { id: 'naval_blockade', name: 'Naval Blockade', desc: 'Block trade and isolate economically', risk: 20, reward: 20, morale: 5 },
+    {
+      id: 'offensive',
+      name: 'Full Offensive',
+      desc: 'All-out attack to crush enemy forces quickly',
+      risk: 30 + relativePower,
+      reward: 40 + relativePower,
+      morale: 10,
+    },
+    {
+      id: 'defensive',
+      name: 'Defensive Posture',
+      desc: 'Hold positions, minimize casualties',
+      risk: 10,
+      reward: 10,
+      morale: -5,
+    },
+    {
+      id: 'siege',
+      name: 'Strategic Siege',
+      desc: 'Cut supply lines and wait them out',
+      risk: 15,
+      reward: 25 + relativePower,
+      morale: 0,
+    },
+    {
+      id: 'special_ops',
+      name: 'Special Operations',
+      desc: 'Elite strikes on key infrastructure',
+      risk: 40,
+      reward: 35,
+      morale: 15,
+    },
+    {
+      id: 'naval_blockade',
+      name: 'Naval Blockade',
+      desc: 'Block trade and isolate economically',
+      risk: 20,
+      reward: 20,
+      morale: 5,
+    },
   ];
   return phases;
 }
 
 export function executeWarPhase(person, countryId, phaseId) {
   const war = person.wars?.[countryId];
-  if (!war) return { success: false, message: 'War not found.' };
+  if (!war) {
+    return { success: false, message: 'War not found.' };
+  }
 
   const myStrength = getMilitaryStrength(person);
   const target = getCountryData(countryId);
@@ -80,10 +133,13 @@ export function executeWarPhase(person, countryId, phaseId) {
 
   const phases = getWarPhases(person, countryId);
   const phase = phases.find(p => p.id === phaseId);
-  if (!phase) return { success: false, message: 'Invalid phase.' };
+  if (!phase) {
+    return { success: false, message: 'Invalid phase.' };
+  }
 
   const roll = Math.random() * 100;
-  const successChance = 50 + (myStrength - targetPower) / 2 - exhaustion / 3 + (phase.reward - phase.risk) / 2;
+  const successChance =
+    50 + (myStrength - targetPower) / 2 - exhaustion / 3 + (phase.reward - phase.risk) / 2;
   const success = roll < Math.min(90, Math.max(10, successChance));
 
   const casualties = Math.floor(1000 + Math.random() * 9000 * (phase.risk / 50));
@@ -152,7 +208,9 @@ export function executeWarPhase(person, countryId, phaseId) {
 
 export function resolveWarEnd(person, countryId, choice) {
   const war = person.wars?.[countryId];
-  if (!war) return { message: 'War not found.' };
+  if (!war) {
+    return { message: 'War not found.' };
+  }
   const target = getCountryData(countryId);
   const rel = person.countryRelations?.[countryId];
 
@@ -160,53 +218,96 @@ export function resolveWarEnd(person, countryId, choice) {
   switch (choice) {
     case 'reparations':
       person.money = (person.money || 0) + 500000;
-      if (rel) { rel.relation = 30; rel.atWar = false; rel.tension = 30; }
+      if (rel) {
+        rel.relation = 30;
+        rel.atWar = false;
+        rel.tension = 30;
+      }
       message = `💰 ${target.name} pays $500,000 in war reparations. Victory is yours!`;
       person.logEvent(`[War] ${message}`, 'good');
       break;
     case 'annex':
-      if (rel) { rel.relation = 10; rel.atWar = false; rel.tension = 50; }
+      if (rel) {
+        rel.relation = 10;
+        rel.atWar = false;
+        rel.tension = 50;
+      }
       person.fame = Math.min(100, (person.fame || 0) + 15);
-      if (person.job) person.job.approval = Math.min(100, (person.job.approval || 50) + 15);
+      if (person.job) {
+        person.job.approval = Math.min(100, (person.job.approval || 50) + 15);
+      }
       message = `🗺️ You annexed ${target.name}! Your country grows stronger. The world is alarmed.`;
       person.logEvent(`[War] ${message}`, 'good');
       break;
     case 'puppet':
-      if (rel) { rel.relation = 50; rel.atWar = false; rel.tension = 20; rel.alliance = 'ally'; }
+      if (rel) {
+        rel.relation = 50;
+        rel.atWar = false;
+        rel.tension = 20;
+        rel.alliance = 'ally';
+      }
       person.fame = Math.min(100, (person.fame || 0) + 10);
       message = `🎭 A puppet government installed in ${target.name}. They answer to you now.`;
       person.logEvent(`[War] ${message}`, 'good');
       break;
     case 'total':
-      if (rel) { rel.relation = 0; rel.atWar = false; rel.tension = 80; }
+      if (rel) {
+        rel.relation = 0;
+        rel.atWar = false;
+        rel.tension = 80;
+      }
       person.fame = Math.min(100, (person.fame || 0) + 25);
       person.notoriety = Math.min(100, (person.notoriety || 0) + 30);
-      if (person.job) person.job.approval = Math.min(100, (person.job.approval || 50) + 20);
+      if (person.job) {
+        person.job.approval = Math.min(100, (person.job.approval || 50) + 20);
+      }
       message = `💀 ${target.name} has been completely conquered! The world condemns your brutality.`;
       person.logEvent(`[War] ${message}`, 'neutral');
       break;
     case 'surrender_reparations':
       person.money = Math.max(0, (person.money || 0) - 300000);
-      if (rel) { rel.relation = 20; rel.atWar = false; rel.tension = 60; }
-      if (person.job) person.job.approval = Math.max(0, (person.job.approval || 50) - 15);
+      if (rel) {
+        rel.relation = 20;
+        rel.atWar = false;
+        rel.tension = 60;
+      }
+      if (person.job) {
+        person.job.approval = Math.max(0, (person.job.approval || 50) - 15);
+      }
       message = `😔 You paid $300,000 in reparations to ${target.name}. Humiliating defeat.`;
       person.logEvent(`[War] ${message}`, 'bad');
       break;
     case 'cede':
-      if (rel) { rel.relation = 15; rel.atWar = false; rel.tension = 70; }
-      if (person.job) person.job.approval = Math.max(0, (person.job.approval || 50) - 20);
+      if (rel) {
+        rel.relation = 15;
+        rel.atWar = false;
+        rel.tension = 70;
+      }
+      if (person.job) {
+        person.job.approval = Math.max(0, (person.job.approval || 50) - 20);
+      }
       person.fame = Math.max(0, (person.fame || 0) - 10);
       message = `🗺️ You ceded territory to ${target.name}. The nation mourns.`;
       person.logEvent(`[War] ${message}`, 'bad');
       break;
     case 'desperate':
-      if (rel) { rel.atWar = false; rel.tension = 50; rel.relation = 10; }
-      if (person.job) person.job.approval = Math.max(0, (person.job.approval || 50) - 5);
+      if (rel) {
+        rel.atWar = false;
+        rel.tension = 50;
+        rel.relation = 10;
+      }
+      if (person.job) {
+        person.job.approval = Math.max(0, (person.job.approval || 50) - 5);
+      }
       message = `⚔️ Your desperate defense held. A stalemate. War ends with no clear victor.`;
       person.logEvent(`[War] ${message}`, 'neutral');
       break;
     default:
-      if (rel) { rel.atWar = false; rel.tension = 50; rel.relation = 25; }
+      if (rel) {
+        rel.atWar = false;
+        rel.tension = 50;
+        rel.relation = 25;
+      }
       message = `🕊️ War with ${target.name} has ended.`;
       person.logEvent(`[War] ${message}`, 'neutral');
   }
@@ -216,7 +317,9 @@ export function resolveWarEnd(person, countryId, choice) {
 }
 
 export function getWarStatus(person) {
-  if (!person.wars) return [];
+  if (!person.wars) {
+    return [];
+  }
   return Object.entries(person.wars)
     .filter(([_, war]) => war)
     .map(([id, war]) => ({
@@ -233,13 +336,21 @@ export function getWarStatus(person) {
 }
 
 export function processWarYears(person) {
-  if (!person.wars) return;
-  if (!person.countryRelations) return;
+  if (!person.wars) {
+    return;
+  }
+  if (!person.countryRelations) {
+    return;
+  }
 
   Object.entries(person.wars).forEach(([countryId, war]) => {
-    if (!war) return;
+    if (!war) {
+      return;
+    }
     const rel = person.countryRelations[countryId];
-    if (!rel) return;
+    if (!rel) {
+      return;
+    }
 
     war.years += 1;
     war.casualties += Math.floor(500 + Math.random() * 3000);
@@ -257,7 +368,10 @@ export function processWarYears(person) {
       const targetPower = target?.power || 50;
       const autoProgress = (myStrength - targetPower) / 2 + (Math.random() - 0.5) * 20;
       if (autoProgress > 0) {
-        war.territoryGained = Math.min(100, war.territoryGained + Math.floor(2 + Math.random() * 5));
+        war.territoryGained = Math.min(
+          100,
+          war.territoryGained + Math.floor(2 + Math.random() * 5)
+        );
         if (war.territoryGained >= 80) {
           war.pendingEvent = {
             type: 'victory',

@@ -91,7 +91,9 @@
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   border-radius: 10px;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .dashboard-list-item:hover {
@@ -176,14 +178,14 @@
   margin-top: 20px;
 }
 
-[dir="rtl"] .dashboard-list-left {
+[dir='rtl'] .dashboard-list-left {
   flex-direction: row-reverse;
 }
 
-[dir="rtl"] .dashboard-list-right {
+[dir='rtl'] .dashboard-list-right {
   flex-direction: row-reverse;
 }
 
-[dir="rtl"] .dashboard-type-label {
+[dir='rtl'] .dashboard-type-label {
   flex-direction: row-reverse;
 }

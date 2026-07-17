@@ -112,23 +112,76 @@ const NPC_EDUCATION_LEVELS = [
 ];
 
 const PET_NAMES = [
-  'Max', 'Charlie', 'Cooper', 'Milo', 'Buddy', 'Rocky', 'Bear', 'Leo', 'Duke', 'Teddy',
-  'Luna', 'Bella', 'Lucy', 'Daisy', 'Lola', 'Sadie', 'Molly', 'Bailey', 'Stella', 'Maggie',
-  'Oliver', 'Jack', 'Toby', 'Jake', 'Ziggy', 'Ruby', 'Penny', 'Pepper', 'Mia', 'Coco',
+  'Max',
+  'Charlie',
+  'Cooper',
+  'Milo',
+  'Buddy',
+  'Rocky',
+  'Bear',
+  'Leo',
+  'Duke',
+  'Teddy',
+  'Luna',
+  'Bella',
+  'Lucy',
+  'Daisy',
+  'Lola',
+  'Sadie',
+  'Molly',
+  'Bailey',
+  'Stella',
+  'Maggie',
+  'Oliver',
+  'Jack',
+  'Toby',
+  'Jake',
+  'Ziggy',
+  'Ruby',
+  'Penny',
+  'Pepper',
+  'Mia',
+  'Coco',
 ];
 
 const HOBBIES = [
-  'painting', 'photography', 'gardening', 'cooking', 'baking', 'hiking',
-  'yoga', 'running', 'cycling', 'fishing', 'camping', 'pottery',
-  'woodworking', 'knitting', 'dancing', 'singing', 'writing', 'blogging',
-  'gaming', 'bird watching', 'wine tasting', 'craft beer brewing',
+  'painting',
+  'photography',
+  'gardening',
+  'cooking',
+  'baking',
+  'hiking',
+  'yoga',
+  'running',
+  'cycling',
+  'fishing',
+  'camping',
+  'pottery',
+  'woodworking',
+  'knitting',
+  'dancing',
+  'singing',
+  'writing',
+  'blogging',
+  'gaming',
+  'bird watching',
+  'wine tasting',
+  'craft beer brewing',
 ];
 
 const AWARDS = [
-  'Employee of the Month', 'Community Service Award', 'Innovation Award',
-  'Leadership Excellence', 'Best Sales Performance', 'Research Grant',
-  'Art Competition Winner', 'Marathon Finisher Medal', 'Culinary Award',
-  'Volunteer Recognition', 'Safety Award', 'Customer Service Star',
+  'Employee of the Month',
+  'Community Service Award',
+  'Innovation Award',
+  'Leadership Excellence',
+  'Best Sales Performance',
+  'Research Grant',
+  'Art Competition Winner',
+  'Marathon Finisher Medal',
+  'Culinary Award',
+  'Volunteer Recognition',
+  'Safety Award',
+  'Customer Service Star',
 ];
 
 export class NPCSimulator {
@@ -272,8 +325,17 @@ export class NPCSimulator {
       if (recession && npc.job && Math.random() < 0.05) {
         npc.job = null;
         npc.money = Math.max(0, npc.money - 10000);
-        this.pushEvent(events, rel, 'job_loss', `${rel.name} lost their job due to the recession.`, 'bad');
-        person.logEvent(`Your ${rel.type}, ${rel.name}, lost their job due to the recession.`, 'bad');
+        this.pushEvent(
+          events,
+          rel,
+          'job_loss',
+          `${rel.name} lost their job due to the recession.`,
+          'bad'
+        );
+        person.logEvent(
+          `Your ${rel.type}, ${rel.name}, lost their job due to the recession.`,
+          'bad'
+        );
       }
 
       if (pandemic && Math.random() < 0.04) {
@@ -283,8 +345,17 @@ export class NPCSimulator {
       }
 
       if (myCountryState && myCountryState.stability < 25 && Math.random() < 0.02) {
-        this.pushEvent(events, rel, 'emigration', `${rel.name} fled the country due to instability.`, 'neutral');
-        person.logEvent(`Your ${rel.type}, ${rel.name}, fled the country due to instability.`, 'neutral');
+        this.pushEvent(
+          events,
+          rel,
+          'emigration',
+          `${rel.name} fled the country due to instability.`,
+          'neutral'
+        );
+        person.logEvent(
+          `Your ${rel.type}, ${rel.name}, fled the country due to instability.`,
+          'neutral'
+        );
       }
 
       if (rel.type === 'Child' && rel.age >= 18) {
@@ -348,7 +419,12 @@ export class NPCSimulator {
   }
 
   static simulateParentRetirement(rel, npc, events, person) {
-    if (!['Father', 'Mother', 'Parent'].includes(rel.type) || rel.age < 60 || !npc.job || Math.random() >= 0.08) {
+    if (
+      !['Father', 'Mother', 'Parent'].includes(rel.type) ||
+      rel.age < 60 ||
+      !npc.job ||
+      Math.random() >= 0.08
+    ) {
       return;
     }
     npc.job = null;
@@ -361,7 +437,9 @@ export class NPCSimulator {
       return;
     }
     const job = this.pickJobForNPC(rel, npc);
-    if (!job) { return; }
+    if (!job) {
+      return;
+    }
     npc.job = { ...job };
     this.pushEvent(events, rel, 'job_start', `${rel.name} became a ${job.title}.`, 'good');
     person.logEvent(
@@ -387,7 +465,13 @@ export class NPCSimulator {
   }
 
   static simulateEducation(rel, npc, events, person) {
-    if (rel.type !== 'Child' || rel.age < 18 || rel.age > 25 || npc.education !== 'None' || Math.random() >= 0.15) {
+    if (
+      rel.type !== 'Child' ||
+      rel.age < 18 ||
+      rel.age > 25 ||
+      npc.education !== 'None' ||
+      Math.random() >= 0.15
+    ) {
       return;
     }
     npc.education = "Bachelor's";
@@ -396,7 +480,12 @@ export class NPCSimulator {
   }
 
   static simulateGraduate(rel, npc, events, person) {
-    if (npc.education === 'None' || npc.education === 'High School' || rel.age < 21 || Math.random() >= 0.03) {
+    if (
+      npc.education === 'None' ||
+      npc.education === 'High School' ||
+      rel.age < 21 ||
+      Math.random() >= 0.03
+    ) {
       return;
     }
     const levels = ['High School', 'Associate', "Bachelor's", "Master's", 'Doctorate'];
@@ -409,7 +498,13 @@ export class NPCSimulator {
     }
     npc.education = levels[idx + 1];
     const label = rel.type === 'Child' ? 'Your child' : `Your ${rel.type}`;
-    this.pushEvent(events, rel, 'education', `${rel.name} earned a ${levels[idx + 1]} degree.`, 'good');
+    this.pushEvent(
+      events,
+      rel,
+      'education',
+      `${rel.name} earned a ${levels[idx + 1]} degree.`,
+      'good'
+    );
     person.logEvent(`${label} ${rel.name} earned a ${levels[idx + 1]} degree!`, 'good');
   }
 
@@ -486,7 +581,13 @@ export class NPCSimulator {
   }
 
   static simulateBuyingHouse(rel, npc, events, person) {
-    if (npc.hasHouse || rel.age < 25 || rel.age > 60 || npc.money < 30000 || Math.random() >= 0.05) {
+    if (
+      npc.hasHouse ||
+      rel.age < 25 ||
+      rel.age > 60 ||
+      npc.money < 30000 ||
+      Math.random() >= 0.05
+    ) {
       return;
     }
     npc.hasHouse = true;
@@ -508,14 +609,27 @@ export class NPCSimulator {
   }
 
   static simulatePetAdoption(rel, npc, events, person) {
-    if (npc.pet || (rel.age < 20 || rel.age > 75) || Math.random() >= 0.02) {
+    if (npc.pet || rel.age < 20 || rel.age > 75 || Math.random() >= 0.02) {
       return;
     }
     const petName = PET_NAMES[Math.floor(Math.random() * PET_NAMES.length)];
-    const petType = Math.random() < 0.6 ? 'dog' : Math.random() < 0.7 ? 'cat' : Math.random() < 0.85 ? 'hamster' : 'parrot';
+    const petType =
+      Math.random() < 0.6
+        ? 'dog'
+        : Math.random() < 0.7
+          ? 'cat'
+          : Math.random() < 0.85
+            ? 'hamster'
+            : 'parrot';
     npc.pet = { name: petName, type: petType };
     npc.happiness = Math.min(100, npc.happiness + 3);
-    this.pushEvent(events, rel, 'pet', `${rel.name} adopted a ${petType} named ${petName}.`, 'good');
+    this.pushEvent(
+      events,
+      rel,
+      'pet',
+      `${rel.name} adopted a ${petType} named ${petName}.`,
+      'good'
+    );
     person.logEvent(`Your ${rel.type} ${rel.name} adopted a ${petType} named ${petName}!`, 'good');
   }
 
@@ -535,7 +649,20 @@ export class NPCSimulator {
       return;
     }
     npc.travelCount = (npc.travelCount || 0) + 1;
-    const destinations = ['Paris', 'Tokyo', 'Bali', 'London', 'Rome', 'Barcelona', 'Dubai', 'Sydney', 'New York', 'Hawaii', 'Amsterdam', 'Bangkok'];
+    const destinations = [
+      'Paris',
+      'Tokyo',
+      'Bali',
+      'London',
+      'Rome',
+      'Barcelona',
+      'Dubai',
+      'Sydney',
+      'New York',
+      'Hawaii',
+      'Amsterdam',
+      'Bangkok',
+    ];
     const dest = destinations[Math.floor(Math.random() * destinations.length)];
     npc.happiness = Math.min(100, npc.happiness + 3);
     this.pushEvent(events, rel, 'travel', `${rel.name} visited ${dest}.`, 'good');

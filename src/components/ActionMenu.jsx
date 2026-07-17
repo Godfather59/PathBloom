@@ -17,13 +17,7 @@ const ACTIONS = [
 ];
 
 export const ActionMenu = memo(
-  ({
-    onAgeUp,
-    onAction,
-    onAgeSkip,
-    language = 'en',
-    t = (key, fallback) => fallback || key,
-  }) => {
+  ({ onAgeUp, onAction, onAgeSkip, language = 'en', t = (key, fallback) => fallback || key }) => {
     const person = getCurrentTimePerson();
     const activeSituation = getActiveMonthlySituation(person);
     const isArabic = language === 'ar';
@@ -56,7 +50,11 @@ export const ActionMenu = memo(
             <button
               className="age-skip-btn month-btn"
               onClick={() => onAgeSkip('month')}
-              title={isArabic ? 'تقدم شهرا واحدا داخل الحالة الحالية.' : 'Advance one month inside the active situation.'}
+              title={
+                isArabic
+                  ? 'تقدم شهرا واحدا داخل الحالة الحالية.'
+                  : 'Advance one month inside the active situation.'
+              }
             >
               🗓️ {isArabic ? 'شهر واحد' : '1 Month'}
             </button>

@@ -15,7 +15,6 @@ import {
   getWarPhases,
   executeWarPhase,
   resolveWarEnd,
-  startWar,
 } from '../logic/WarSystem';
 import {
   RESOLUTION_TYPES,

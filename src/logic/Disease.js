@@ -1,74 +1,158 @@
 export const DISEASES = {
   common_cold: {
-    id: 'common_cold', name: 'Common Cold', category: 'acute', severity: 1,
-    contagious: 0.3, healthDrain: 3, duration: { min: 1, max: 2 },
-    treatments: ['rest', 'medicine'], cureRate: 0.95, mortalityRate: 0,
+    id: 'common_cold',
+    name: 'Common Cold',
+    category: 'acute',
+    severity: 1,
+    contagious: 0.3,
+    healthDrain: 3,
+    duration: { min: 1, max: 2 },
+    treatments: ['rest', 'medicine'],
+    cureRate: 0.95,
+    mortalityRate: 0,
     description: 'Runny nose, cough, mild fatigue.',
   },
   flu: {
-    id: 'flu', name: 'Seasonal Flu', category: 'acute', severity: 2,
-    contagious: 0.4, healthDrain: 8, duration: { min: 1, max: 2 },
-    treatments: ['rest', 'medicine'], cureRate: 0.9, mortalityRate: 0.005,
+    id: 'flu',
+    name: 'Seasonal Flu',
+    category: 'acute',
+    severity: 2,
+    contagious: 0.4,
+    healthDrain: 8,
+    duration: { min: 1, max: 2 },
+    treatments: ['rest', 'medicine'],
+    cureRate: 0.9,
+    mortalityRate: 0.005,
     description: 'High fever, body aches, extreme fatigue.',
   },
   food_poisoning: {
-    id: 'food_poisoning', name: 'Food Poisoning', category: 'acute', severity: 1,
-    contagious: 0, healthDrain: 5, duration: { min: 1, max: 1 },
-    treatments: ['rest', 'medicine'], cureRate: 0.95, mortalityRate: 0.001,
+    id: 'food_poisoning',
+    name: 'Food Poisoning',
+    category: 'acute',
+    severity: 1,
+    contagious: 0,
+    healthDrain: 5,
+    duration: { min: 1, max: 1 },
+    treatments: ['rest', 'medicine'],
+    cureRate: 0.95,
+    mortalityRate: 0.001,
     description: 'Stomach cramps, nausea, dehydration.',
   },
   pneumonia: {
-    id: 'pneumonia', name: 'Pneumonia', category: 'serious', severity: 3,
-    contagious: 0.15, healthDrain: 15, duration: { min: 1, max: 3 },
-    treatments: ['antibiotics', 'hospitalization'], cureRate: 0.8, mortalityRate: 0.05,
+    id: 'pneumonia',
+    name: 'Pneumonia',
+    category: 'serious',
+    severity: 3,
+    contagious: 0.15,
+    healthDrain: 15,
+    duration: { min: 1, max: 3 },
+    treatments: ['antibiotics', 'hospitalization'],
+    cureRate: 0.8,
+    mortalityRate: 0.05,
     description: 'Severe lung infection, difficulty breathing, high fever.',
   },
   mono: {
-    id: 'mono', name: 'Mononucleosis', category: 'serious', severity: 2,
-    contagious: 0.2, healthDrain: 10, duration: { min: 1, max: 2 },
-    treatments: ['rest', 'medicine'], cureRate: 0.85, mortalityRate: 0.001,
+    id: 'mono',
+    name: 'Mononucleosis',
+    category: 'serious',
+    severity: 2,
+    contagious: 0.2,
+    healthDrain: 10,
+    duration: { min: 1, max: 2 },
+    treatments: ['rest', 'medicine'],
+    cureRate: 0.85,
+    mortalityRate: 0.001,
     description: 'Extreme fatigue, swollen lymph nodes, sore throat.',
   },
   hepatitis_b: {
-    id: 'hepatitis_b', name: 'Hepatitis B', category: 'chronic', severity: 3,
-    contagious: 0.1, healthDrain: 8, duration: { min: 5, max: 20 },
-    treatments: ['antivirals', 'hospitalization'], cureRate: 0.6, mortalityRate: 0.02,
+    id: 'hepatitis_b',
+    name: 'Hepatitis B',
+    category: 'chronic',
+    severity: 3,
+    contagious: 0.1,
+    healthDrain: 8,
+    duration: { min: 5, max: 20 },
+    treatments: ['antivirals', 'hospitalization'],
+    cureRate: 0.6,
+    mortalityRate: 0.02,
     description: 'Liver inflammation, jaundice, abdominal pain.',
   },
   diabetes: {
-    id: 'diabetes', name: 'Type 2 Diabetes', category: 'chronic', severity: 2,
-    contagious: 0, healthDrain: 4, duration: { min: 999, max: 999 },
-    treatments: ['medicine', 'lifestyle'], cureRate: 0.1, mortalityRate: 0.005,
+    id: 'diabetes',
+    name: 'Type 2 Diabetes',
+    category: 'chronic',
+    severity: 2,
+    contagious: 0,
+    healthDrain: 4,
+    duration: { min: 999, max: 999 },
+    treatments: ['medicine', 'lifestyle'],
+    cureRate: 0.1,
+    mortalityRate: 0.005,
     description: 'High blood sugar, requires ongoing management.',
   },
   asthma: {
-    id: 'asthma', name: 'Asthma', category: 'chronic', severity: 2,
-    contagious: 0, healthDrain: 3, duration: { min: 999, max: 999 },
-    treatments: ['medicine'], cureRate: 0.05, mortalityRate: 0.002,
+    id: 'asthma',
+    name: 'Asthma',
+    category: 'chronic',
+    severity: 2,
+    contagious: 0,
+    healthDrain: 3,
+    duration: { min: 999, max: 999 },
+    treatments: ['medicine'],
+    cureRate: 0.05,
+    mortalityRate: 0.002,
     description: 'Wheezing, shortness of breath, triggered by exertion.',
   },
   heart_disease: {
-    id: 'heart_disease', name: 'Coronary Artery Disease', category: 'chronic', severity: 4,
-    contagious: 0, healthDrain: 12, duration: { min: 999, max: 999 },
-    treatments: ['surgery', 'lifestyle'], cureRate: 0.15, mortalityRate: 0.05,
+    id: 'heart_disease',
+    name: 'Coronary Artery Disease',
+    category: 'chronic',
+    severity: 4,
+    contagious: 0,
+    healthDrain: 12,
+    duration: { min: 999, max: 999 },
+    treatments: ['surgery', 'lifestyle'],
+    cureRate: 0.15,
+    mortalityRate: 0.05,
     description: 'Blocked arteries, chest pain, risk of heart attack.',
   },
   cancer: {
-    id: 'cancer', name: 'Cancer', category: 'critical', severity: 5,
-    contagious: 0, healthDrain: 20, duration: { min: 2, max: 6 },
-    treatments: ['chemotherapy', 'surgery', 'radiation'], cureRate: 0.35, mortalityRate: 0.3,
+    id: 'cancer',
+    name: 'Cancer',
+    category: 'critical',
+    severity: 5,
+    contagious: 0,
+    healthDrain: 20,
+    duration: { min: 2, max: 6 },
+    treatments: ['chemotherapy', 'surgery', 'radiation'],
+    cureRate: 0.35,
+    mortalityRate: 0.3,
     description: 'Malignant tumor. Early detection improves survival odds.',
   },
   stroke: {
-    id: 'stroke', name: 'Stroke', category: 'critical', severity: 5,
-    contagious: 0, healthDrain: 25, duration: { min: 1, max: 5 },
-    treatments: ['hospitalization', 'surgery'], cureRate: 0.25, mortalityRate: 0.2,
+    id: 'stroke',
+    name: 'Stroke',
+    category: 'critical',
+    severity: 5,
+    contagious: 0,
+    healthDrain: 25,
+    duration: { min: 1, max: 5 },
+    treatments: ['hospitalization', 'surgery'],
+    cureRate: 0.25,
+    mortalityRate: 0.2,
     description: 'Brain hemorrhage. Immediate treatment critical.',
   },
   kidney_disease: {
-    id: 'kidney_disease', name: 'Kidney Disease', category: 'chronic', severity: 3,
-    contagious: 0, healthDrain: 10, duration: { min: 5, max: 15 },
-    treatments: ['dialysis', 'surgery'], cureRate: 0.2, mortalityRate: 0.03,
+    id: 'kidney_disease',
+    name: 'Kidney Disease',
+    category: 'chronic',
+    severity: 3,
+    contagious: 0,
+    healthDrain: 10,
+    duration: { min: 5, max: 15 },
+    treatments: ['dialysis', 'surgery'],
+    cureRate: 0.2,
+    mortalityRate: 0.03,
     description: 'Kidney failure, requires dialysis or transplant.',
   },
 };
@@ -95,18 +179,34 @@ export const DISEASE_TRIGGERS = [
   { diseaseId: 'hepatitis_b', chance: 0.005, minAge: 15, condition: () => true },
   { diseaseId: 'diabetes', chance: 0.008, minAge: 30, condition: person => person.health < 50 },
   { diseaseId: 'asthma', chance: 0.005, minAge: 0, condition: () => true },
-  { diseaseId: 'heart_disease', chance: 0.005, minAge: 40, condition: person => person.health < 40 },
+  {
+    diseaseId: 'heart_disease',
+    chance: 0.005,
+    minAge: 40,
+    condition: person => person.health < 40,
+  },
   { diseaseId: 'cancer', chance: 0.003, minAge: 30, condition: () => true },
   { diseaseId: 'stroke', chance: 0.002, minAge: 50, condition: person => person.health < 35 },
-  { diseaseId: 'kidney_disease', chance: 0.002, minAge: 35, condition: person => person.health < 40 },
+  {
+    diseaseId: 'kidney_disease',
+    chance: 0.002,
+    minAge: 35,
+    condition: person => person.health < 40,
+  },
 ];
 
 export function contractDisease(person, diseaseId) {
   const def = DISEASES[diseaseId];
-  if (!def) return null;
+  if (!def) {
+    return null;
+  }
 
-  if (!person.conditions) person.conditions = [];
-  if (person.conditions.some(c => c.id === diseaseId)) return null;
+  if (!person.conditions) {
+    person.conditions = [];
+  }
+  if (person.conditions.some(c => c.id === diseaseId)) {
+    return null;
+  }
 
   const condition = {
     id: def.id,
@@ -115,7 +215,8 @@ export function contractDisease(person, diseaseId) {
     contractedAtAge: person.age,
     treated: false,
     treatmentApplied: null,
-    yearsRemaining: def.duration.min + Math.floor(Math.random() * (def.duration.max - def.duration.min + 1)),
+    yearsRemaining:
+      def.duration.min + Math.floor(Math.random() * (def.duration.max - def.duration.min + 1)),
     cured: false,
   };
 
@@ -125,13 +226,23 @@ export function contractDisease(person, diseaseId) {
 }
 
 export function tryContractDisease(person) {
-  if (person.age < 5) return null;
-  if (!person.conditions) person.conditions = [];
+  if (person.age < 5) {
+    return null;
+  }
+  if (!person.conditions) {
+    person.conditions = [];
+  }
 
   for (const trigger of DISEASE_TRIGGERS) {
-    if (person.age < trigger.minAge) continue;
-    if (!trigger.condition(person)) continue;
-    if (person.conditions.some(c => c.id === trigger.diseaseId)) continue;
+    if (person.age < trigger.minAge) {
+      continue;
+    }
+    if (!trigger.condition(person)) {
+      continue;
+    }
+    if (person.conditions.some(c => c.id === trigger.diseaseId)) {
+      continue;
+    }
     if (Math.random() < trigger.chance) {
       return contractDisease(person, trigger.diseaseId);
     }
@@ -141,9 +252,13 @@ export function tryContractDisease(person) {
 
 export function getAvailableTreatments(person, diseaseId) {
   const def = DISEASES[diseaseId];
-  if (!def) return [];
+  if (!def) {
+    return [];
+  }
   const condition = person.conditions?.find(c => c.id === diseaseId);
-  if (!condition) return [];
+  if (!condition) {
+    return [];
+  }
 
   return def.treatments.map(tId => ({
     id: tId,
@@ -155,14 +270,21 @@ export function getAvailableTreatments(person, diseaseId) {
 export function treatDisease(person, diseaseId, treatmentId) {
   const def = DISEASES[diseaseId];
   const condition = person.conditions?.find(c => c.id === diseaseId);
-  if (!def || !condition) return { success: false, message: 'Condition not found.' };
+  if (!def || !condition) {
+    return { success: false, message: 'Condition not found.' };
+  }
 
   const treatment = TREATMENT_EFFECTS[treatmentId];
-  if (!treatment) return { success: false, message: 'Invalid treatment.' };
+  if (!treatment) {
+    return { success: false, message: 'Invalid treatment.' };
+  }
 
-  const cost = treatment.cost;
+  const { cost } = treatment;
   if (person.money < cost) {
-    return { success: false, message: `Treatment costs $${cost.toLocaleString()}. You can't afford it.` };
+    return {
+      success: false,
+      message: `Treatment costs $${cost.toLocaleString()}. You can't afford it.`,
+    };
   }
 
   if (cost > 0) {
@@ -200,7 +322,9 @@ export function treatDisease(person, diseaseId, treatmentId) {
 }
 
 export function processConditions(person) {
-  if (!person.conditions || person.conditions.length === 0) return [];
+  if (!person.conditions || person.conditions.length === 0) {
+    return [];
+  }
 
   const events = [];
   const toRemove = [];
@@ -251,7 +375,9 @@ export function processConditions(person) {
 }
 
 export function getDiseaseSummary(person) {
-  if (!person.conditions || person.conditions.length === 0) return null;
+  if (!person.conditions || person.conditions.length === 0) {
+    return null;
+  }
   const totalHealthDrain = person.conditions.reduce((sum, c) => {
     const def = DISEASES[c.id];
     return sum + (def ? def.healthDrain : 0);

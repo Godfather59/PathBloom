@@ -2,8 +2,12 @@ let toastTimer = null;
 
 export function showGameToast(message, type = 'neutral') {
   const existing = document.getElementById('game-toast');
-  if (existing) existing.remove();
-  if (toastTimer) clearTimeout(toastTimer);
+  if (existing) {
+    existing.remove();
+  }
+  if (toastTimer) {
+    clearTimeout(toastTimer);
+  }
 
   const el = document.createElement('div');
   el.id = 'game-toast';
@@ -33,6 +37,10 @@ export function showGameToast(message, type = 'neutral') {
 
   toastTimer = setTimeout(() => {
     el.style.opacity = '0';
-    setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 300);
+    setTimeout(() => {
+      if (el.parentNode) {
+        el.parentNode.removeChild(el);
+      }
+    }, 300);
   }, 2500);
 }

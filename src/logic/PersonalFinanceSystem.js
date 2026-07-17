@@ -3,7 +3,9 @@ import { getCountryRules } from './CountryLifeSystem';
 const clamp = (value, min, max) => Math.max(min, Math.min(max, Number(value) || 0));
 
 export function ensurePersonalFinance(person) {
-  if (!person || typeof person !== 'object') return null;
+  if (!person || typeof person !== 'object') {
+    return null;
+  }
   const current = person.finance && typeof person.finance === 'object' ? person.finance : {};
   person.finance = {
     creditScore: Math.round(clamp(current.creditScore ?? 650, 300, 850)),
@@ -13,7 +15,8 @@ export function ensurePersonalFinance(person) {
     bankruptcies: Math.max(0, Math.floor(Number(current.bankruptcies ?? person.bankruptcies) || 0)),
     budgetDiscipline: Math.round(clamp(current.budgetDiscipline ?? 45, 0, 100)),
     annualLedger: Array.isArray(current.annualLedger) ? current.annualLedger.slice(-15) : [],
-    lastBudget: current.lastBudget && typeof current.lastBudget === 'object' ? current.lastBudget : null,
+    lastBudget:
+      current.lastBudget && typeof current.lastBudget === 'object' ? current.lastBudget : null,
     collectionsBalance: Math.max(0, Number(current.collectionsBalance) || 0),
     childSupportPaid: Math.max(0, Number(current.childSupportPaid) || 0),
     benefitsReceived: Math.max(0, Number(current.benefitsReceived) || 0),
@@ -40,18 +43,24 @@ function calculateChildSupport(person, rules) {
   const hasPartner = (person.relationships || []).some(
     rel => ['Spouse', 'Partner', 'Fiance'].includes(rel.type) && rel.status !== 'Deceased'
   );
-  if (hasPartner) return 0;
+  if (hasPartner) {
+    return 0;
+  }
   const dependentChildren = (person.relationships || []).filter(
     rel => rel.type === 'Child' && rel.status !== 'Deceased' && Number(rel.age) < 18
   ).length;
-  if (!dependentChildren || !person.job) return 0;
+  if (!dependentChildren || !person.job) {
+    return 0;
+  }
   const income = Math.max(0, Number(person.job.salary) || 0);
   return Math.floor(income * rules.childSupportRate * Math.min(2, dependentChildren));
 }
 
 function chargeObligation(person, amount) {
   const due = Math.max(0, Math.floor(Number(amount) || 0));
-  if (due <= 0) return { paid: 0, shortfall: 0 };
+  if (due <= 0) {
+    return { paid: 0, shortfall: 0 };
+  }
   const cash = Math.max(0, Number(person.money) || 0);
   const paid = Math.min(cash, due);
   const shortfall = due - paid;
@@ -63,7 +72,8 @@ function chargeObligation(person, amount) {
 }
 
 function updateCreditScore(person, finance, yearData) {
-  const debt = Math.max(0, Number(person.personalDebt) || 0) + Math.max(0, Number(person.loans) || 0);
+  const debt =
+    Math.max(0, Number(person.personalDebt) || 0) + Math.max(0, Number(person.loans) || 0);
   const income = Math.max(1, Number(person.job?.salary) || 1);
   const debtRatio = debt / income;
   let change = 0;
@@ -80,9 +90,13 @@ function updateCreditScore(person, finance, yearData) {
     change += 5;
   }
 
-  if (debtRatio > 1.5) change -= 18;
-  else if (debtRatio > 0.75) change -= 8;
-  else if (debtRatio < 0.2) change += 5;
+  if (debtRatio > 1.5) {
+    change -= 18;
+  } else if (debtRatio > 0.75) {
+    change -= 8;
+  } else if (debtRatio < 0.2) {
+    change += 5;
+  }
 
   if (person.bankruptcies > finance.bankruptcies) {
     finance.bankruptcies = person.bankruptcies;
@@ -94,11 +108,15 @@ function updateCreditScore(person, finance, yearData) {
 
 export function processPersonalFinanceYear(person) {
   const finance = ensurePersonalFinance(person);
-  if (!finance || person.age < 18) return finance;
+  if (!finance || person.age < 18) {
+    return finance;
+  }
 
   const rules = getCountryRules(person);
   const livingCost = Math.max(0, Number(person.lastLivingCost) || 0);
-  const ownsHome = (person.assets || []).some(asset => asset.type === 'Real Estate' && !asset.isRented);
+  const ownsHome = (person.assets || []).some(
+    asset => asset.type === 'Real Estate' && !asset.isRented
+  );
   const categories = splitLivingCost(livingCost, ownsHome);
   const childSupport = calculateChildSupport(person, rules);
   const childSupportResult = chargeObligation(person, childSupport);
@@ -109,7 +127,8 @@ export function processPersonalFinanceYear(person) {
   finance.savingsAccount += savingsInterest;
 
   const debt = Math.max(0, Number(person.personalDebt) || 0);
-  const collectionInterest = debt > 0 ? Math.floor(debt * (rules.creditAccess >= 70 ? 0.035 : 0.07)) : 0;
+  const collectionInterest =
+    debt > 0 ? Math.floor(debt * (rules.creditAccess >= 70 ? 0.035 : 0.07)) : 0;
   if (collectionInterest > 0) {
     person.personalDebt += collectionInterest;
   }
@@ -142,7 +161,10 @@ export function processPersonalFinanceYear(person) {
   if (finance.creditScore < 450 && Math.random() < 0.35) {
     person.logEvent?.('Your poor credit score is blocking loans and rental applications.', 'bad');
   } else if (finance.creditScore >= 760 && person.age % 5 === 0) {
-    person.logEvent?.('Your excellent credit gives you access to the best borrowing rates.', 'good');
+    person.logEvent?.(
+      'Your excellent credit gives you access to the best borrowing rates.',
+      'good'
+    );
   }
 
   return finance;
@@ -150,7 +172,9 @@ export function processPersonalFinanceYear(person) {
 
 export function processPersonalFinanceMonth(person) {
   const finance = ensurePersonalFinance(person);
-  if (!finance || person.age < 18) return finance;
+  if (!finance || person.age < 18) {
+    return finance;
+  }
   const monthlyIncome = Math.max(0, Number(person.job?.salary) || 0) / 12;
   const monthlyLiving = Math.max(0, Number(person.lastLivingCost) || 0) / 12;
   const surplus = monthlyIncome - monthlyLiving;

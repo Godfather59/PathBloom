@@ -12,19 +12,33 @@ const TYPE_EMOJIS = {
 };
 
 function getChoiceEmoji(choice) {
-  if (choice.emoji) return choice.emoji;
-  if (choice.type && TYPE_EMOJIS[choice.type]) return TYPE_EMOJIS[choice.type];
+  if (choice.emoji) {
+    return choice.emoji;
+  }
+  if (choice.type && TYPE_EMOJIS[choice.type]) {
+    return TYPE_EMOJIS[choice.type];
+  }
 
   const effects = choice.effects || {};
   const score = Object.entries(effects).reduce((total, [key, value]) => {
-    if (key === 'stress') return total - value;
+    if (key === 'stress') {
+      return total - value;
+    }
     return total + value;
   }, 0);
 
-  if ((effects.money ?? 0) > 0) return '💰';
-  if ((effects.money ?? 0) < 0) return '💸';
-  if (score > 5) return '✅';
-  if (score < -5) return '⚠️';
+  if ((effects.money ?? 0) > 0) {
+    return '💰';
+  }
+  if ((effects.money ?? 0) < 0) {
+    return '💸';
+  }
+  if (score > 5) {
+    return '✅';
+  }
+  if (score < -5) {
+    return '⚠️';
+  }
   return '💭';
 }
 

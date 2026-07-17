@@ -10,7 +10,6 @@ import {
 } from './EducationLogic';
 import { RelationshipManager } from './Relationships';
 import { ACTIVITIES } from './Activities';
-import { clearWorldEvents } from './WorldEvents';
 
 const CORE_STATS = [
   'happiness',
@@ -179,14 +178,7 @@ export function withDeterministicRuntime(seed, callback) {
 }
 
 export function resetSimulationState() {
-  clearWorldEvents();
-  GameEngine.worldState = {
-    economy: 'Normal',
-    conflict: 'Peace',
-    pandemic: false,
-    activeWorldEvents: [],
-  };
-  GameEngine.marketTrends = { indexFund: 100, dogecoin: 0.5 };
+  GameEngine.resetSimulationState();
 }
 
 function issue(code, path, message) {

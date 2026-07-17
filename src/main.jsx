@@ -10,7 +10,9 @@ function showStartupError(error) {
   const message = error?.stack || error?.message || String(error || 'Unknown startup error');
   console.error('PathBloom startup error:', error);
 
-  if (!rootElement) return;
+  if (!rootElement) {
+    return;
+  }
   rootElement.innerHTML = `
     <div style="min-height:100vh;padding:24px;background:#10101c;color:#f5f5f5;font-family:Arial,sans-serif;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:14px;">
       <h1 style="margin:0;font-size:24px;">PathBloom failed to start</h1>

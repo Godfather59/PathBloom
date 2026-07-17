@@ -15,10 +15,10 @@ function getSalaryMultiplier(countryState, rules) {
 function isProtectedCareer(jobData) {
   return Boolean(
     jobData?.isMilitary ||
-      jobData?.isPolitical ||
-      jobData?.isRoyal ||
-      jobData?.isMafia ||
-      jobData?.isNationalService
+    jobData?.isPolitical ||
+    jobData?.isRoyal ||
+    jobData?.isMafia ||
+    jobData?.isNationalService
   );
 }
 

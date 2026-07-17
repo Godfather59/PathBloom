@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { runSimulationBatch, printSimulationReport } from '../utils/SimulationBench';
+import { runSimulationBatch } from '../utils/SimulationBench';
 import './Modal.css';
 
 export function DebugMenu({ onClose, t = (key, fallback) => fallback || key }) {
@@ -70,9 +70,7 @@ export function DebugMenu({ onClose, t = (key, fallback) => fallback || key }) {
               <div>Total lives simulated: {results.total}</div>
               <div>
                 Deaths: {results.deaths} (
-                {results.total > 0
-                  ? Math.round((results.deaths / results.total) * 100)
-                  : 0}
+                {results.total > 0 ? Math.round((results.deaths / results.total) * 100) : 0}
                 %)
               </div>
               <div>Errors: {results.errors.length}</div>
@@ -104,8 +102,7 @@ export function DebugMenu({ onClose, t = (key, fallback) => fallback || key }) {
                 Avg lifespan:{' '}
                 {results.lifespans.length > 0
                   ? Math.round(
-                      results.lifespans.reduce((a, b) => a + b, 0) /
-                        results.lifespans.length
+                      results.lifespans.reduce((a, b) => a + b, 0) / results.lifespans.length
                     )
                   : 'N/A'}
               </div>
@@ -113,8 +110,7 @@ export function DebugMenu({ onClose, t = (key, fallback) => fallback || key }) {
                 Avg final money: $
                 {results.finalMoney.length > 0
                   ? Math.round(
-                      results.finalMoney.reduce((a, b) => a + b, 0) /
-                        results.finalMoney.length
+                      results.finalMoney.reduce((a, b) => a + b, 0) / results.finalMoney.length
                     ).toLocaleString()
                   : 'N/A'}
               </div>

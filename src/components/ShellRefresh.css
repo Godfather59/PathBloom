@@ -8,6 +8,7 @@
   --pb-font-sm: clamp(0.82rem, 0.78rem + 0.2vw, 0.94rem);
   --pb-font-md: clamp(0.96rem, 0.9rem + 0.28vw, 1.08rem);
   --pb-font-lg: clamp(1.18rem, 1.08rem + 0.42vw, 1.42rem);
+  --pb-text-muted: #91a2b8;
   --pb-elevation-sheet: 0 -24px 64px rgba(0, 0, 0, 0.48);
   --pb-elevation-floating: 0 14px 36px rgba(0, 0, 0, 0.3);
 }
@@ -16,8 +17,8 @@ html,
 body,
 #root {
   width: 100%;
-  min-height: 100%;
   height: 100%;
+  min-height: 100%;
   overflow: hidden;
 }
 
@@ -25,8 +26,8 @@ body,
   html,
   body,
   #root {
-    height: 100dvh;
-    min-height: 100dvh;
+    height: var(--pb-visual-height, 100dvh);
+    min-height: var(--pb-visual-height, 100dvh);
   }
 }
 
@@ -197,7 +198,7 @@ button,
   line-height: 1.4;
 }
 
-/* Compact gameplay frame */
+/* Compact gameplay shell */
 .hud-container {
   padding:
     calc(var(--pb-safe-top) + 6px)
@@ -207,7 +208,7 @@ button,
 }
 
 .hud-identity-row {
-  min-height: 48px;
+  min-height: var(--pb-tap-target);
 }
 
 .avatar-circle {
@@ -301,7 +302,7 @@ button,
   box-shadow: var(--pb-elevation-floating);
 }
 
-/* Sheets and dialogs */
+/* Bottom sheets and confirmations */
 .pb-sheet-layer {
   position: fixed;
   inset: 0;
@@ -420,7 +421,7 @@ button,
   background: rgba(204, 226, 255, 0.04);
 }
 
-/* Activities: one-column, favorites and recent */
+/* Activities */
 .activity-view-tabs {
   display: flex;
   gap: 7px;
@@ -438,8 +439,29 @@ button,
   min-height: var(--pb-tap-target);
 }
 
+.activity-view-tabs button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
 .feature-path-grid {
   grid-template-columns: minmax(0, 1fr) !important;
+}
+
+.activity-row-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--pb-tap-target);
+  align-items: stretch;
+  gap: 8px;
+}
+
+.activity-row-shell > .feature-path-card,
+.activity-row-shell > .quick-activity-row {
+  width: 100%;
+  min-width: 0;
 }
 
 .feature-path-card,
@@ -447,20 +469,16 @@ button,
   min-height: 64px;
 }
 
-.activity-row-actions {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
 .activity-favorite {
   width: var(--pb-tap-target);
+  min-width: var(--pb-tap-target);
   height: var(--pb-tap-target);
+  align-self: center;
   display: grid;
   place-items: center;
-  flex: 0 0 auto;
   border-radius: 999px;
   color: var(--pb-text-muted);
+  background: rgba(204, 226, 255, 0.04);
 }
 
 .activity-favorite.is-active {
@@ -472,9 +490,33 @@ button,
   color: var(--pb-warning) !important;
 }
 
-/* Two-step new-life flow */
+/* Two-step New Life flow */
 .new-life-card {
   min-height: 0;
+}
+
+.new-life-brand-icon {
+  width: var(--pb-tap-target);
+  height: var(--pb-tap-target);
+  display: grid;
+  place-items: center;
+  margin-inline: auto;
+  border-radius: 16px;
+  color: var(--pb-growth);
+  background: var(--pb-growth-soft);
+}
+
+.settings-language-label,
+.main-menu-section-label,
+.new-life-load,
+.new-life-continue,
+.new-life-randomize,
+.start-btn,
+.new-life-step-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .new-life-progress {
@@ -519,8 +561,21 @@ button,
   margin-top: 4px;
 }
 
+.new-life-step-actions > span:empty {
+  display: none;
+}
+
 .new-life-step-actions button {
   min-height: var(--pb-tap-target);
+}
+
+.new-life-step-panel[data-step='identity'] .new-life-step-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.new-life-step-panel[data-step='identity'] .new-life-step-actions button {
+  min-width: min(100%, 220px);
 }
 
 .new-life-advanced {
@@ -557,7 +612,8 @@ button,
   font-size: var(--pb-font-md);
 }
 
-.autosave-visible {
+.autosave-visible,
+.hud-save-status {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -578,8 +634,12 @@ button,
 }
 
 @keyframes pbFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @media (max-width: 380px) {
@@ -589,10 +649,7 @@ button,
     display: none;
   }
 
-  .stats-sheet-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
+  .stats-sheet-grid,
   .pb-sheet-actions,
   .new-life-step-actions {
     grid-template-columns: minmax(0, 1fr);

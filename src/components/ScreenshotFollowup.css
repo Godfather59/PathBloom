@@ -1,0 +1,70 @@
+/* Follow-up fixes from the physical Android RTL screenshot review. */
+
+/* The timeline owns its scroll area, but the native WebView scrollbar was
+   rendered as a thick grey bar on the left edge in RTL. */
+.event-log {
+  scrollbar-gutter: auto;
+  scrollbar-width: none;
+}
+
+.event-log::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* The previous Smart +5 design reserved a 54px lane above the navigation.
+   The action now opens from a compact confirmation control, so reclaim that
+   space for the story timeline. */
+.bottom-navigation {
+  margin-top: 0;
+}
+
+.life-shortcuts {
+  margin-bottom: 20px;
+}
+
+/* Keep automatic progression secondary and separate from the Age Up button. */
+.time-more-action {
+  position: absolute;
+  inset-inline-end: 14px;
+  top: -18px;
+  z-index: 4;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(103, 169, 255, 0.34);
+  border-radius: 999px;
+  color: var(--pb-blue);
+  background: rgba(16, 31, 51, 0.98);
+  box-shadow: var(--pb-elevation-floating);
+}
+
+.time-more-action:active {
+  transform: scale(0.94);
+}
+
+@media (max-width: 360px) {
+  .life-shortcuts {
+    margin-bottom: 18px;
+  }
+
+  .time-more-action {
+    inset-inline-end: 10px;
+    top: -17px;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    min-height: 38px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .time-more-action {
+    transition: none !important;
+  }
+}

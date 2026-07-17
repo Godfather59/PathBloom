@@ -86,8 +86,8 @@ export const Hud = memo(
           if (recordsTab && !recordsTab.classList.contains('is-active')) {
             recordsTab.click();
           } else {
-            const historyButton = Array.from(menu.querySelectorAll('.system-menu-tile')).find(button =>
-              /(?:Event history|سجل الأحداث)/i.test(String(button.textContent || ''))
+            const historyButton = Array.from(menu.querySelectorAll('.system-menu-tile')).find(
+              button => /(?:Event history|سجل الأحداث)/i.test(String(button.textContent || ''))
             );
             if (historyButton) {
               historyButton.click();

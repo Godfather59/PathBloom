@@ -1,5 +1,112 @@
-import React from 'react';
-import './Modal.css';
+import React, { useMemo, useState } from 'react';
+import { translateGameMessage, translateGameText } from '../logic/i18n';
+import { cleanLocalizedText } from '../logic/localizationSanitizer';
+import { translateDeepSimulationText } from '../logic/DeepLocalization';
+import { formatArabicNumber, localizeArabicCandidate } from '../logic/ArabicLocalization';
+import {
+  PhaseTwoEmpty,
+  PhaseTwoMetric,
+  PhaseTwoScreen,
+  PhaseTwoSection,
+  PhaseTwoTabs,
+} from './PhaseTwoScaffold';
+
+const COPY = {
+  en: {
+    eyebrow: 'World',
+    title: 'News and history',
+    subtitle: 'Global events and important stories from the people around you.',
+    all: 'All',
+    world: 'World',
+    personal: 'People',
+    positive: 'Positive',
+    critical: 'Critical',
+    stories: 'Stories',
+    worldStories: 'World stories',
+    peopleStories: 'People stories',
+    ages: 'Life stages',
+    latest: 'Latest stories',
+    latestHint: 'The newest events appear first and remain grouped by your age.',
+    search: 'Search news…',
+    noNews: 'No news yet',
+    noNewsHint:
+      'As the world turns and people around you live their lives, stories will appear here.',
+    age: 'Age',
+    year: 'Year',
+    worldBadge: 'WORLD',
+    close: 'Close world news',
+  },
+  ar: {
+    eyebrow: 'العالم',
+    title: 'الأخبار والتاريخ',
+    subtitle: 'الأحداث العالمية والقصص المهمة من حياة الأشخاص حولك.',
+    all: 'الكل',
+    world: 'العالم',
+    personal: 'الأشخاص',
+    positive: 'إيجابية',
+    critical: 'حرجة',
+    stories: 'القصص',
+    worldStories: 'قصص العالم',
+    peopleStories: 'قصص الأشخاص',
+    ages: 'مراحل الحياة',
+    latest: 'أحدث القصص',
+    latestHint: 'تظهر الأحداث الأحدث أولا وتبقى مجمعة حسب عمرك.',
+    search: 'ابحث في الأخبار…',
+    noNews: 'لا توجد أخبار بعد',
+    noNewsHint: 'مع تغير العالم واستمرار حياة من حولك ستظهر القصص هنا.',
+    age: 'العمر',
+    year: 'السنة',
+    worldBadge: 'العالم',
+    close: 'أغلق أخبار العالم',
+  },
+};
+
+function formatNumber(value, language) {
+  return language === 'ar'
+    ? formatArabicNumber(value, { maximumFractionDigits: 0 })
+    : Number(value || 0).toLocaleString('en-US');
+}
+
+function localizeNews(item, language) {
+  const fallback =
+    typeof item?.text === 'string'
+      ? item.text.replace(/^Your\s+\S+,\s+/, '')
+      : String(item?.text || '');
+  const packText =
+    item?.localizedText && typeof item.localizedText === 'object'
+      ? item.localizedText[language] || item.localizedText.en
+      : null;
+  if (packText) {
+    return language === 'ar'
+      ? localizeArabicCandidate(packText, item.localizedText.en || fallback, 'world-news')
+      : String(packText);
+  }
+  const translated = item?.messageKey
+    ? translateGameMessage(language, item.messageKey, item.messageParams || {}, fallback)
+    : translateGameText(language, fallback);
+  const cleaned = cleanLocalizedText(translated, fallback, language);
+  const deep = translateDeepSimulationText(cleaned, language);
+  return language === 'ar' ? localizeArabicCandidate(deep, fallback, 'world-news') : deep;
+}
+
+function storyIcon(item) {
+  if (item?.category === 'geopolitics') {
+    if (item.type === 'bad') {
+      return '⚔️';
+    }
+    if (item.type === 'good') {
+      return '🌍';
+    }
+    return '🏛️';
+  }
+  if (item?.type === 'bad') {
+    return '⚠️';
+  }
+  if (item?.type === 'good') {
+    return '✨';
+  }
+  return '📰';
+}
 
 export function WorldNewsFeed({
   person,
@@ -7,223 +114,163 @@ export function WorldNewsFeed({
   language = 'en',
   t = (key, fallback) => fallback || key,
 }) {
-  const dir = language === 'ar' ? 'rtl' : 'ltr';
-  const news = Array.isArray(person?.worldNews) ? person.worldNews : [];
+  const locale = language === 'ar' ? 'ar' : 'en';
+  const copy = COPY[locale];
+  const news = Array.isArray(person?.worldNews) ? person.worldNews.filter(Boolean) : [];
+  const [activeTab, setActiveTab] = useState('all');
+  const [query, setQuery] = useState('');
 
-  const newsByAge = {};
-  news.forEach(item => {
-    if (!item || typeof item !== 'object') {
-      return;
-    }
-    const age = Number(item?.age);
-    if (!Number.isFinite(age)) {
-      return;
-    }
-    if (!newsByAge[age]) {
-      newsByAge[age] = [];
-    }
-    newsByAge[age].push(item);
-  });
+  const normalized = useMemo(
+    () =>
+      news
+        .map((item, index) => ({
+          ...item,
+          _index: index,
+          _age: Number.isFinite(Number(item?.age)) ? Number(item.age) : 0,
+          _year: Number.isFinite(Number(item?.year)) ? Number(item.year) : null,
+          _text: localizeNews(item, language),
+          _world: item?.category === 'geopolitics',
+        }))
+        .sort(
+          (a, b) =>
+            b._age - a._age || Number(b._year || 0) - Number(a._year || 0) || b._index - a._index
+        ),
+    [news, language]
+  );
 
-  const sortedAges = Object.keys(newsByAge)
-    .map(Number)
-    .filter(Number.isFinite)
-    .sort((a, b) => b - a);
+  const visible = useMemo(() => {
+    const needle = query.trim().toLocaleLowerCase(locale === 'ar' ? 'ar' : 'en');
+    return normalized.filter(item => {
+      const tabMatch =
+        activeTab === 'all' ||
+        (activeTab === 'world' && item._world) ||
+        (activeTab === 'personal' && !item._world) ||
+        (activeTab === 'positive' && item.type === 'good') ||
+        (activeTab === 'critical' && item.type === 'bad');
+      const textMatch =
+        !needle || `${item._text} ${item.relName || ''}`.toLocaleLowerCase().includes(needle);
+      return tabMatch && textMatch;
+    });
+  }, [activeTab, locale, normalized, query]);
 
-  const safeText = text => {
-    if (typeof text === 'string') {
-      return text.replace(/^Your\s+\S+,\s+/, '');
-    }
-    if (text == null) {
-      return '';
-    }
-    return String(text);
-  };
+  const groups = useMemo(() => {
+    const map = new Map();
+    visible.forEach(item => {
+      if (!map.has(item._age)) {
+        map.set(item._age, []);
+      }
+      map.get(item._age).push(item);
+    });
+    return [...map.entries()].sort((a, b) => b[0] - a[0]);
+  }, [visible]);
 
-  const safeYear = item => {
-    const year = Number(item?.year);
-    return Number.isFinite(year) ? year : null;
-  };
-
-  let content = null;
-
-  try {
-    content = (
-      <div className="modal-body">
-        {news.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
-            <div style={{ fontSize: '2.5rem', marginBottom: '10px' }}></div>
-            <p>
-              {t('worldNews.empty', 'No news yet. As the world turns, stories will appear here.')}
-            </p>
-          </div>
-        ) : (
-          <div>
-            <div
-              style={{
-                background: 'rgba(255,215,0,0.06)',
-                border: '1px solid rgba(255,215,0,0.15)',
-                borderRadius: '10px',
-                padding: '12px 16px',
-                marginBottom: '16px',
-                fontSize: '0.85rem',
-                color: '#aaa',
-              }}
-            >
-              {t('worldNews.description', 'Notable events from the lives of those around you.')}
-            </div>
-
-            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '16px' }}>
-              {sortedAges.slice(0, 10).map(age => (
-                <span
-                  key={age}
-                  style={{
-                    background: 'rgba(255,255,255,0.06)',
-                    padding: '4px 10px',
-                    borderRadius: '12px',
-                    fontSize: '0.75rem',
-                    color: '#888',
-                  }}
-                >
-                  {t('worldNews.age', 'Age')} {age}
-                </span>
-              ))}
-              {sortedAges.length > 10 && (
-                <span style={{ color: '#666', fontSize: '0.75rem', padding: '4px 0' }}>
-                  +{sortedAges.length - 10} {t('worldNews.more', 'more')}
-                </span>
-              )}
-            </div>
-
-            {sortedAges.map(age => {
-              const ageItems = newsByAge[age] || [];
-              const firstItem = ageItems[0];
-              const year = safeYear(firstItem);
-              return (
-                <div key={age} style={{ marginBottom: '16px' }}>
-                  <div
-                    style={{
-                      fontSize: '0.8rem',
-                      color: '#666',
-                      textTransform: 'uppercase',
-                      letterSpacing: '1px',
-                      marginBottom: '8px',
-                      paddingBottom: '4px',
-                      borderBottom: '1px solid rgba(255,255,255,0.06)',
-                    }}
-                  >
-                    {t('worldNews.age', 'Age')} {age}
-                    {year ? `  ${year}` : ''}
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    {ageItems.map((item, i) => {
-                      const itemText = safeText(item?.text);
-                      const itemType = typeof item?.type === 'string' ? item.type : 'neutral';
-                      const relName = typeof item?.relName === 'string' ? item.relName : '';
-                      return (
-                        <div
-                          key={i}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'flex-start',
-                            gap: '10px',
-                            padding: '8px 12px',
-                            borderRadius: '8px',
-                            background:
-                              itemType === 'bad'
-                                ? 'rgba(244,67,54,0.05)'
-                                : itemType === 'good'
-                                  ? 'rgba(76,175,80,0.05)'
-                                  : 'rgba(255,255,255,0.02)',
-                            borderLeft: `3px solid ${itemType === 'bad' ? '#f44336' : itemType === 'good' ? '#4caf50' : '#555'}`,
-                          }}
-                        >
-                          <div
-                            style={{
-                              fontSize: '1.1rem',
-                              width: '24px',
-                              textAlign: 'center',
-                              flexShrink: 0,
-                              marginTop: '1px',
-                            }}
-                          >
-                            {item?.category === 'geopolitics'
-                              ? itemType === 'bad'
-                                ? '⚔️'
-                                : itemType === 'good'
-                                  ? '🌍'
-                                  : '🏛️'
-                              : itemType === 'bad'
-                                ? '⚠️'
-                                : itemType === 'good'
-                                  ? '✨'
-                                  : '📰'}
-                          </div>
-                          <div style={{ flex: 1, fontSize: '0.9rem' }}>
-                            {relName ? (
-                              <span
-                                style={{
-                                  color: '#ffd700',
-                                  fontWeight: 600,
-                                  marginRight: '4px',
-                                }}
-                              >
-                                {relName}
-                              </span>
-                            ) : null}
-                            <span style={{ color: '#ddd' }}>{itemText}</span>
-                            {item?.category === 'geopolitics' && (
-                              <span
-                                style={{
-                                  marginLeft: '6px',
-                                  fontSize: '0.65rem',
-                                  padding: '1px 6px',
-                                  borderRadius: '3px',
-                                  background: 'rgba(33,150,243,0.15)',
-                                  color: '#64b5f6',
-                                  fontWeight: 700,
-                                  verticalAlign: 'middle',
-                                }}
-                              >
-                                WORLD
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    );
-  } catch (e) {
-    content = (
-      <div style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
-        <p>{t('worldNews.empty', 'No news yet. As the world turns, stories will appear here.')}</p>
-      </div>
-    );
-  }
+  const worldCount = normalized.filter(item => item._world).length;
+  const peopleCount = normalized.length - worldCount;
+  const ageCount = new Set(normalized.map(item => item._age)).size;
+  const tabs = [
+    { id: 'all', label: copy.all, icon: '📰', count: normalized.length },
+    { id: 'world', label: copy.world, icon: '🌍', count: worldCount },
+    { id: 'personal', label: copy.personal, icon: '👥', count: peopleCount },
+    { id: 'positive', label: copy.positive, icon: '✨' },
+    { id: 'critical', label: copy.critical, icon: '⚠️' },
+  ];
 
   return (
-    <div className="modal-overlay">
-      <div
-        className="modal-content"
-        dir={dir}
-        style={{ maxWidth: '650px', maxHeight: '90vh', overflow: 'auto' }}
-      >
-        <div className="modal-header">
-          <h2 className="modal-title">{t('worldNews.title', 'World News')}</h2>
-          <button className="close-btn" onClick={onClose} type="button">
-            &times;
-          </button>
-        </div>
-
-        {content}
+    <PhaseTwoScreen
+      icon="news"
+      eyebrow={copy.eyebrow}
+      title={copy.title}
+      subtitle={copy.subtitle}
+      onClose={onClose}
+      closeLabel={copy.close}
+      dir={locale === 'ar' ? 'rtl' : 'ltr'}
+      className="world-news-destination"
+    >
+      <div className="phase-two-metrics">
+        <PhaseTwoMetric
+          icon="📰"
+          label={copy.stories}
+          value={formatNumber(normalized.length, language)}
+        />
+        <PhaseTwoMetric
+          icon="🌍"
+          label={copy.worldStories}
+          value={formatNumber(worldCount, language)}
+          tone="world"
+        />
+        <PhaseTwoMetric
+          icon="👥"
+          label={copy.peopleStories}
+          value={formatNumber(peopleCount, language)}
+          tone="growth"
+        />
+        <PhaseTwoMetric
+          icon="🎂"
+          label={copy.ages}
+          value={formatNumber(ageCount, language)}
+          tone="gold"
+        />
       </div>
-    </div>
+
+      <PhaseTwoTabs
+        tabs={tabs}
+        activeId={activeTab}
+        onChange={setActiveTab}
+        ariaLabel={copy.title}
+      />
+
+      <PhaseTwoSection title={copy.latest} subtitle={copy.latestHint}>
+        <input
+          className="phase-two-search"
+          type="search"
+          value={query}
+          onChange={event => setQuery(event.target.value)}
+          placeholder={copy.search}
+          aria-label={copy.search}
+        />
+
+        {groups.length > 0 ? (
+          <div className="world-news-groups">
+            {groups.map(([age, items]) => (
+              <section key={age} className="world-news-age-group">
+                <header>
+                  <span>
+                    {copy.age} {formatNumber(age, language)}
+                  </span>
+                  {items[0]?._year != null && (
+                    <small>
+                      {copy.year} {formatNumber(items[0]._year, language)}
+                    </small>
+                  )}
+                </header>
+                <div className="world-news-story-list">
+                  {items.map(item => (
+                    <article
+                      key={`${item._age}-${item._year}-${item._index}`}
+                      className={`world-news-story type-${item.type || 'neutral'}`}
+                    >
+                      <span className="world-news-story-icon" aria-hidden="true">
+                        {storyIcon(item)}
+                      </span>
+                      <div className="world-news-story-copy">
+                        <div className="world-news-story-meta">
+                          {item.relName && <strong dir="auto">{item.relName}</strong>}
+                          {item._world && (
+                            <span className="phase-two-pill world">{copy.worldBadge}</span>
+                          )}
+                        </div>
+                        <p dir="auto">{item._text}</p>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+        ) : (
+          <PhaseTwoEmpty icon="📰" title={copy.noNews} description={copy.noNewsHint} />
+        )}
+      </PhaseTwoSection>
+    </PhaseTwoScreen>
   );
 }

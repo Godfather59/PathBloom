@@ -1,0 +1,481 @@
+/* Career */
+.career-current-heading,
+.education-current-heading,
+.relationship-person-heading,
+.world-country-heading,
+.country-leader-card,
+.phase-two-assets-runtime-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.career-current-heading h2,
+.education-current-heading h2,
+.relationship-person-heading h2,
+.world-country-heading h2,
+.country-leader-copy h2 {
+  margin: 2px 0 0;
+  color: var(--pb-text);
+  font-size: 1.05rem;
+}
+
+.career-current-heading p,
+.education-current-heading p,
+.relationship-person-heading p,
+.world-country-heading p,
+.country-leader-copy p {
+  margin: 4px 0 0;
+  color: var(--pb-text-secondary);
+  font-size: 0.72rem;
+}
+
+.career-current-icon,
+.education-current-icon,
+.relationship-person-avatar,
+.country-leader-avatar {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  font-size: 1.35rem;
+  background: rgba(57, 217, 138, 0.1);
+  border: 1px solid rgba(57, 217, 138, 0.16);
+}
+
+.career-market-list,
+.education-program-list,
+.relationship-overview-list {
+  margin-top: 10px;
+}
+
+.career-resign-wide,
+.relationship-manager-wide {
+  width: 100%;
+  margin-top: 9px;
+}
+
+.military-branch-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.military-branch-card {
+  text-align: center;
+}
+
+.military-branch-icon {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 9px;
+  border-radius: 17px;
+  background: rgba(243, 201, 105, 0.11);
+  font-size: 1.5rem;
+}
+
+.military-branch-card h2 {
+  margin: 0 0 10px;
+  color: var(--pb-text);
+  font-size: 0.94rem;
+}
+
+.military-branch-card small {
+  display: block;
+  margin-top: 8px;
+  color: var(--pb-text-muted);
+  font-size: 0.65rem;
+}
+
+/* Education */
+.education-current-heading {
+  justify-content: flex-start;
+}
+
+.education-current-heading > div {
+  min-width: 0;
+}
+
+/* Relationships */
+.relationship-person-card.is-deceased {
+  opacity: 0.65;
+}
+
+.relationship-person-heading {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.relationship-person-heading > div {
+  min-width: 0;
+}
+
+.relationship-person-heading > strong {
+  color: var(--pb-text);
+  font-size: 0.88rem;
+}
+
+.relationship-badges {
+  margin-top: 10px;
+}
+
+/* World */
+.world-overview-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.world-sort-control {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--pb-text-muted);
+  font-size: 0.65rem;
+}
+
+.world-country-list,
+.world-news-groups,
+.world-news-story-list {
+  display: grid;
+  gap: 9px;
+}
+
+.world-country-card {
+  width: 100%;
+  text-align: start;
+}
+
+.world-country-card:active {
+  transform: scale(0.99);
+}
+
+.world-country-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 9px;
+}
+
+.world-country-stats span {
+  padding: 4px 7px;
+  border-radius: 999px;
+  color: var(--pb-text-secondary);
+  background: rgba(204, 226, 255, 0.045);
+  border: 1px solid var(--pb-border);
+  font-size: 0.66rem;
+}
+
+.country-leader-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.country-leader-copy {
+  min-width: 0;
+}
+
+.country-economy-metrics {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* World news */
+.world-news-age-group > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 12px 2px 7px;
+  color: var(--pb-text-secondary);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.world-news-age-group > header small {
+  color: var(--pb-text-muted);
+  font-weight: 650;
+}
+
+.world-news-story {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 11px;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(204, 226, 255, 0.04);
+  border: 1px solid var(--pb-border);
+  border-inline-start: 3px solid var(--pb-text-muted);
+}
+
+.world-news-story.type-good {
+  border-inline-start-color: var(--pb-growth);
+  background: rgba(57, 217, 138, 0.055);
+}
+
+.world-news-story.type-bad {
+  border-inline-start-color: var(--pb-danger);
+  background: rgba(255, 107, 122, 0.05);
+}
+
+.world-news-story-icon {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: rgba(204, 226, 255, 0.055);
+  font-size: 1.08rem;
+}
+
+.world-news-story-copy {
+  min-width: 0;
+}
+
+.world-news-story-meta {
+  min-height: 22px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.world-news-story-meta strong {
+  color: var(--pb-gold);
+  font-size: 0.74rem;
+}
+
+.world-news-story-copy p {
+  margin: 4px 0 0;
+  color: var(--pb-text);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+/* Runtime-enhanced Assets */
+.modal-overlay.phase-two-assets-host {
+  align-items: stretch !important;
+  padding: 0 !important;
+  background: rgba(2, 8, 16, 0.76) !important;
+}
+
+.modal-overlay.phase-two-assets-host > .modal-content {
+  width: 100% !important;
+  max-width: 760px !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  margin: 0 auto !important;
+  border-radius: 0 !important;
+  border-color: var(--pb-border) !important;
+  background: linear-gradient(180deg, #0c1a2c, #07111f 70%) !important;
+}
+
+.phase-two-assets-runtime-summary {
+  padding: 13px 14px 4px;
+  background: rgba(7, 17, 31, 0.96);
+}
+
+.phase-two-assets-runtime-heading {
+  margin-bottom: 9px;
+  padding: 12px 13px;
+  border-radius: 17px;
+  background:
+    linear-gradient(135deg, rgba(57, 217, 138, 0.12), transparent 55%), rgba(204, 226, 255, 0.04);
+  border: 1px solid rgba(57, 217, 138, 0.18);
+}
+
+.phase-two-assets-runtime-heading div {
+  min-width: 0;
+}
+
+.phase-two-assets-runtime-heading strong,
+.phase-two-assets-runtime-heading small {
+  display: block;
+}
+
+.phase-two-assets-runtime-heading strong {
+  color: var(--pb-text-secondary);
+  font-size: 0.75rem;
+}
+
+.phase-two-assets-runtime-heading small {
+  margin-top: 3px;
+  color: var(--pb-text-muted);
+  font-size: 0.65rem;
+}
+
+.phase-two-assets-runtime-heading b {
+  color: var(--pb-growth);
+  font-size: 1.08rem;
+}
+
+.phase-two-assets-runtime-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.phase-two-assets-runtime-metric {
+  min-width: 0;
+  padding: 9px 10px;
+  border-radius: 13px;
+  background: rgba(204, 226, 255, 0.035);
+  border: 1px solid var(--pb-border);
+}
+
+.phase-two-assets-runtime-metric > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+}
+
+.phase-two-assets-runtime-metric strong {
+  min-width: 0;
+  color: var(--pb-text);
+  font-size: 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.phase-two-assets-runtime-metric small {
+  display: block;
+  margin-top: 4px;
+  color: var(--pb-text-muted);
+  font-size: 0.63rem;
+}
+
+.phase-two-assets-runtime-metric.growth {
+  border-color: rgba(57, 217, 138, 0.16);
+}
+.phase-two-assets-runtime-metric.world {
+  border-color: rgba(103, 169, 255, 0.16);
+}
+.phase-two-assets-runtime-metric.danger {
+  border-color: rgba(255, 107, 122, 0.18);
+}
+
+.modal-overlay.phase-two-assets-host .modal-header {
+  min-height: 76px;
+  padding: max(18px, env(safe-area-inset-top)) 16px 14px !important;
+  background: rgba(8, 20, 35, 0.94) !important;
+  border-bottom: 1px solid var(--pb-border) !important;
+}
+
+.modal-overlay.phase-two-assets-host .modal-content > div[style*='overflowX'] {
+  margin: 0 !important;
+  padding: 9px 14px !important;
+  border: 0 !important;
+  background: rgba(7, 17, 31, 0.96);
+}
+
+.modal-overlay.phase-two-assets-host .modal-body {
+  padding: 12px 14px max(22px, env(safe-area-inset-bottom)) !important;
+}
+
+.modal-overlay.phase-two-assets-host .list-item {
+  padding: 13px !important;
+  margin-bottom: 8px !important;
+  border-radius: 16px !important;
+  background: rgba(204, 226, 255, 0.045) !important;
+  border-color: var(--pb-border) !important;
+}
+
+.modal-overlay.phase-two-assets-host .btn-primary,
+.modal-overlay.phase-two-assets-host .btn-secondary,
+.modal-overlay.phase-two-assets-host .btn-danger {
+  min-height: 42px;
+  border-radius: 12px !important;
+}
+
+/* Runtime-enhanced full Relationships manager */
+.relationships-menu.phase-two-relationships-host {
+  align-items: stretch !important;
+  padding: 0 !important;
+  background: rgba(2, 8, 16, 0.76) !important;
+}
+
+.relationships-menu.phase-two-relationships-host > .phase-two-relationships-content {
+  width: 100% !important;
+  max-width: 760px !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  margin: 0 auto !important;
+  padding: 0 14px max(22px, env(safe-area-inset-bottom)) !important;
+  border-radius: 0 !important;
+  border-color: var(--pb-border) !important;
+  background: linear-gradient(180deg, #0c1a2c, #07111f 70%) !important;
+}
+
+.relationships-menu.phase-two-relationships-host
+  > .phase-two-relationships-content
+  > .flex:first-child {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  margin: 0 -14px 14px !important;
+  padding: max(18px, env(safe-area-inset-top)) 16px 14px !important;
+  background: rgba(8, 20, 35, 0.94) !important;
+  border-bottom: 1px solid var(--pb-border) !important;
+}
+
+.relationships-menu.phase-two-relationships-host button {
+  min-height: 44px;
+  border-radius: 13px !important;
+  border: 1px solid var(--pb-border) !important;
+}
+
+.relationships-menu.phase-two-relationships-host .rel-detail > button:first-child {
+  color: var(--pb-growth) !important;
+  background: var(--pb-growth-soft) !important;
+  border-color: rgba(57, 217, 138, 0.2) !important;
+}
+
+.relationships-menu.phase-two-relationships-host details,
+.relationships-menu.phase-two-relationships-host section,
+.relationships-menu.phase-two-relationships-host .rel-detail > div {
+  border-radius: 16px !important;
+  border-color: var(--pb-border) !important;
+  background: rgba(204, 226, 255, 0.045) !important;
+}
+
+.relationships-menu.phase-two-relationships-host button[style*='backgroundColor'],
+.relationships-menu.phase-two-relationships-host button[style*='background-color'] {
+  border-radius: 13px !important;
+}
+
+@media (min-width: 640px) {
+  .modal-overlay.phase-two-assets-host,
+  .relationships-menu.phase-two-relationships-host {
+    align-items: center !important;
+    padding: 18px !important;
+  }
+
+  .modal-overlay.phase-two-assets-host > .modal-content,
+  .relationships-menu.phase-two-relationships-host > .phase-two-relationships-content {
+    height: min(92dvh, 900px) !important;
+    max-height: min(92dvh, 900px) !important;
+    border-radius: 26px !important;
+    box-shadow: 0 32px 90px rgba(0, 0, 0, 0.5) !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .military-branch-grid,
+  .world-overview-controls,
+  .country-leader-card {
+    grid-template-columns: 1fr;
+  }
+
+  .country-leader-card {
+    justify-items: start;
+  }
+
+  .phase-two-assets-runtime-metrics {
+    grid-template-columns: 1fr;
+  }
+}

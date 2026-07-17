@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { installArabicLocalizationRuntime } from './logic/ArabicLocalizationRuntime';
 import { installArabicSupplementalRuntime } from './logic/ArabicSupplementalRuntime';
+import { installPhaseTwoScreenRuntime } from './logic/PhaseTwoScreenRuntime';
 import './index.css';
 import './components/NewFeatures.css';
 import './components/MobilePolish.css';
@@ -12,6 +13,9 @@ import './components/PrisonRedesign.css';
 import './components/DecisionSheet.css';
 import './components/DestinationScreens.css';
 import './components/SystemMenuRedesign.css';
+import './components/PhaseTwoScreens.css';
+import './components/PhaseTwoFeatureStyles.css';
+import './components/PhaseTwoMusicStyles.css';
 
 const rootElement = document.getElementById('root');
 
@@ -100,6 +104,7 @@ async function bootstrap() {
 
     installArabicSupplementalRuntime();
     installArabicLocalizationRuntime();
+    installPhaseTwoScreenRuntime();
   } catch (error) {
     showStartupError(error);
   }

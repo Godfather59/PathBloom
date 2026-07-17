@@ -15,13 +15,28 @@ on:
       - 'src/components/SystemMenu.jsx'
       - 'src/components/PrisonMenu.jsx'
       - 'src/components/SituationDetailsSheet.jsx'
+      - 'src/components/OccupationMenu.jsx'
+      - 'src/components/EducationMenu.jsx'
+      - 'src/components/RelationshipDashboard.jsx'
+      - 'src/components/RelationshipsMenu.jsx'
+      - 'src/components/AssetsMenu.jsx'
+      - 'src/components/CareerModal.jsx'
+      - 'src/components/CountryProfile.jsx'
+      - 'src/components/WorldOverview.jsx'
+      - 'src/components/WorldNewsFeed.jsx'
+      - 'src/components/PhaseTwoScaffold.jsx'
+      - 'src/components/PhaseTwoLegacyWrappers.jsx'
       - 'src/components/DesignSystem.css'
       - 'src/components/ShellExtensions.css'
       - 'src/components/PrisonRedesign.css'
       - 'src/components/DecisionSheet.css'
       - 'src/components/DestinationScreens.css'
       - 'src/components/SystemMenuRedesign.css'
+      - 'src/components/PhaseTwoScreens.css'
+      - 'src/components/PhaseTwoFeatureStyles.css'
+      - 'src/logic/PhaseTwoScreenRuntime.js'
       - 'src/logic/__tests__/uiShell.test.jsx'
+      - 'src/logic/__tests__/uiPhaseTwo.test.jsx'
       - 'src/main.jsx'
       - 'package.json'
       - 'package-lock.json'
@@ -52,11 +67,14 @@ jobs:
       - name: Validate Arabic localization
         run: npm run validate:i18n
 
-      - name: Run UI shell tests
+      - name: Run phase one and phase two UI tests
         run: npm run test:ui
 
       - name: Run content integration tests
         run: npm run test:content
+
+      - name: Run world simulation tests
+        run: npm run test:world
 
       - name: Build production app
         run: npm run build

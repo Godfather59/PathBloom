@@ -38,10 +38,32 @@ jobs:
         run: npm ci
 
       - name: Run ESLint
-        run: npm run lint
+        run: |
+          set -o pipefail
+          npm run lint 2>&1 | tee lint-output.txt
+
+      - name: Upload lint diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: lint-output-${{ github.run_number }}
+          path: lint-output.txt
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Check formatting
-        run: npm run format:check
+        run: |
+          set -o pipefail
+          npm run format:check 2>&1 | tee format-output.txt
+
+      - name: Upload formatting diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: format-output-${{ github.run_number }}
+          path: format-output.txt
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Run unit and UI tests
         run: npm test

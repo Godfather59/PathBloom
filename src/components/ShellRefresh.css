@@ -72,10 +72,8 @@ button,
   flex-direction: column;
   min-width: 0;
   min-height: 0;
-  padding:
-    calc(var(--pb-safe-top) + var(--pb-space-3))
-    calc(var(--pb-safe-right) + var(--pb-space-3))
-    calc(var(--pb-safe-bottom) + var(--pb-space-3))
+  padding: calc(var(--pb-safe-top) + var(--pb-space-3))
+    calc(var(--pb-safe-right) + var(--pb-space-3)) calc(var(--pb-safe-bottom) + var(--pb-space-3))
     calc(var(--pb-safe-left) + var(--pb-space-3));
   color: var(--pb-text);
   background: var(--pb-bg);
@@ -200,10 +198,7 @@ button,
 
 /* Compact gameplay shell */
 .hud-container {
-  padding:
-    calc(var(--pb-safe-top) + 6px)
-    calc(var(--pb-safe-right) + 9px)
-    7px
+  padding: calc(var(--pb-safe-top) + 6px) calc(var(--pb-safe-right) + 9px) 7px
     calc(var(--pb-safe-left) + 9px) !important;
 }
 
@@ -237,9 +232,7 @@ button,
 
 .event-log {
   min-height: 0;
-  padding-inline:
-    calc(var(--pb-safe-left) + 10px)
-    calc(var(--pb-safe-right) + 10px);
+  padding-inline: calc(var(--pb-safe-left) + 10px) calc(var(--pb-safe-right) + 10px);
   scrollbar-gutter: stable;
 }
 
@@ -256,10 +249,7 @@ button,
 }
 
 .action-menu {
-  padding:
-    0
-    calc(var(--pb-safe-right) + 8px)
-    calc(var(--pb-safe-bottom) + 7px)
+  padding: 0 calc(var(--pb-safe-right) + 8px) calc(var(--pb-safe-bottom) + 7px)
     calc(var(--pb-safe-left) + 8px) !important;
 }
 
@@ -323,10 +313,7 @@ button,
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  padding:
-    7px
-    calc(var(--pb-safe-right) + 14px)
-    calc(var(--pb-safe-bottom) + 14px)
+  padding: 7px calc(var(--pb-safe-right) + 14px) calc(var(--pb-safe-bottom) + 14px)
     calc(var(--pb-safe-left) + 14px);
   border: 1px solid var(--pb-border-strong);
   border-bottom: 0;

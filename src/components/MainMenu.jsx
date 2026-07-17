@@ -207,9 +207,15 @@ export function MainMenu({
   };
 
   return (
-    <main className="main-menu animate-fade-in new-life-start" dir={isRtl ? 'rtl' : 'ltr'} lang={locale}>
+    <main
+      className="main-menu animate-fade-in new-life-start"
+      dir={isRtl ? 'rtl' : 'ltr'}
+      lang={locale}
+    >
       <header className="new-life-brand">
-        <span className="new-life-brand-icon"><AppIcon name="life" size={28} /></span>
+        <span className="new-life-brand-icon">
+          <AppIcon name="life" size={28} />
+        </span>
         <h1 className="main-menu-title">{t('app.title', 'PathBloom')}</h1>
         <p>{t('app.subtitle', copy.subtitle)}</p>
       </header>
@@ -237,7 +243,9 @@ export function MainMenu({
         {hasSave && saveSummary && (
           <div className="save-summary new-life-save-summary">
             <div className="save-summary-info">
-              <div className="save-summary-name" dir="auto">{saveSummary.name}</div>
+              <div className="save-summary-name" dir="auto">
+                {saveSummary.name}
+              </div>
               <div className="save-summary-detail" dir="auto">
                 {t('common.age', copy.age)} {saveSummary.age} · {saveSummary.job}
               </div>
@@ -255,7 +263,9 @@ export function MainMenu({
         )}
 
         <div className="new-life-section-heading">
-          <span aria-hidden="true"><AppIcon name="identity" size={22} /></span>
+          <span aria-hidden="true">
+            <AppIcon name="identity" size={22} />
+          </span>
           <div>
             <h2>{copy.newLife}</h2>
             <p>{step === 1 ? copy.identityHint : copy.settingsHint}</p>
@@ -311,7 +321,11 @@ export function MainMenu({
               </label>
             </div>
 
-            <button type="button" onClick={randomizeName} className="randomize-btn new-life-randomize">
+            <button
+              type="button"
+              onClick={randomizeName}
+              className="randomize-btn new-life-randomize"
+            >
               <AppIcon name="random" size={18} /> {t('main.randomizeName', copy.randomize)}
             </button>
 
@@ -359,7 +373,9 @@ export function MainMenu({
                 className="main-menu-select"
               >
                 {COUNTRIES.map(option => (
-                  <option key={option} value={option}>{localizedCountry(locale, option)}</option>
+                  <option key={option} value={option}>
+                    {localizedCountry(locale, option)}
+                  </option>
                 ))}
               </select>
             </label>
@@ -378,12 +394,14 @@ export function MainMenu({
                     className="main-menu-select"
                   >
                     <option value="">{t('main.normalLife', copy.normalLife)}</option>
-                    {CHALLENGES.filter(challenge => challenge.available !== false).map(challenge => (
-                      <option key={challenge.id} value={challenge.id}>
-                        {locale === 'ar' ? challenge.nameAr || challenge.name : challenge.name}
-                        {challenge.difficulty ? ` · ${challenge.difficulty}` : ''}
-                      </option>
-                    ))}
+                    {CHALLENGES.filter(challenge => challenge.available !== false).map(
+                      challenge => (
+                        <option key={challenge.id} value={challenge.id}>
+                          {locale === 'ar' ? challenge.nameAr || challenge.name : challenge.name}
+                          {challenge.difficulty ? ` · ${challenge.difficulty}` : ''}
+                        </option>
+                      )
+                    )}
                   </select>
                 </label>
 
@@ -405,11 +423,18 @@ export function MainMenu({
                       className={`menu-btn${mode === 'daily' && !dailyPlayed ? ' active-mode-daily' : ''}${dailyPlayed ? ' daily-disabled' : ''}`}
                       aria-pressed={mode === 'daily'}
                     >
-                      {t('main.dailyLife', copy.dailyShort)} {streak.streak > 0 ? `(${streak.streak})` : ''}
+                      {t('main.dailyLife', copy.dailyShort)}{' '}
+                      {streak.streak > 0 ? `(${streak.streak})` : ''}
                     </button>
                   </div>
-                  {dailyPlayed && <p className="daily-done-text">{t('main.dailyAlreadyPlayed', copy.dailyDone)}</p>}
-                  {mode === 'daily' && !dailyPlayed && <p className="hint-text">{t('main.dailyLifeDesc', copy.dailyDescription)}</p>}
+                  {dailyPlayed && (
+                    <p className="daily-done-text">
+                      {t('main.dailyAlreadyPlayed', copy.dailyDone)}
+                    </p>
+                  )}
+                  {mode === 'daily' && !dailyPlayed && (
+                    <p className="hint-text">{t('main.dailyLifeDesc', copy.dailyDescription)}</p>
+                  )}
                 </fieldset>
               </div>
             </details>

@@ -381,7 +381,9 @@ export function ActivitiesMenu({
         .filter(card => matchesView(card.uiKey))
         .filter(card => {
           const title = t(`activities.${card.key}`, card.title);
-          return !normalizedQuery || `${title} ${card.title}`.toLowerCase().includes(normalizedQuery);
+          return (
+            !normalizedQuery || `${title} ${card.title}`.toLowerCase().includes(normalizedQuery)
+          );
         })
         .sort(sortRecent),
     [person, category, view, normalizedQuery, t, favoriteSet, recentPositions]
@@ -399,7 +401,9 @@ export function ActivitiesMenu({
         .filter(activity => matchesView(activity.uiKey))
         .filter(activity => {
           const title = t(`activity.${activity.id}`, activity.title);
-          return !normalizedQuery || `${title} ${activity.title}`.toLowerCase().includes(normalizedQuery);
+          return (
+            !normalizedQuery || `${title} ${activity.title}`.toLowerCase().includes(normalizedQuery)
+          );
         })
         .sort(sortRecent),
     [category, view, normalizedQuery, t, favoriteSet, recentPositions]
@@ -468,7 +472,11 @@ export function ActivitiesMenu({
               aria-label={copy.search}
             />
             {query && (
-              <button type="button" onClick={() => setQuery('')} aria-label={t('common.close', 'Clear')}>
+              <button
+                type="button"
+                onClick={() => setQuery('')}
+                aria-label={t('common.close', 'Clear')}
+              >
                 <AppIcon name="close" size={15} />
               </button>
             )}
@@ -484,7 +492,10 @@ export function ActivitiesMenu({
                 className={view === id ? 'is-active' : ''}
                 onClick={() => setView(id)}
               >
-                <AppIcon name={id === 'favorites' ? 'favorite' : id === 'recent' ? 'recent' : 'activities'} size={16} />
+                <AppIcon
+                  name={id === 'favorites' ? 'favorite' : id === 'recent' ? 'recent' : 'activities'}
+                  size={16}
+                />
                 {copy[id]}
               </button>
             ))}
@@ -528,7 +539,13 @@ export function ActivitiesMenu({
                       <button
                         type="button"
                         className={`feature-path-card category-${card.category}`}
-                        onClick={() => perform(card.uiKey, { ...card.payload, minAge: card.minAge, title: card.title })}
+                        onClick={() =>
+                          perform(card.uiKey, {
+                            ...card.payload,
+                            minAge: card.minAge,
+                            title: card.title,
+                          })
+                        }
                         disabled={locked}
                         aria-describedby={locked ? `${card.key}-lock` : undefined}
                       >
@@ -537,7 +554,10 @@ export function ActivitiesMenu({
                         </span>
                         <span className="feature-path-copy">
                           <strong>{t(`activities.${card.key}`, card.title)}</strong>
-                          <small id={`${card.key}-lock`} className={locked ? 'activity-lock-reason' : ''}>
+                          <small
+                            id={`${card.key}-lock`}
+                            className={locked ? 'activity-lock-reason' : ''}
+                          >
                             {lockReason || t(`activities.${card.key}Hint`, '')}
                           </small>
                         </span>
@@ -578,7 +598,10 @@ export function ActivitiesMenu({
                           {effects.length > 0 && (
                             <span className="quick-effect-list">
                               {effects.map(effect => (
-                                <span key={effect.key} className={effect.positive ? 'is-positive' : 'is-negative'}>
+                                <span
+                                  key={effect.key}
+                                  className={effect.positive ? 'is-positive' : 'is-negative'}
+                                >
                                   {effect.text}
                                 </span>
                               ))}
@@ -604,12 +627,16 @@ export function ActivitiesMenu({
                           <span>
                             ϟ{' '}
                             {locale === 'ar'
-                              ? formatArabicNumber(Number(activity.energyCost) || 0, { maximumFractionDigits: 0 })
+                              ? formatArabicNumber(Number(activity.energyCost) || 0, {
+                                  maximumFractionDigits: 0,
+                                })
                               : Number(activity.energyCost) || 0}{' '}
                             {copy.energy}
                           </span>
                           {activity.risk && (
-                            <span className={`risk-${activity.risk}`}>{t(`risk.${activity.risk}`, activity.risk)}</span>
+                            <span className={`risk-${activity.risk}`}>
+                              {t(`risk.${activity.risk}`, activity.risk)}
+                            </span>
                           )}
                         </span>
                       </button>
@@ -624,7 +651,12 @@ export function ActivitiesMenu({
           {!hasResults && (
             <div className="destination-empty">
               <span>
-                <AppIcon name={view === 'favorites' ? 'favorite' : view === 'recent' ? 'recent' : 'activities'} size={28} />
+                <AppIcon
+                  name={
+                    view === 'favorites' ? 'favorite' : view === 'recent' ? 'recent' : 'activities'
+                  }
+                  size={28}
+                />
               </span>
               <strong>{copy.noResults}</strong>
             </div>

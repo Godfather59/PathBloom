@@ -1,0 +1,37 @@
+name: Diagnose compact HUD tests
+
+on:
+  push:
+    branches: [fix/compact-hud-physical-layout]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PUPPETEER_SKIP_DOWNLOAD: 'true'
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Capture tests
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          npm test 2>&1 | tee compact-hud-test-output.txt
+      - name: Upload diagnostics
+        uses: actions/upload-artifact@v7
+        with:
+          name: compact-hud-test-output-${{ github.run_number }}
+          path: compact-hud-test-output.txt
+          if-no-files-found: error
+          retention-days: 3

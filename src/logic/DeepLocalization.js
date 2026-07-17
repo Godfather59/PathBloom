@@ -12,6 +12,7 @@ const AR_EXACT = {
   'Your career setback is forcing you to choose a new direction.':
     'تجبرك انتكاستك المهنية على اختيار اتجاه جديد.',
   'Your financial situation needs an immediate decision.': 'يحتاج وضعك المالي إلى قرار فوري.',
+  'Another year passed.': 'مر عام آخر.',
   'Report it to an adult': 'أبلغ شخصا بالغا',
   'Confront the bully': 'واجه المتنمر',
   'Keep ignoring it': 'استمر في تجاهله',
@@ -99,6 +100,15 @@ const AR_EXACT = {
 };
 
 const AR_PATTERNS = [
+  [/^(?:Event|الحدث)\s*:\s*(.+)$/i, match => translateDeepSimulationText(match[1], 'ar')],
+  [
+    /^(?:You chose to|You chose|اخترت)\s*:\s*(.+?)[.!؟]*$/i,
+    match => `اخترت: ${translateDeepSimulationText(match[1], 'ar').replace(/[.!؟]+$/, '')}.`,
+  ],
+  [
+    /^(?:Age|العمر)\s*[0-9٠-٩]+\s*:\s*(.+)$/i,
+    match => translateDeepSimulationText(match[1], 'ar'),
+  ],
   [
     /^A pregnancy has begun\. The baby is expected in nine months\.$/,
     () => 'بدأ الحمل، ومن المتوقع ولادة الطفل بعد تسعة أشهر.',

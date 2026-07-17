@@ -56,7 +56,11 @@ describe('App save and continue smoke test', () => {
       setInputValue(inputs[1], 'Smoke');
     });
 
+    const continueSetupButton = findButton('Continue');
+    expect(continueSetupButton).toBeDefined();
+    await act(async () => continueSetupButton.click());
     await act(async () => container.querySelector('.start-btn').click());
+
     const skipOnboardingButton = findButton('Skip');
     expect(skipOnboardingButton).toBeDefined();
     await act(async () => skipOnboardingButton.click());

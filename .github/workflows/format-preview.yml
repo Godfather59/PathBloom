@@ -1,0 +1,65 @@
+name: Format preview
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: format-preview-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  format:
+    name: Generate formatted source bundle
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PUPPETEER_SKIP_DOWNLOAD: 'true'
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Apply deterministic formatting
+        run: |
+          npm run lint:fix
+          npm run format
+
+      - name: Package formatted files
+        run: |
+          tar -czf formatted-source.tgz \
+            src/components/ActivitiesMenu.jsx \
+            src/components/AppIcon.jsx \
+            src/components/BottomNavigation.jsx \
+            src/components/Hud.jsx \
+            src/components/MainMenu.jsx \
+            src/components/ShellPrimitives.jsx \
+            src/components/ShellRefresh.css \
+            src/logic/__tests__/androidThemeRegression.test.jsx \
+            src/logic/__tests__/arabicScreenshotRegression.test.jsx \
+            src/logic/__tests__/uiShell.test.jsx \
+            src/__tests__/appSmoke.test.jsx \
+            src/main.jsx
+
+      - name: Upload formatted source
+        uses: actions/upload-artifact@v7
+        with:
+          name: formatted-source-${{ github.run_number }}
+          path: formatted-source.tgz
+          if-no-files-found: error
+          retention-days: 2

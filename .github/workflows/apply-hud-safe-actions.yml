@@ -1,0 +1,94 @@
+name: Apply HUD safe actions
+
+on:
+  push:
+    branches: [fix/hud-safe-actions]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: fix/hud-safe-actions
+          persist-credentials: true
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Patch HUD and timeline actions
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          hud = Path('src/components/Hud.jsx')
+          text = hud.read_text(encoding='utf-8')
+          text = text.replace('    onWorldNews,\n', '')
+          text = re.sub(
+              r"\n\s*\{Array\.isArray\(person\.worldNews\).*?</button>\n\s*\)\}",
+              '',
+              text,
+              count=1,
+              flags=re.S,
+          )
+          hud.write_text(text, encoding='utf-8')
+
+          event_log = Path('src/components/EventLog.jsx')
+          text = event_log.read_text(encoding='utf-8')
+          text = text.replace(
+              "    headerContent = null,\n  }) => {",
+              "    headerContent = null,\n    onWorldNews,\n    onOpenHistory,\n    newsCount = 0,\n  }) => {",
+              1,
+          )
+          old = """        <div className=\"timeline-heading\">\n          <span>{language === 'ar' ? 'قصتك' : 'Your story'}</span>\n          <strong>{language === 'ar' ? 'أحدث الأحداث أولا' : 'Newest first'}</strong>\n        </div>"""
+          new = """        <div className=\"timeline-heading\">\n          <div className=\"timeline-heading-copy\">\n            <span>{language === 'ar' ? 'قصتك' : 'Your story'}</span>\n            <strong>{language === 'ar' ? 'أحدث الأحداث أولا' : 'Newest first'}</strong>\n          </div>\n          <div className=\"timeline-heading-actions\">\n            {onWorldNews && newsCount > 0 && (\n              <button\n                type=\"button\"\n                className=\"timeline-action-button\"\n                onClick={onWorldNews}\n                aria-label={t('hud.news', 'World News')}\n              >\n                <AppIcon name=\"news\" size={18} />\n                <span>{language === 'ar' ? 'الأخبار' : 'News'}</span>\n                <b>{language === 'ar' ? formatArabicNumber(newsCount) : newsCount}</b>\n              </button>\n            )}\n            {onOpenHistory && (\n              <button\n                type=\"button\"\n                className=\"timeline-action-button\"\n                onClick={onOpenHistory}\n                aria-label={language === 'ar' ? 'سجل الحياة' : 'Life history'}\n              >\n                <AppIcon name=\"recent\" size={18} />\n                <span>{language === 'ar' ? 'السجل' : 'History'}</span>\n              </button>\n            )}\n          </div>\n        </div>"""
+          if old not in text:
+              raise SystemExit('Timeline heading block not found')
+          event_log.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          app = Path('src/App.jsx')
+          text = app.read_text(encoding='utf-8')
+          text = text.replace("        onWorldNews={() => setModal('world_news')}\n", '', 1)
+          old = '<EventLog history={person.history} language={language} t={t} />'
+          new = """<EventLog\n        history={person.history}\n        language={language}\n        t={t}\n        newsCount={Array.isArray(person.worldNews) ? person.worldNews.length : 0}\n        onWorldNews={() => setModal('world_news')}\n        onOpenHistory={() => setModal('event_history')}\n      />"""
+          if old not in text:
+              raise SystemExit('EventLog invocation not found')
+          app.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          hud_css = Path('src/components/Hud.css')
+          css = hud_css.read_text(encoding='utf-8')
+          css += """\n\n/* Stat icons are informational glyphs, never online/badge indicators. */\n.compact-stat-icon,\n.stat-symbol {\n  position: relative;\n  background: transparent;\n  border-radius: 0;\n  box-shadow: none;\n}\n\n.compact-stat-icon::before,\n.compact-stat-icon::after,\n.stat-symbol::before,\n.stat-symbol::after {\n  content: none !important;\n  display: none !important;\n}\n"""
+          hud_css.write_text(css, encoding='utf-8')
+
+          event_css = Path('src/components/EventLog.css')
+          css = event_css.read_text(encoding='utf-8')
+          css += """\n\n/* Keep News and History below the Android status/notification gesture zone. */\n.timeline-heading {\n  align-items: center;\n}\n\n.timeline-heading-copy {\n  min-width: 0;\n  display: flex;\n  flex-direction: column;\n  gap: 2px;\n}\n\n.timeline-heading-copy > span {\n  color: var(--pb-text);\n  font-size: 1.05rem;\n  font-weight: 850;\n}\n\n.timeline-heading-copy > strong {\n  color: var(--pb-text-muted);\n  font-size: 0.68rem;\n  font-weight: 650;\n}\n\n.timeline-heading-actions {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n}\n\n.timeline-action-button {\n  min-width: 48px;\n  min-height: 48px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  gap: 6px;\n  padding: 0 11px;\n  border: 1px solid var(--pb-border);\n  border-radius: 14px;\n  color: var(--pb-text-secondary);\n  background: rgba(204, 226, 255, 0.055);\n}\n\n.timeline-action-button span {\n  font-size: 0.72rem;\n  font-weight: 750;\n}\n\n.timeline-action-button b {\n  min-width: 18px;\n  height: 18px;\n  display: grid;\n  place-items: center;\n  padding-inline: 4px;\n  border-radius: 999px;\n  color: #251b05;\n  background: var(--pb-gold);\n  font-size: 0.58rem;\n}\n\n/* Remove the decorative badge/dot appearance around timeline stat hearts. */\n.timeline-dot {\n  width: 20px;\n  height: 20px;\n  margin-top: 13px;\n  border: 0;\n  border-radius: 0;\n  background: transparent;\n  box-shadow: none;\n}\n\n@media (max-width: 420px) {\n  .timeline-action-button span {\n    display: none;\n  }\n\n  .timeline-action-button {\n    width: 48px;\n    padding: 0;\n  }\n}\n"""
+          event_css.write_text(css, encoding='utf-8')
+
+          Path('.github/workflows/apply-hud-safe-actions.yml').unlink()
+          PY
+
+      - name: Install and format
+        run: |
+          npm ci
+          npx prettier --write src/components/Hud.jsx src/components/Hud.css src/components/EventLog.jsx src/components/EventLog.css src/App.jsx
+
+      - name: Validate
+        run: |
+          npm run lint
+          npm test
+          npm run build
+
+      - name: Commit changes
+        run: |
+          git config user.name 'PathBloom Automation'
+          git config user.email 'actions@users.noreply.github.com'
+          git add -A
+          git commit -m 'Move news and history below HUD safe area'
+          git push origin HEAD:fix/hud-safe-actions

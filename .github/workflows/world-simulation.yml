@@ -1,0 +1,88 @@
+name: World simulation validation
+
+on:
+  pull_request:
+    paths:
+      - 'src/logic/WorldSimulation2*.js'
+      - 'src/components/WorldSimulation2Dashboard.jsx'
+      - 'src/content/packs/world-geopolitics.json'
+      - 'src/logic/__tests__/worldSimulation2.test.js'
+      - 'scripts/run-world-simulation-checks.mjs'
+      - 'src/main.jsx'
+      - 'src/components/SystemMenu.jsx'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/world-simulation.yml'
+  workflow_dispatch:
+
+jobs:
+  validate-world:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate bilingual content packs
+        run: npm run validate:content
+
+      - name: Check World Simulation source syntax
+        run: node --check src/logic/WorldSimulation2.js
+
+      - name: Run World Simulation 2 tests
+        id: world_tests
+        shell: bash
+        run: |
+          set +e
+          npm run test:world 2>&1 | tee world-test-output.txt
+          exit_code=${PIPESTATUS[0]}
+          echo "exit_code=${exit_code}" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Upload world test output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: world-test-output
+          path: world-test-output.txt
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Stop after failed world tests
+        if: steps.world_tests.outputs.exit_code != '0'
+        run: exit 1
+
+      - name: Run multi-world stress check
+        id: world_stress
+        shell: bash
+        run: |
+          set +e
+          node scripts/run-world-simulation-checks.mjs --worlds=20 --months=240 2>&1 | tee world-stress-output.txt
+          exit_code=${PIPESTATUS[0]}
+          echo "exit_code=${exit_code}" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Upload world stress output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: world-stress-output
+          path: world-stress-output.txt
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Stop after failed world stress check
+        if: steps.world_stress.outputs.exit_code != '0'
+        run: exit 1
+
+      - name: Build production app
+        run: npm run build

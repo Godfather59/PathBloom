@@ -32,12 +32,13 @@ window.addEventListener('unhandledrejection', event => {
 
 async function bootstrap() {
   try {
-    // Runtime order matters: compatibility fixes first, connected simulation second,
-    // country careers third, data-driven content fourth, then smart monthly controls
-    // wrap the completed monthly pipeline.
+    // Runtime order matters: foundational fixes first, connected personal simulation second,
+    // country careers and the autonomous world next, data-driven content after that, and
+    // smart monthly controls last so fast-forward loops pass through every completed system.
     await import('./logic/GameEngineRuntimeFixes');
     await import('./logic/DeepSimulationRuntime');
     await import('./logic/CountryJobRuntime');
+    await import('./logic/WorldSimulation2Runtime');
     await import('./logic/DataDrivenContentRuntime');
     await import('./logic/SmartMonthRuntime');
 

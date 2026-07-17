@@ -4,6 +4,7 @@ import { THEMES } from '../logic/themes';
 import { getCurrentTimePerson } from '../logic/TimeProgression';
 import SimulationDashboard from './SimulationDashboard';
 import ContentStudio from './ContentStudio';
+import WorldSimulation2Dashboard from './WorldSimulation2Dashboard';
 import './Modal.css';
 
 export function SystemMenu({
@@ -42,6 +43,7 @@ export function SystemMenu({
 }) {
   const [showSimulation, setShowSimulation] = useState(false);
   const [showContentStudio, setShowContentStudio] = useState(false);
+  const [showWorldSimulation2, setShowWorldSimulation2] = useState(false);
   const currentPerson = getCurrentTimePerson();
   const openSimulation = onSimulationDashboard || (() => setShowSimulation(true));
 
@@ -60,10 +62,26 @@ export function SystemMenu({
     return <ContentStudio onClose={() => setShowContentStudio(false)} language={language} t={t} />;
   }
 
+  if (showWorldSimulation2 && currentPerson) {
+    return (
+      <WorldSimulation2Dashboard
+        person={currentPerson}
+        onClose={() => setShowWorldSimulation2(false)}
+        language={language}
+      />
+    );
+  }
+
   const navigation = [
     [onStats, '📊', 'system.stats', 'Lifetime Stats'],
     [onHistory, '📈', 'system.history', 'Current Life Trends'],
     [openSimulation, '🧩', 'system.simulation', 'Simulation Overview'],
+    [
+      () => setShowWorldSimulation2(true),
+      '🌐',
+      'system.worldSimulation2',
+      language === 'ar' ? 'محاكاة العالم 2.0' : 'World Simulation 2.0',
+    ],
     [
       () => setShowContentStudio(true),
       '🧰',

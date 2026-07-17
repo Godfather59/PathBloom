@@ -24,7 +24,8 @@ const LABELS = {
     confirmTitle: 'Advance automatically?',
     confirmYears: 'This can move the story forward by up to five years.',
     confirmMonths: 'This can move the active situation forward by up to twelve months.',
-    warning: 'Automatic progression stops for decisions, but several events can happen before it stops.',
+    warning:
+      'Automatic progression stops for decisions, but several events can happen before it stops.',
     confirm: 'Advance',
     cancel: 'Cancel',
   },

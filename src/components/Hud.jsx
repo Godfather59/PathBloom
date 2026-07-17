@@ -8,17 +8,18 @@ import {
 } from '../logic/ArabicLocalization';
 import { ensureTimeProgress, setCurrentTimePerson } from '../logic/TimeProgression';
 import { AppIcon } from './AppIcon';
+import { BottomSheet } from './ShellPrimitives';
 import './Hud.css';
 
 const STAT_DEFINITIONS = [
-  { id: 'health', icon: '♥', key: 'stat.health', en: 'Health' },
-  { id: 'happiness', icon: '☺', key: 'stat.happiness', en: 'Happiness' },
-  { id: 'stress', icon: '!', key: 'stat.stress', en: 'Stress' },
-  { id: 'smarts', icon: '◇', key: 'stat.smarts', en: 'Smarts' },
-  { id: 'looks', icon: '✦', key: 'stat.looks', en: 'Looks' },
-  { id: 'karma', icon: '⚖', key: 'stat.karma', en: 'Karma' },
-  { id: 'energy', icon: 'ϟ', key: 'stat.energy', en: 'Energy' },
-  { id: 'fame', icon: '★', key: 'stat.fame', en: 'Fame', optional: true },
+  { id: 'health', icon: 'health', key: 'stat.health', en: 'Health' },
+  { id: 'happiness', icon: 'happiness', key: 'stat.happiness', en: 'Happiness' },
+  { id: 'stress', icon: 'stress', key: 'stat.stress', en: 'Stress' },
+  { id: 'smarts', icon: 'smarts', key: 'stat.smarts', en: 'Smarts' },
+  { id: 'looks', icon: 'looks', key: 'stat.looks', en: 'Looks' },
+  { id: 'karma', icon: 'karma', key: 'stat.karma', en: 'Karma' },
+  { id: 'energy', icon: 'energy', key: 'stat.energy', en: 'Energy' },
+  { id: 'fame', icon: 'fame', key: 'stat.fame', en: 'Fame', optional: true },
 ];
 
 export const Hud = memo(
@@ -29,7 +30,7 @@ export const Hud = memo(
     language = 'en',
     t = (key, fallback) => fallback || key,
   }) => {
-    const [expanded, setExpanded] = useState(false);
+    const [statsOpen, setStatsOpen] = useState(false);
 
     if (!person) {
       return null;
@@ -89,101 +90,96 @@ export const Hud = memo(
     );
 
     return (
-      <header
-        className={`hud-container ${expanded ? 'is-expanded' : ''}`}
-        dir={isArabic ? 'rtl' : 'ltr'}
-      >
-        <div className="hud-identity-row">
-          <div className="avatar-circle" data-person-name="true">
-            {getAvatar()}
-            <span className="status-dot" aria-hidden="true" />
-            {person.social?.isInfluencer && <span className="influencer-badge">★</span>}
-          </div>
-
-          <div className="person-info">
-            <div className="person-name-row">
-              <h1 className="person-name" dir="auto" data-person-name="true">
-                {person.getFullName()}
-              </h1>
-              <span className="hud-age-pill">{ageLabel}</span>
+      <>
+        <header className="hud-container" dir={isArabic ? 'rtl' : 'ltr'}>
+          <div className="hud-identity-row">
+            <div className="avatar-circle" data-person-name="true">
+              {getAvatar()}
+              <span className="status-dot" aria-hidden="true" />
+              {person.social?.isInfluencer && <span className="influencer-badge">★</span>}
             </div>
-            <div className="hud-role-line" dir="auto">
-              <span className="hud-role">{roleLabel}</span>
-              {locationLabel && <span className="hud-location">{locationLabel}</span>}
+
+            <div className="person-info">
+              <div className="person-name-row">
+                <h1 className="person-name" dir="auto" data-person-name="true">
+                  {person.getFullName()}
+                </h1>
+                <span className="hud-age-pill">{ageLabel}</span>
+              </div>
+              <div className="hud-role-line" dir="auto">
+                <span className="hud-role">{roleLabel}</span>
+                {locationLabel && <span className="hud-location">{locationLabel}</span>}
+              </div>
             </div>
-          </div>
 
-          <div className="hud-finance-block" dir="ltr">
-            <strong className="hud-money">{formatMoney(person.money)}</strong>
-            {totalDebt > 0 && (
-              <span className="hud-debt">
-                {isArabic ? 'دين' : 'Debt'} {formatMoney(totalDebt)}
-              </span>
-            )}
-          </div>
+            <div className="hud-finance-block" dir="ltr">
+              <strong className="hud-money">{formatMoney(person.money)}</strong>
+              {totalDebt > 0 && (
+                <span className="hud-debt">
+                  {isArabic ? 'دين' : 'Debt'} {formatMoney(totalDebt)}
+                </span>
+              )}
+            </div>
 
-          <div className="hud-top-btns">
-            {Array.isArray(person.worldNews) && person.worldNews.length > 0 && (
+            <div className="hud-top-btns">
+              {Array.isArray(person.worldNews) && person.worldNews.length > 0 && (
+                <button
+                  type="button"
+                  onClick={onWorldNews}
+                  className="hud-icon-button news-btn"
+                  aria-label={t('hud.news', 'World News')}
+                >
+                  <AppIcon name="news" size={19} />
+                  <span className="news-btn-count">
+                    {isArabic
+                      ? formatArabicNumber(person.worldNews.length, { maximumFractionDigits: 0 })
+                      : person.worldNews.length}
+                  </span>
+                </button>
+              )}
               <button
                 type="button"
-                onClick={onWorldNews}
-                className="hud-icon-button news-btn"
-                aria-label={t('hud.news', 'World News')}
+                className="hud-icon-button hud-menu-fallback"
+                onClick={onOpenMenu}
+                aria-label={t('hud.openMenu', 'Open Menu')}
               >
-                <AppIcon name="news" size={19} />
-                <span className="news-btn-count">
-                  {isArabic
-                    ? formatArabicNumber(person.worldNews.length, { maximumFractionDigits: 0 })
-                    : person.worldNews.length}
-                </span>
+                <AppIcon name="menu" size={19} />
               </button>
-            )}
-            <button
-              type="button"
-              className="hud-icon-button hud-menu-fallback"
-              onClick={onOpenMenu}
-              aria-label={t('hud.openMenu', 'Open Menu')}
-            >
-              <AppIcon name="menu" size={19} />
-            </button>
+            </div>
           </div>
-        </div>
 
-        <button
-          type="button"
-          className="hud-stat-summary"
-          onClick={() => setExpanded(value => !value)}
-          aria-expanded={expanded}
-          aria-label={
-            expanded
-              ? isArabic
-                ? 'أخفِ جميع الإحصائيات'
-                : 'Hide all stats'
-              : isArabic
-                ? 'اعرض جميع الإحصائيات'
-                : 'Show all stats'
-          }
+          <button
+            type="button"
+            className="hud-stat-summary"
+            onClick={() => setStatsOpen(true)}
+            aria-expanded={statsOpen}
+            aria-haspopup="dialog"
+            aria-label={isArabic ? 'اعرض جميع الإحصائيات' : 'Show all stats'}
+          >
+            <span className="hud-summary-stats">
+              {summaryStats.map(definition => (
+                <CompactStat
+                  key={definition.id}
+                  definition={definition}
+                  value={person[definition.id]}
+                  language={language}
+                  t={t}
+                />
+              ))}
+            </span>
+            <AppIcon name="chevron" size={17} className="hud-expand-icon" />
+          </button>
+        </header>
+
+        <BottomSheet
+          open={statsOpen}
+          onClose={() => setStatsOpen(false)}
+          title={isArabic ? 'جميع الإحصائيات' : 'All stats'}
+          subtitle={isArabic ? 'ملخص حالتك الحالية.' : 'A complete view of your current condition.'}
+          closeLabel={t('common.close', 'Close')}
+          className="stats-bottom-sheet"
         >
-          <span className="hud-summary-stats">
-            {summaryStats.map(definition => (
-              <CompactStat
-                key={definition.id}
-                definition={definition}
-                value={person[definition.id]}
-                language={language}
-                t={t}
-              />
-            ))}
-          </span>
-          <AppIcon
-            name="chevron"
-            size={17}
-            className={`hud-expand-icon ${expanded ? 'is-open' : ''}`}
-          />
-        </button>
-
-        {expanded && (
-          <div className="stat-grid">
+          <div className="stats-sheet-grid">
             {visibleStats.map(definition => (
               <StatBar
                 key={definition.id}
@@ -194,8 +190,8 @@ export const Hud = memo(
               />
             ))}
           </div>
-        )}
-      </header>
+        </BottomSheet>
+      </>
     );
   }
 );
@@ -207,7 +203,7 @@ function CompactStat({ definition, value, language, t }) {
   return (
     <span className={`compact-stat compact-stat-${definition.id}`}>
       <span className="compact-stat-icon" aria-hidden="true">
-        {definition.icon}
+        <AppIcon name={definition.icon} size={12} strokeWidth={2} />
       </span>
       <span className="compact-stat-label">{t(definition.key, definition.en)}</span>
       <strong>{number}</strong>
@@ -225,13 +221,19 @@ function StatBar({ definition, value, language, t }) {
       <div className="stat-header">
         <span>
           <span className="stat-symbol" aria-hidden="true">
-            {definition.icon}
+            <AppIcon name={definition.icon} size={15} strokeWidth={2} />
           </span>{' '}
           {t(definition.key, definition.en)}
         </span>
         <strong>{number}%</strong>
       </div>
-      <div className="progress-track">
+      <div
+        className="progress-track"
+        role="progressbar"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow={safeValue}
+      >
         <div className={`progress-fill fill-${definition.id}`} style={{ width: `${safeValue}%` }} />
       </div>
     </div>

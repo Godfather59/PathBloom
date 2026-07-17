@@ -21,6 +21,7 @@ import './components/ReleasePerformance.css';
 import './components/SaveRelease.css';
 import './components/ThemeCompatibility.css';
 import './components/ScreenshotRegressionFixes.css';
+import './components/ShellRefresh.css';
 
 const rootElement = document.getElementById('root');
 
@@ -64,6 +65,53 @@ window.addEventListener('unhandledrejection', event => {
   showStartupError(event.reason || event);
 });
 
+function installVisualViewportBridge() {
+  const viewport = window.visualViewport;
+  if (!viewport) {
+    return;
+  }
+
+  const update = () => {
+    document.documentElement.style.setProperty('--pb-visual-height', `${viewport.height}px`);
+    const keyboardHeight = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop);
+    document.documentElement.style.setProperty('--pb-keyboard-height', `${keyboardHeight}px`);
+  };
+
+  viewport.addEventListener('resize', update);
+  viewport.addEventListener('scroll', update);
+  update();
+}
+
+function findVisibleCloseControl() {
+  const selectors = [
+    '[data-back-handler="close"]',
+    '.pb-sheet-layer .pb-icon-button',
+    '.decision-sheet .sheet-close',
+    '.destination-overlay .destination-close',
+    '.modal-overlay .modal-close',
+    '.modal-overlay .close-btn',
+  ];
+
+  for (const selector of selectors) {
+    const candidates = Array.from(document.querySelectorAll(selector)).reverse();
+    const candidate = candidates.find(element => {
+      const style = window.getComputedStyle(element);
+      const rect = element.getBoundingClientRect();
+      return (
+        style.display !== 'none' &&
+        style.visibility !== 'hidden' &&
+        rect.width > 0 &&
+        rect.height > 0 &&
+        !element.disabled
+      );
+    });
+    if (candidate) {
+      return candidate;
+    }
+  }
+  return null;
+}
+
 async function bootstrap() {
   try {
     // Runtime order matters: foundational fixes first, connected personal simulation second,
@@ -85,6 +133,8 @@ async function bootstrap() {
       import('./components/ErrorBoundary.jsx'),
     ]);
 
+    installVisualViewportBridge();
+
     let backCount = 0;
     CapApp.addListener('backButton', event => {
       const customEvent = new CustomEvent('capacitor-back', { detail: event, cancelable: true });
@@ -93,7 +143,15 @@ async function bootstrap() {
         backCount = 0;
         return;
       }
-      backCount++;
+
+      const closeControl = findVisibleCloseControl();
+      if (closeControl) {
+        closeControl.click();
+        backCount = 0;
+        return;
+      }
+
+      backCount += 1;
       if (backCount >= 2) {
         CapApp.exitApp();
       }

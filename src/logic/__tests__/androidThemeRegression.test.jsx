@@ -129,7 +129,7 @@ describe('focused appearance modes', () => {
 describe('Arabic new-life setup', () => {
   beforeEach(() => localStorage.clear());
 
-  it('renders a native RTL setup with Arabic fields and Morocco selected', () => {
+  it('renders the first native RTL identity step and preserves Morocco as the settings default', () => {
     const html = render(
       <MainMenu
         language="ar"
@@ -139,14 +139,17 @@ describe('Arabic new-life setup', () => {
         hasSave={false}
       />
     );
+    const source = readComponentSource('MainMenu.jsx');
 
     expect(html).toContain('dir="rtl"');
     expect(html).toContain('الاسم الأول');
     expect(html).toContain('اسم العائلة');
     expect(html).toContain('اكتب الاسم الأول');
-    expect(html).toContain('ابدأ الحياة');
-    expect(html).toContain('المغرب');
-    expect(html).toContain('value="Morocco" selected=""');
+    expect(html).toContain('1. الهوية');
+    expect(html).toContain('2. إعدادات الحياة');
+    expect(html).toContain('متابعة');
+    expect(html).not.toContain('ابدأ الحياة');
+    expect(source).toContain("isRtl ? 'Morocco' : 'United States'");
   });
 
   it('starts directly without importing or rendering AvatarCreator', () => {
@@ -182,11 +185,12 @@ describe('physical Android RTL screenshot fixes', () => {
     expect(css).toContain('.news-btn-count');
   });
 
-  it('reserves a separate lane so automatic progression never covers shortcuts', () => {
-    const css = readComponentCss('ScreenshotRegressionFixes.css');
+  it('keeps automatic progression behind a separate confirmation control', () => {
+    const css = readComponentCss('ShellRefresh.css');
     expect(css).toContain('.bottom-navigation');
-    expect(css).toContain('margin-top: 54px');
-    expect(css).toContain('.time-smart-action');
-    expect(css).toContain('top: -50px');
+    expect(css).toContain('.time-primary-action');
+    expect(css).toContain('.time-more-action');
+    expect(css).toContain('top: -35px');
+    expect(css).not.toContain('.time-smart-action');
   });
 });

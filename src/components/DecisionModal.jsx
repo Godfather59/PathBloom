@@ -7,6 +7,7 @@ import {
   formatArabicNumber,
   localizeArabicCandidate,
 } from '../logic/ArabicLocalization';
+import { HAPTICS } from '../logic/Haptics';
 import { AppIcon } from './AppIcon';
 import './Modal.css';
 
@@ -49,6 +50,14 @@ const COPY = {
     certain: 'تأثير مباشر',
   },
 };
+
+function hapticsAllowed() {
+  try {
+    return localStorage.getItem('pathbloom_haptics_enabled') !== 'false';
+  } catch {
+    return true;
+  }
+}
 
 function getChoiceEmoji(choice) {
   if (choice.emoji) {
@@ -187,6 +196,13 @@ export function DecisionModal({
       : deepLocalized;
   };
 
+  const choose = choice => {
+    if (hapticsAllowed()) {
+      HAPTICS.event();
+    }
+    onChoice(choice);
+  };
+
   return (
     <div className="modal-overlay decision-sheet-overlay">
       <section
@@ -226,7 +242,7 @@ export function DecisionModal({
               <button
                 key={choice.id || choice.effect || index}
                 type="button"
-                onClick={() => onChoice(choice)}
+                onClick={() => choose(choice)}
                 className={`decision-choice-card risk-${risk}`}
               >
                 <span className="decision-choice-symbol" aria-hidden="true">

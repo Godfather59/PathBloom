@@ -1,4 +1,9 @@
 import React, { memo } from 'react';
+import {
+  getActiveMonthlySituation,
+  getCurrentTimePerson,
+  getSituationLabel,
+} from '../logic/TimeProgression';
 import './ActionMenu.css';
 
 const ACTIONS = [
@@ -12,7 +17,11 @@ const ACTIONS = [
 ];
 
 export const ActionMenu = memo(
-  ({ onAgeUp, onAction, onAgeSkip, t = (key, fallback) => fallback || key }) => {
+  ({ onAgeUp, onAction, onAgeSkip, language = 'en', t = (key, fallback) => fallback || key }) => {
+    const person = getCurrentTimePerson();
+    const activeSituation = getActiveMonthlySituation(person);
+    const isArabic = language === 'ar';
+
     return (
       <div className="action-menu">
         <div className="action-menu-grid">
@@ -26,23 +35,41 @@ export const ActionMenu = memo(
           ))}
         </div>
 
-        <div className="age-actions">
+        {activeSituation && (
+          <div className="time-situation" role="status">
+            <span aria-hidden="true">{activeSituation.icon}</span>
+            <span>
+              {isArabic ? 'تقدم شهري متاح:' : 'Monthly progression available:'}{' '}
+              <strong>{getSituationLabel(activeSituation, language)}</strong>
+            </span>
+          </div>
+        )}
+
+        <div className={`age-actions ${activeSituation ? 'is-monthly' : 'is-normal'}`}>
+          {activeSituation ? (
+            <button
+              className="age-skip-btn month-btn"
+              onClick={() => onAgeSkip('month')}
+              title={
+                isArabic
+                  ? 'تقدم شهرا واحدا داخل الحالة الحالية.'
+                  : 'Advance one month inside the active situation.'
+              }
+            >
+              🗓️ {isArabic ? 'شهر واحد' : '1 Month'}
+            </button>
+          ) : (
+            <button
+              className="age-skip-btn"
+              onClick={() => onAgeSkip(5)}
+              title={t('action.smartSkipHint', 'Stops when an important decision needs you.')}
+            >
+              ⏩ {t('action.smartSkip5', 'Smart +5')}
+            </button>
+          )}
+
           <button className="age-up-btn" onClick={onAgeUp}>
             🎂 {t('action.ageUp', 'Age Up')}
-          </button>
-          <button
-            className="age-skip-btn"
-            onClick={() => onAgeSkip(5)}
-            title={t('action.smartSkipHint', 'Stops when an important decision needs you.')}
-          >
-            ⏩ {t('action.smartSkip5', 'Smart +5')}
-          </button>
-          <button
-            className="age-skip-btn warning"
-            onClick={() => onAgeSkip(10)}
-            title={t('action.smartSkipHint', 'Stops when an important decision needs you.')}
-          >
-            🚀 {t('action.smartSkip10', 'Smart +10')}
           </button>
         </div>
       </div>

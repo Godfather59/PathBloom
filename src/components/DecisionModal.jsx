@@ -1,5 +1,6 @@
 import React from 'react';
 import { translateGameMessage, translateGameText } from '../logic/i18n';
+import { cleanLocalizedText } from '../logic/localizationSanitizer';
 import './Modal.css';
 
 const TYPE_EMOJIS = {
@@ -46,10 +47,13 @@ export function DecisionModal({
   language = 'en',
   t = (key, fallback) => fallback || key,
 }) {
-  const localize = (value, messageKey, messageParams) =>
-    messageKey
+  const localize = (value, messageKey, messageParams) => {
+    const localized = messageKey
       ? translateGameMessage(language, messageKey, messageParams || {}, value)
       : translateGameText(language, value);
+
+    return cleanLocalizedText(localized, value, language);
+  };
 
   return (
     <div className="modal-overlay">
@@ -74,7 +78,7 @@ export function DecisionModal({
                 onClick={() => onChoice(choice)}
                 className="btn-secondary"
                 style={{
-                  textAlign: 'left',
+                  textAlign: language === 'ar' ? 'right' : 'left',
                   padding: '16px',
                   backgroundColor: 'rgba(255,255,255,0.08)',
                   border: '1px solid rgba(255,255,255,0.1)',

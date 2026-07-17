@@ -4,11 +4,20 @@ import './Modal.css';
 export function PrisonMenu({
   person,
   onAction,
-  onAgeUp,
   onSystem,
+  language = 'en',
   t = (key, fallback) => fallback || key,
 }) {
-  // If we wanted a sub-modal state, we could add it here
+  const isArabic = language === 'ar';
+  const storedMonths = Number(person.timeProgress?.prisonMonthsRemaining);
+  const remainingMonths = Number.isFinite(storedMonths)
+    ? Math.max(0, Math.floor(storedMonths))
+    : Math.max(0, Math.round((Number(person.prisonSentence) || 0) * 12));
+  const remainingYears = Math.floor(remainingMonths / 12);
+  const extraMonths = remainingMonths % 12;
+  const sentenceLabel = isArabic
+    ? `${remainingYears > 0 ? `${remainingYears} سنة` : ''}${remainingYears > 0 && extraMonths > 0 ? ' و' : ''}${extraMonths > 0 ? `${extraMonths} شهر` : remainingYears === 0 ? 'أقل من شهر' : ''}`
+    : `${remainingYears > 0 ? `${remainingYears} year${remainingYears === 1 ? '' : 's'}` : ''}${remainingYears > 0 && extraMonths > 0 ? ', ' : ''}${extraMonths > 0 ? `${extraMonths} month${extraMonths === 1 ? '' : 's'}` : remainingYears === 0 ? 'Less than one month' : ''}`;
 
   const handleAction = action => {
     onAction(action);
@@ -16,11 +25,9 @@ export function PrisonMenu({
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content" style={{ border: '2px solid #ff4444' }}>
+      <div className="modal-content prison-modal" dir={isArabic ? 'rtl' : 'ltr'}>
         <div className="modal-header">
-          <h2 className="modal-title" style={{ color: '#ff4444' }}>
-            🚔 {t('prison.title', 'State Penitentiary')}
-          </h2>
+          <h2 className="modal-title prison-title">🚔 {t('prison.title', 'State Penitentiary')}</h2>
           <button
             className="close-btn"
             onClick={onSystem}
@@ -31,21 +38,11 @@ export function PrisonMenu({
         </div>
 
         <div className="modal-body">
-          <div
-            style={{
-              textAlign: 'center',
-              marginBottom: '20px',
-              padding: '15px',
-              background: 'rgba(255,0,0,0.1)',
-              borderRadius: '8px',
-            }}
-          >
+          <div className="prison-sentence-card">
             <div className="empty-state-badge">🔒</div>
             <h3>{t('prison.sentence', 'Sentence Remaining')}</h3>
-            <div style={{ fontSize: '2rem', fontWeight: 'bold' }}>
-              {person.prisonSentence} {t('prison.years', 'Years')}
-            </div>
-            <div style={{ fontSize: '0.9rem', color: '#aaa', marginTop: '5px' }}>
+            <div className="prison-sentence-value">{sentenceLabel}</div>
+            <div className="prison-meta">
               {t('prison.respect', 'Respect')}: {person.notoriety || 0}% |{' '}
               {t('prison.gang', 'Gang')}:{' '}
               {person.mafia?.family
@@ -54,7 +51,19 @@ export function PrisonMenu({
             </div>
           </div>
 
-          <h3 style={{ borderBottom: '1px solid #ff4444' }}>{t('prison.yard', 'Prison Yard')}</h3>
+          <div className="prison-time-actions">
+            <button
+              className="age-skip-btn month-btn"
+              onClick={() => handleAction('__advance_month__')}
+            >
+              🗓️ {isArabic ? 'اقضِ شهرا' : 'Serve 1 Month'}
+            </button>
+            <button className="age-up-btn" onClick={() => handleAction('__advance_year__')}>
+              🎂 {isArabic ? 'اقضِ سنة' : t('prison.serveYear', 'Serve One Year')}
+            </button>
+          </div>
+
+          <h3 className="prison-section-title">{t('prison.yard', 'Prison Yard')}</h3>
           <div className="activity-grid">
             <button className="list-item activity-card" onClick={() => handleAction('workout')}>
               <span className="activity-token">💪</span>
@@ -70,11 +79,7 @@ export function PrisonMenu({
             </button>
           </div>
 
-          <button className="btn-primary" onClick={onAgeUp} style={{ marginBottom: '20px' }}>
-            🎂 {t('prison.serveYear', 'Serve One Year')}
-          </button>
-
-          <h3 style={{ borderBottom: '1px solid #ff4444', marginTop: '20px' }}>
+          <h3 className="prison-section-title prison-legal-title">
             {t('prison.legal', 'Legal & Illegal')}
           </h3>
           <div className="activity-grid">
@@ -83,17 +88,15 @@ export function PrisonMenu({
               <span>{t('prison.appeal', 'Appeal Sentence ($5,000)')}</span>
             </button>
             <button
-              className="list-item activity-card"
+              className="list-item activity-card prison-danger-action"
               onClick={() => handleAction('riot')}
-              style={{ borderColor: '#ff4444', color: '#ff4444' }}
             >
               <span className="activity-token">🔥</span>
               <span>{t('prison.riot', 'Incite Riot')}</span>
             </button>
             <button
-              className="list-item activity-card"
+              className="list-item activity-card prison-danger-action"
               onClick={() => handleAction('escape')}
-              style={{ borderColor: '#ff4444', color: '#ff4444' }}
             >
               <span className="activity-token">🏃</span>
               <span>{t('prison.escape', 'Escape!')}</span>

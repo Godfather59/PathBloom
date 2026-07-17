@@ -1,13 +1,17 @@
 import React, { useEffect, useRef, memo, useMemo } from 'react';
 import { translateGameMessage, translateGameText } from '../logic/i18n';
+import { cleanLocalizedText } from '../logic/localizationSanitizer';
 import './EventLog.css';
 
 const MAX_VISIBLE_EVENTS = 100;
 
-const localizeEvent = (event, language) =>
-  event.messageKey
+const localizeEvent = (event, language) => {
+  const localized = event.messageKey
     ? translateGameMessage(language, event.messageKey, event.messageParams || {}, event.text)
     : translateGameText(language, event.text);
+
+  return cleanLocalizedText(localized, event.text, language);
+};
 
 const EventCard = memo(({ event, language, t }) => (
   <div className={`event-card type-${event.type || 'neutral'}`}>
@@ -32,10 +36,10 @@ export const EventLog = memo(
         const hud = document.querySelector('.hud-container');
         const actionMenu = document.querySelector('.action-menu');
         if (hud) {
-          el.style.paddingTop = `${hud.offsetHeight + 4}px`;
+          el.style.paddingTop = `${hud.offsetHeight + 8}px`;
         }
         if (actionMenu) {
-          el.style.paddingBottom = `${actionMenu.offsetHeight + 4}px`;
+          el.style.paddingBottom = `${actionMenu.offsetHeight + 8}px`;
         }
       };
 

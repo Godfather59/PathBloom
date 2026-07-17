@@ -1,0 +1,394 @@
+/* Android/mobile polish overrides loaded last. */
+:root {
+  --android-status-padding: max(50px, calc(env(safe-area-inset-top, 0px) + 18px));
+  --android-bottom-padding: max(20px, calc(env(safe-area-inset-bottom, 0px) + 16px));
+}
+
+html,
+body,
+#root {
+  min-height: 100dvh;
+}
+
+.app-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: var(--bg-surface);
+  text-align: start;
+}
+
+.app-container[dir='rtl'] {
+  direction: rtl;
+  text-align: right;
+}
+
+.hud-container {
+  padding: 10px 14px 10px;
+  padding-top: var(--android-status-padding);
+  max-width: 450px;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+}
+
+.hud-header {
+  min-height: 52px;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.hud-top-btns {
+  position: absolute;
+  top: 2px;
+  inset-inline-end: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 65;
+}
+
+.settings-btn {
+  position: static;
+  top: auto;
+  right: auto;
+  left: auto;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+}
+
+.hud-container[dir='rtl'] .settings-btn {
+  left: auto;
+  right: auto;
+}
+
+.person-info {
+  min-width: 0;
+  padding-right: 0;
+  padding-left: 0;
+  padding-inline-end: 96px;
+}
+
+.hud-container[dir='rtl'] .person-info {
+  padding-right: 0;
+  padding-left: 0;
+  padding-inline-end: 96px;
+}
+
+.person-name {
+  font-size: clamp(1.12rem, 4.8vw, 1.5rem);
+  line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.person-details {
+  line-height: 1.28;
+  font-size: 0.82rem;
+}
+
+.hud-money,
+.hud-debt,
+.stat-header span:last-child {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.hud-location,
+.hud-role {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.avatar-circle {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+}
+
+.news-btn {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  min-height: 42px;
+  padding: 0;
+  border-radius: 50%;
+  flex: 0 0 42px;
+  flex-direction: column;
+  gap: 0;
+  background: rgba(255, 215, 0, 0.12);
+}
+
+.news-btn-icon {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.news-btn-count {
+  position: absolute;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  inset-block-start: -5px;
+  inset-inline-end: -5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffd700;
+  color: #1a1600;
+  font-size: 0.58rem;
+  font-weight: 900;
+  line-height: 1;
+  opacity: 1;
+  max-width: 34px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: 2px solid rgba(20, 20, 33, 0.95);
+}
+
+.stat-grid {
+  gap: 8px 14px;
+}
+
+.stat-header {
+  text-transform: none;
+  letter-spacing: 0.2px;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.progress-track {
+  height: 7px;
+}
+
+.event-log {
+  padding-inline: 14px;
+  scroll-padding-top: 16px;
+  scroll-padding-bottom: 16px;
+}
+
+.event-card {
+  border-radius: 14px;
+  padding: 14px 14px;
+  margin-bottom: 10px;
+  min-height: 54px;
+}
+
+.event-card:first-child {
+  margin-top: 4px;
+}
+
+.event-text {
+  direction: inherit;
+  unicode-bidi: plaintext;
+  font-size: 0.96rem;
+  line-height: 1.5;
+}
+
+.event-age-badge {
+  border-radius: 8px;
+  padding: 3px 8px;
+  line-height: 1.15;
+}
+
+.event-log[dir='rtl'] .event-age-badge {
+  direction: rtl;
+}
+
+.action-menu {
+  padding: 14px;
+  padding-bottom: var(--android-bottom-padding);
+  gap: 14px;
+}
+
+.action-menu-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.action-btn {
+  min-height: 78px;
+  border-radius: 18px;
+  padding: 10px 6px;
+}
+
+.action-icon {
+  margin-bottom: 7px;
+}
+
+.action-label {
+  font-size: 0.76rem;
+  line-height: 1.18;
+}
+
+.age-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.age-up-btn,
+.age-skip-btn {
+  min-height: 56px;
+  border-radius: 18px;
+  font-size: 0.9rem;
+  line-height: 1.2;
+  text-transform: none;
+  white-space: normal;
+}
+
+.month-btn {
+  background: rgba(3, 169, 244, 0.18);
+  border-color: rgba(3, 169, 244, 0.4);
+  box-shadow: 0 4px 14px rgba(3, 169, 244, 0.12);
+}
+
+.time-situation {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: rgba(3, 169, 244, 0.1);
+  border: 1px solid rgba(3, 169, 244, 0.22);
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.time-situation strong {
+  color: var(--text-primary);
+}
+
+.modal-content[dir='rtl'] .btn-secondary {
+  direction: rtl;
+}
+
+.prison-modal {
+  border: 2px solid #ff4444;
+}
+
+.prison-title {
+  color: #ff4444;
+}
+
+.prison-sentence-card {
+  text-align: center;
+  margin-bottom: 14px;
+  padding: 15px;
+  background: rgba(255, 0, 0, 0.1);
+  border-radius: 14px;
+}
+
+.prison-sentence-card h3 {
+  margin: 8px 0;
+}
+
+.prison-sentence-value {
+  font-size: 1.65rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.prison-meta {
+  font-size: 0.82rem;
+  color: #aaa;
+  margin-top: 7px;
+}
+
+.prison-time-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.prison-section-title {
+  border-bottom: 1px solid #ff4444;
+}
+
+.prison-legal-title {
+  margin-top: 20px;
+}
+
+.prison-danger-action {
+  border-color: #ff4444 !important;
+  color: #ff7777 !important;
+}
+
+@media (max-width: 450px) {
+  .hud-container {
+    max-width: none;
+    left: 0;
+    right: 0;
+    transform: none;
+  }
+}
+
+@media (max-width: 370px) {
+  .hud-container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .person-info,
+  .hud-container[dir='rtl'] .person-info {
+    padding-inline-end: 90px;
+  }
+
+  .action-menu {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .action-menu-grid {
+    gap: 8px;
+  }
+
+  .action-btn {
+    min-height: 72px;
+  }
+
+  .age-actions,
+  .prison-time-actions {
+    gap: 8px;
+  }
+
+  .age-up-btn,
+  .age-skip-btn {
+    font-size: 0.82rem;
+    padding: 8px 6px;
+  }
+}
+
+@media (max-height: 720px) {
+  :root {
+    --android-status-padding: max(46px, calc(env(safe-area-inset-top, 0px) + 16px));
+  }
+
+  .hud-container {
+    padding-bottom: 8px;
+  }
+
+  .hud-header {
+    margin-bottom: 8px;
+  }
+
+  .action-btn {
+    min-height: 68px;
+  }
+
+  .age-up-btn,
+  .age-skip-btn {
+    min-height: 50px;
+  }
+}

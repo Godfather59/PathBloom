@@ -2,6 +2,11 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { installArabicLocalizationRuntime } from './logic/ArabicLocalizationRuntime';
 import { installArabicSupplementalRuntime } from './logic/ArabicSupplementalRuntime';
+import {
+  dispatchInGameBack,
+  findVisibleBackControl,
+  hasVisibleBackLayer,
+} from './logic/AndroidBackNavigation';
 import { installPhaseTwoScreenRuntime } from './logic/PhaseTwoScreenRuntime';
 import './index.css';
 import './components/NewFeatures.css';
@@ -83,36 +88,6 @@ function installVisualViewportBridge() {
   update();
 }
 
-function findVisibleCloseControl() {
-  const selectors = [
-    '[data-back-handler="close"]',
-    '.pb-sheet-layer .pb-icon-button',
-    '.decision-sheet .sheet-close',
-    '.destination-overlay .destination-close',
-    '.modal-overlay .modal-close',
-    '.modal-overlay .close-btn',
-  ];
-
-  for (const selector of selectors) {
-    const candidates = Array.from(document.querySelectorAll(selector)).reverse();
-    const candidate = candidates.find(element => {
-      const style = window.getComputedStyle(element);
-      const rect = element.getBoundingClientRect();
-      return (
-        style.display !== 'none' &&
-        style.visibility !== 'hidden' &&
-        rect.width > 0 &&
-        rect.height > 0 &&
-        !element.disabled
-      );
-    });
-    if (candidate) {
-      return candidate;
-    }
-  }
-  return null;
-}
-
 async function bootstrap() {
   try {
     // Runtime order matters: foundational fixes first, connected personal simulation second,
@@ -137,17 +112,29 @@ async function bootstrap() {
     installVisualViewportBridge();
 
     let backCount = 0;
-    CapApp.addListener('backButton', event => {
-      const customEvent = new CustomEvent('capacitor-back', { detail: event, cancelable: true });
-      const handledInGame = !window.dispatchEvent(customEvent);
+    await CapApp.addListener('backButton', event => {
+      const handledInGame = dispatchInGameBack(event);
       if (handledInGame) {
         backCount = 0;
         return;
       }
 
-      const closeControl = findVisibleCloseControl();
+      const closeControl = findVisibleBackControl();
       if (closeControl) {
         closeControl.click();
+        backCount = 0;
+        return;
+      }
+
+      // Mandatory decisions and non-dismissible layers must consume Back instead of
+      // making the first gesture appear broken and the second gesture exit the app.
+      if (hasVisibleBackLayer()) {
+        backCount = 0;
+        return;
+      }
+
+      if (event?.canGoBack && window.history.length > 1) {
+        window.history.back();
         backCount = 0;
         return;
       }
@@ -160,6 +147,10 @@ async function bootstrap() {
         backCount = 0;
       }, 2000);
     });
+
+    // Capacitor 8 exposes this switch explicitly. Keeping it enabled makes Android's
+    // button and edge-swipe gesture use the same listener on Android 13-16.
+    await CapApp.toggleBackButtonHandler({ enabled: true });
 
     createRoot(rootElement).render(
       <StrictMode>

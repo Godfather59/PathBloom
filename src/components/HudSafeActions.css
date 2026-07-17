@@ -1,5 +1,6 @@
-/* Keep HUD shortcuts below the Android status and notification gesture region. */
+/* Keep the identity HUD below the Android status and notification gesture region. */
 .hud-container {
+  overflow: visible;
   padding-top: max(24px, calc(env(safe-area-inset-top) + 10px));
 }
 
@@ -11,71 +12,92 @@
   display: none !important;
 }
 
+/* News and history stay reachable, but no longer consume a full HUD row.
+   They float beside the story heading, below the fixed HUD and system bar. */
 .hud-safe-actions {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr);
-  gap: 7px;
-  margin-top: 9px;
+  position: absolute;
+  inset-inline-end: 14px;
+  bottom: -64px;
+  z-index: 70;
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  pointer-events: auto;
 }
 
 .hud-safe-action {
-  min-width: 0;
+  position: relative;
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
   min-height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  padding: 8px 10px;
+  display: grid;
+  place-items: center;
+  padding: 0;
   border: 1px solid var(--pb-border);
-  border-radius: 13px;
+  border-radius: 15px;
   color: var(--pb-text-secondary);
-  background: rgba(204, 226, 255, 0.045);
-  font-size: 0.72rem;
-  font-weight: 800;
+  background: rgba(11, 23, 40, 0.96);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 }
 
 .hud-safe-action:active {
-  transform: scale(0.98);
+  transform: scale(0.94);
 }
 
-.hud-safe-action span {
-  min-width: 0;
+.hud-safe-action > span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
   overflow: hidden;
-  text-overflow: ellipsis;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
   white-space: nowrap;
 }
 
 .hud-safe-action.is-news {
   color: var(--pb-gold);
-  border-color: rgba(243, 201, 105, 0.2);
-  background: rgba(243, 201, 105, 0.075);
+  border-color: rgba(243, 201, 105, 0.24);
+  background: rgba(34, 30, 21, 0.96);
 }
 
 .hud-safe-action.is-history {
   color: var(--pb-blue);
-  border-color: rgba(103, 169, 255, 0.2);
-  background: rgba(103, 169, 255, 0.07);
+  border-color: rgba(103, 169, 255, 0.24);
+  background: rgba(17, 29, 47, 0.96);
 }
 
+/* Menu already exists in the bottom navigation. Keep this trigger only so
+   the existing navigation fallback can activate it programmatically. */
 .hud-safe-action.is-menu {
-  color: var(--pb-text-secondary);
-  border-color: var(--pb-border);
-  background: rgba(204, 226, 255, 0.045);
+  display: none;
 }
 
 .hud-safe-action-count {
-  min-width: 22px;
-  height: 22px;
+  position: absolute;
+  inset-inline-end: -5px;
+  top: -6px;
+  min-width: 21px;
+  height: 21px;
   display: grid;
   place-items: center;
   padding-inline: 5px;
+  border: 2px solid var(--pb-bg);
   border-radius: 999px;
   color: #251b05;
   background: var(--pb-gold);
-  font-size: 0.62rem;
+  font-size: 0.58rem;
   line-height: 1;
   font-weight: 900;
+}
+
+/* Reserve the right/inline-end side of the story header for the two controls. */
+.timeline-heading {
+  min-height: 48px;
+  align-items: center;
+  padding-inline-end: 112px;
 }
 
 /* Heart/stat glyphs stay clean. Only the avatar keeps its online status dot. */
@@ -95,9 +117,13 @@
 }
 
 @media (max-width: 360px) {
-  .hud-safe-action {
-    padding-inline: 7px;
-    font-size: 0.66rem;
+  .hud-safe-actions {
+    inset-inline-end: 10px;
+    gap: 6px;
+  }
+
+  .timeline-heading {
+    padding-inline-end: 106px;
   }
 }
 

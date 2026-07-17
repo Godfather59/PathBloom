@@ -1,0 +1,333 @@
+name: Apply screenshot bug fixes
+
+on:
+  push:
+    branches: [fix/screenshot-arabic-dock]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: screenshot-bugfix-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apply:
+    name: Patch Arabic timeline and bottom dock
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PUPPETEER_SKIP_DOWNLOAD: 'true'
+
+    steps:
+      - name: Check out bug-fix branch
+        uses: actions/checkout@v6
+        with:
+          ref: fix/screenshot-arabic-dock
+          persist-credentials: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Apply targeted fixes
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              file = Path(path)
+              text = file.read_text(encoding='utf-8')
+              if old in text:
+                  file.write_text(text.replace(old, new, 1), encoding='utf-8')
+                  return
+              if new not in text:
+                  raise SystemExit(f'Expected patch target missing in {path}')
+
+          replace_once(
+              'src/components/EventLog.jsx',
+              """const localizeEvent = (event, language) => {
+            const packText =
+              event.localizedText && typeof event.localizedText === 'object'
+                ? event.localizedText[language] || event.localizedText.en
+                : null;
+            if (packText) {
+              return language === 'ar'
+                ? localizeArabicCandidate(
+                    packText,
+                    event.localizedText.en || event.text,
+                    `history:${event.type || 'event'}`
+                  )
+                : String(packText);
+            }
+
+            const localized = event.messageKey
+              ? translateGameMessage(language, event.messageKey, event.messageParams || {}, event.text)
+              : translateGameText(language, event.text);
+            const cleaned = cleanLocalizedText(localized, event.text, language);
+            const deepLocalized = translateDeepSimulationText(cleaned, language);
+            return language === 'ar'
+              ? localizeArabicCandidate(deepLocalized, event.text, `history:${event.type || 'event'}`)
+              : deepLocalized;
+          };""",
+              """function unwrapHistoryText(value) {
+            const text = String(value || '').trim();
+            const eventMatch = text.match(/^(?:Event|الحدث)\\s*:\\s*(.+)$/i);
+            if (eventMatch) {
+              return { kind: 'event', text: eventMatch[1].trim() };
+            }
+
+            const choiceMatch = text.match(/^(?:You chose to|You chose|اخترت)\\s*:\\s*(.+)$/i);
+            if (choiceMatch) {
+              return {
+                kind: 'choice',
+                text: choiceMatch[1].replace(/[.!؟]+$/, '').trim(),
+              };
+            }
+
+            return { kind: null, text };
+          }
+
+          function stripRedundantAgePrefix(value) {
+            return String(value ?? '')
+              .replace(/^(?:Age|العمر)\\s*[0-9٠-٩]+\\s*:\\s*/i, '')
+              .trim();
+          }
+
+          function wrapHistoryText(value, kind, language) {
+            const text = stripRedundantAgePrefix(value);
+            if (kind !== 'choice') {
+              return text;
+            }
+
+            const choice = text.replace(/[.!؟]+$/, '').trim();
+            return language === 'ar' ? `اخترت: ${choice}.` : `You chose: ${choice}.`;
+          }
+
+          export const localizeTimelineEvent = (event, language) => {
+            const source = unwrapHistoryText(event.text);
+            const packText =
+              event.localizedText && typeof event.localizedText === 'object'
+                ? event.localizedText[language] || event.localizedText.en
+                : null;
+            if (packText) {
+              const localizedPack =
+                language === 'ar'
+                  ? localizeArabicCandidate(
+                      packText,
+                      event.localizedText.en || source.text,
+                      `history:${event.type || 'event'}`
+                    )
+                  : String(packText);
+              return wrapHistoryText(localizedPack, source.kind, language);
+            }
+
+            const localized = event.messageKey
+              ? translateGameMessage(language, event.messageKey, event.messageParams || {}, source.text)
+              : translateGameText(language, source.text);
+            const cleaned = cleanLocalizedText(localized, source.text, language);
+            const deepLocalized = translateDeepSimulationText(cleaned, language);
+            const resolved =
+              language === 'ar'
+                ? localizeArabicCandidate(
+                    deepLocalized,
+                    source.text,
+                    `history:${event.type || 'event'}`
+                  )
+                : deepLocalized;
+            return wrapHistoryText(resolved, source.kind, language);
+          };"""
+          )
+
+          replace_once(
+              'src/components/EventLog.jsx',
+              '{localizeEvent(event, language)}',
+              '{localizeTimelineEvent(event, language)}'
+          )
+
+          more_button = """            <button
+              type=\"button\"
+              className=\"time-more-action\"
+              onClick={() => setSmartConfirmOpen(true)}
+              disabled={disabled}
+              title={`${labels.moreTime}: ${resolvedSmartLabel}`}
+              aria-label={`${labels.moreTime}: ${resolvedSmartLabel}`}
+              aria-haspopup=\"dialog\"
+            >
+              <AppIcon name=\"more\" size={20} />
+            </button>
+"""
+          replace_once('src/components/BottomNavigation.jsx', more_button, '')
+
+          replace_once(
+              'src/components/BottomNavigation.jsx',
+              """          </div>
+
+          <div className=\"bottom-nav-side bottom-nav-end\">{secondHalf.map(renderDestination)}</div>""",
+              """          </div>
+
+          <div className=\"bottom-nav-side bottom-nav-end\">{secondHalf.map(renderDestination)}</div>
+
+          <button
+            type=\"button\"
+            className=\"time-more-action\"
+            onClick={() => setSmartConfirmOpen(true)}
+            disabled={disabled}
+            title={`${labels.moreTime}: ${resolvedSmartLabel}`}
+            aria-label={`${labels.moreTime}: ${resolvedSmartLabel}`}
+            aria-haspopup=\"dialog\"
+          >
+            <AppIcon name=\"fast\" size={18} />
+          </button>"""
+          )
+
+          replace_once(
+              'src/components/ShellRefresh.css',
+              """.event-log {
+            min-height: 0;
+            padding-inline: calc(var(--pb-safe-left) + 10px) calc(var(--pb-safe-right) + 10px);
+            scrollbar-gutter: stable;
+          }""",
+              """.event-log {
+            min-height: 0;
+            padding-inline: calc(var(--pb-safe-left) + 10px) calc(var(--pb-safe-right) + 10px);
+            scrollbar-gutter: auto;
+            scrollbar-width: none;
+          }
+
+          .event-log::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
+          }"""
+          )
+
+          replace_once(
+              'src/components/ShellRefresh.css',
+              """.life-shortcut {
+            min-height: var(--pb-tap-target);
+          }""",
+              """.life-shortcuts {
+            margin-bottom: 12px;
+          }
+
+          .life-shortcut {
+            min-height: var(--pb-tap-target);
+          }"""
+          )
+
+          replace_once(
+              'src/components/ShellRefresh.css',
+              """.bottom-navigation {
+            min-height: 78px;
+            grid-template-columns: minmax(0, 1fr) 98px minmax(0, 1fr);
+            padding: 7px 5px 5px;
+          }""",
+              """.bottom-navigation {
+            min-height: 78px;
+            margin-top: 0;
+            grid-template-columns: minmax(0, 1fr) 98px minmax(0, 1fr);
+            padding: 7px 5px 5px;
+          }"""
+          )
+
+          replace_once(
+              'src/components/ShellRefresh.css',
+              """.time-more-action {
+            position: absolute;
+            inset-inline-end: -1px;
+            top: -35px;
+            width: var(--pb-tap-target);
+            height: var(--pb-tap-target);
+            display: grid;
+            place-items: center;
+            border: 1px solid var(--pb-border-strong);
+            border-radius: 999px;
+            color: var(--pb-text-secondary);
+            background: rgba(16, 31, 51, 0.98);
+            box-shadow: var(--pb-elevation-floating);
+          }""",
+              """.time-more-action {
+            position: absolute;
+            inset-inline-end: 14px;
+            top: -20px;
+            z-index: 4;
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            border: 1px solid var(--pb-border-strong);
+            border-radius: 999px;
+            color: var(--pb-blue);
+            background: rgba(16, 31, 51, 0.98);
+            box-shadow: var(--pb-elevation-floating);
+          }"""
+          )
+
+          replace_once(
+              'src/logic/__tests__/androidThemeRegression.test.jsx',
+              """    expect(css).toContain('.time-more-action');
+            expect(css).toContain('top: -35px');
+            expect(css).not.toContain('.time-smart-action');""",
+              """    expect(css).toContain('.time-more-action');
+            expect(css).toContain('top: -20px');
+            expect(css).toContain('margin-top: 0');
+            expect(css).not.toContain('.time-smart-action');"""
+          )
+
+          replace_once(
+              'src/logic/__tests__/arabicScreenshotRegression.test.jsx',
+              "import { BottomNavigation } from '../../components/BottomNavigation';",
+              "import { BottomNavigation } from '../../components/BottomNavigation';\nimport { localizeTimelineEvent } from '../../components/EventLog';"
+          )
+
+          replace_once(
+              'src/logic/__tests__/arabicScreenshotRegression.test.jsx',
+              """  it('translates the exact mixed Arabic relationship event from the phone screenshot', () => {""",
+              """  it('localizes prefixed health history and removes duplicate age prefixes', () => {
+            expect(
+              localizeTimelineEvent(
+                {
+                  type: 'neutral',
+                  text: 'Event: Your symptoms have not completely disappeared. What will you do?',
+                },
+                'ar'
+              )
+            ).toBe('لم تختف الأعراض تماما. ماذا ستفعل؟');
+            expect(
+              localizeTimelineEvent(
+                { type: 'neutral', text: 'You chose to: Visit a doctor ($500)' },
+                'ar'
+              )
+            ).toBe('اخترت: زر طبيبا (500 دولار).');
+            expect(
+              localizeTimelineEvent({ type: 'neutral', text: 'Age 2: Another year passed.' }, 'ar')
+            ).toBe('مر عام آخر.');
+          });
+
+          it('translates the exact mixed Arabic relationship event from the phone screenshot', () => {"""
+          )
+          PY
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Format changed files
+        run: |
+          npm run lint:fix
+          npm run format
+
+      - name: Commit fixes
+        run: |
+          if git diff --quiet; then
+            echo 'Bug fixes already applied.'
+            exit 0
+          fi
+          git config user.name 'PathBloom Automation'
+          git config user.email 'actions@users.noreply.github.com'
+          git add src/components/EventLog.jsx src/components/BottomNavigation.jsx src/components/ShellRefresh.css src/logic/__tests__/androidThemeRegression.test.jsx src/logic/__tests__/arabicScreenshotRegression.test.jsx
+          git commit -m 'Fix Arabic timeline and Android bottom dock regressions'
+          git push origin HEAD:fix/screenshot-arabic-dock

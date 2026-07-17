@@ -105,10 +105,7 @@ const AR_PATTERNS = [
     /^(?:You chose to|You chose|اخترت)\s*:\s*(.+?)[.!؟]*$/i,
     match => `اخترت: ${translateDeepSimulationText(match[1], 'ar').replace(/[.!؟]+$/, '')}.`,
   ],
-  [
-    /^(?:Age|العمر)\s*[0-9٠-٩]+\s*:\s*(.+)$/i,
-    match => translateDeepSimulationText(match[1], 'ar'),
-  ],
+  [/^(?:Age|العمر)\s*[0-9٠-٩]+\s*:\s*(.+)$/i, match => translateDeepSimulationText(match[1], 'ar')],
   [
     /^A pregnancy has begun\. The baby is expected in nine months\.$/,
     () => 'بدأ الحمل، ومن المتوقع ولادة الطفل بعد تسعة أشهر.',

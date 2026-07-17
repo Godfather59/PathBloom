@@ -187,6 +187,15 @@ export const Hud = memo(
               <AppIcon name="recent" size={18} />
               <span>{t('hud.eventHistory', 'Event History')}</span>
             </button>
+            <button
+              type="button"
+              className="hud-safe-action hud-menu-fallback is-menu"
+              onClick={onOpenMenu}
+              aria-label={t('hud.openMenu', 'Open Menu')}
+            >
+              <AppIcon name="menu" size={18} />
+              <span>{t('hud.openMenu', 'Menu')}</span>
+            </button>
           </div>
 
           <button

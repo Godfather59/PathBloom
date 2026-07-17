@@ -181,7 +181,7 @@ describe('physical Android RTL screenshot fixes', () => {
     const source = readComponentSource('Hud.jsx');
 
     expect(css).toContain('.hud-safe-actions');
-    expect(css).toContain('grid-template-columns: repeat(2, minmax(0, 1fr))');
+    expect(css).toContain('grid-auto-columns: minmax(0, 1fr)');
     expect(css).toContain('calc(env(safe-area-inset-top) + 10px)');
     expect(css).toContain('min-height: 48px');
     expect(source).toContain('className="hud-safe-actions"');

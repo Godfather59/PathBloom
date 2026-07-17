@@ -14,6 +14,7 @@ describe('Android HUD safe actions', () => {
     expect(hud).toContain("t('hud.news', 'World News')");
     expect(hud).toContain("t('hud.eventHistory', 'Event History')");
     expect(hud).not.toContain('className="hud-top-btns"');
+    expect(hud).toContain('hud-safe-action hud-menu-fallback is-menu');
     expect(hud).toContain('const openEventHistory = () =>');
     expect(hud).toContain('/(?:Event history|سجل الأحداث)/i');
   });

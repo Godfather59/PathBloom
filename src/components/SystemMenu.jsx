@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { LANGUAGES } from '../logic/i18n';
 import { THEMES } from '../logic/themes';
+import { getCurrentTimePerson } from '../logic/TimeProgression';
+import SimulationDashboard from './SimulationDashboard';
 import './Modal.css';
 
 export function SystemMenu({
@@ -35,7 +37,39 @@ export function SystemMenu({
   onEventHistory,
   onLifeTimeline,
   onCountryProfile,
+  onSimulationDashboard,
 }) {
+  const [showSimulation, setShowSimulation] = useState(false);
+  const currentPerson = getCurrentTimePerson();
+  const openSimulation = onSimulationDashboard || (() => setShowSimulation(true));
+
+  if (showSimulation && currentPerson) {
+    return (
+      <SimulationDashboard
+        person={currentPerson}
+        onClose={() => setShowSimulation(false)}
+        language={language}
+        t={t}
+      />
+    );
+  }
+
+  const navigation = [
+    [onStats, '📊', 'system.stats', 'Lifetime Stats'],
+    [onHistory, '📈', 'system.history', 'Current Life Trends'],
+    [openSimulation, '🧩', 'system.simulation', 'Simulation Overview'],
+    [onFamilyTree, '🌳', 'system.familyTree', 'Family Dynasty'],
+    [onWorldNews, '📰', 'system.worldNews', 'World News'],
+    [onWorldOverview, '🌍', 'system.worldOverview', 'World Overview'],
+    [onRelationshipDashboard, '🤝', 'system.relationships', 'Relationships'],
+    [onLifeTimeline, '🕰️', 'system.lifeTimeline', 'Life Timeline'],
+    [onEventHistory, '📜', 'system.eventHistory', 'Event History'],
+    [onCountryProfile, '🗺️', 'system.countryProfile', 'Country Profile'],
+    [onAchievements, '🏆', 'system.achievements', 'Achievements'],
+    [onChallenge, '🎯', 'system.challenge', 'Challenges'],
+    [onTutorial, '🧭', 'system.tutorial', 'Tutorial'],
+  ];
+
   return (
     <div className="modal-overlay">
       <div
@@ -61,7 +95,6 @@ export function SystemMenu({
           >
             ▶️ {t('system.resume', 'Resume Game')}
           </button>
-
           <button
             className="btn-secondary"
             onClick={onSave}
@@ -69,7 +102,6 @@ export function SystemMenu({
           >
             💾 {t('system.save', 'Save Game')}
           </button>
-
           <button
             className="list-item"
             onClick={onGodMode}
@@ -87,56 +119,17 @@ export function SystemMenu({
             ⚡ {t('system.godMode', 'God Mode')}
           </button>
 
-          <button className="btn-secondary" onClick={onStats} style={{ padding: '12px' }}>
-            📊 {t('system.stats', 'Lifetime Stats')}
-          </button>
-
-          <button className="btn-secondary" onClick={onHistory} style={{ padding: '12px' }}>
-            📈 {t('system.history', 'Current Life Trends')}
-          </button>
-
-          <button className="btn-secondary" onClick={onFamilyTree} style={{ padding: '12px' }}>
-            🌳 {t('system.familyTree', 'Family Dynasty')}
-          </button>
-
-          <button className="btn-secondary" onClick={onWorldNews} style={{ padding: '12px' }}>
-            📰 {t('system.worldNews', 'World News')}
-          </button>
-
-          <button className="btn-secondary" onClick={onWorldOverview} style={{ padding: '12px' }}>
-            🌍 {t('system.worldOverview', 'World Overview')}
-          </button>
-
-          {onRelationshipDashboard && (
-            <button
-              className="btn-secondary"
-              onClick={onRelationshipDashboard}
-              style={{ padding: '12px' }}
-            >
-              📊 {t('system.relationships', 'Relationships')}
-            </button>
-          )}
-
-          {onLifeTimeline && (
-            <button className="btn-secondary" onClick={onLifeTimeline} style={{ padding: '12px' }}>
-              📈 {t('system.lifeTimeline', 'Life Timeline')}
-            </button>
-          )}
-
-          {onEventHistory && (
-            <button className="btn-secondary" onClick={onEventHistory} style={{ padding: '12px' }}>
-              📜 {t('system.eventHistory', 'Event History')}
-            </button>
-          )}
-
-          {onCountryProfile && (
-            <button
-              className="btn-secondary"
-              onClick={onCountryProfile}
-              style={{ padding: '12px' }}
-            >
-              🗺️ {t('system.countryProfile', 'Country Profile')}
-            </button>
+          {navigation.map(([handler, icon, key, fallback]) =>
+            handler ? (
+              <button
+                key={key}
+                className="btn-secondary"
+                onClick={handler}
+                style={{ padding: '12px' }}
+              >
+                {icon} {t(key, fallback)}
+              </button>
+            ) : null
           )}
 
           {onDebug && (
@@ -148,18 +141,6 @@ export function SystemMenu({
               🛠️ {t('system.debug', 'Debug Tools')}
             </button>
           )}
-
-          <button className="btn-secondary" onClick={onAchievements} style={{ padding: '12px' }}>
-            🏆 {t('system.achievements', 'Achievements')}
-          </button>
-
-          <button className="btn-secondary" onClick={onChallenge} style={{ padding: '12px' }}>
-            🎯 {t('system.challenge', 'Challenges')}
-          </button>
-
-          <button className="btn-secondary" onClick={onTutorial} style={{ padding: '12px' }}>
-            🧭 {t('system.tutorial', 'Tutorial')}
-          </button>
 
           <button
             className="btn-secondary"
@@ -197,10 +178,10 @@ export function SystemMenu({
               max="1"
               step="0.05"
               value={sfxVolume}
-              onChange={e => onSfxVolumeChange?.(Number(e.target.value))}
+              onChange={event => onSfxVolumeChange?.(Number(event.target.value))}
               style={{ width: '100%', accentColor: 'var(--accent-primary)' }}
             />
-            <div style={{ textAlign: 'right', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+            <div style={{ textAlign: 'end', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
               {Math.round(sfxVolume * 100)}%
             </div>
           </div>
@@ -215,10 +196,10 @@ export function SystemMenu({
               max="1"
               step="0.05"
               value={musicVolume}
-              onChange={e => onMusicVolumeChange?.(Number(e.target.value))}
+              onChange={event => onMusicVolumeChange?.(Number(event.target.value))}
               style={{ width: '100%', accentColor: 'var(--accent-primary)' }}
             />
-            <div style={{ textAlign: 'right', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+            <div style={{ textAlign: 'end', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
               {Math.round(musicVolume * 100)}%
             </div>
           </div>
@@ -275,8 +256,7 @@ export function SystemMenu({
             </div>
           </div>
 
-          <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', margin: '8px 0' }}></div>
-
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', margin: '8px 0' }} />
           <button
             className="btn-danger"
             onClick={() => {

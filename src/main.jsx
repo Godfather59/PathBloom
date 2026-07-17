@@ -32,7 +32,12 @@ window.addEventListener('unhandledrejection', event => {
 
 async function bootstrap() {
   try {
+    // Runtime order matters: compatibility fixes first, connected simulation second,
+    // then country careers and smart monthly controls wrap the completed pipeline.
     await import('./logic/GameEngineRuntimeFixes');
+    await import('./logic/DeepSimulationRuntime');
+    await import('./logic/CountryJobRuntime');
+    await import('./logic/SmartMonthRuntime');
 
     const [{ App: CapApp }, { default: App }, { default: ErrorBoundary }] = await Promise.all([
       import('@capacitor/app'),

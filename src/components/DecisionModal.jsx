@@ -1,6 +1,7 @@
 import React from 'react';
 import { translateGameMessage, translateGameText } from '../logic/i18n';
 import { cleanLocalizedText } from '../logic/localizationSanitizer';
+import { translateDeepSimulationText } from '../logic/DeepLocalization';
 import './Modal.css';
 
 const TYPE_EMOJIS = {
@@ -51,8 +52,8 @@ export function DecisionModal({
     const localized = messageKey
       ? translateGameMessage(language, messageKey, messageParams || {}, value)
       : translateGameText(language, value);
-
-    return cleanLocalizedText(localized, value, language);
+    const cleaned = cleanLocalizedText(localized, value, language);
+    return translateDeepSimulationText(cleaned, language);
   };
 
   return (
@@ -72,9 +73,9 @@ export function DecisionModal({
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {event.choices.map((choice, index) => (
+            {(event.choices || []).map((choice, index) => (
               <button
-                key={index}
+                key={choice.id || choice.effect || index}
                 onClick={() => onChoice(choice)}
                 className="btn-secondary"
                 style={{

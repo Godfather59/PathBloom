@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, memo, useMemo } from 'react';
 import { translateGameMessage, translateGameText } from '../logic/i18n';
 import { cleanLocalizedText } from '../logic/localizationSanitizer';
+import { translateDeepSimulationText } from '../logic/DeepLocalization';
 import './EventLog.css';
 
 const MAX_VISIBLE_EVENTS = 100;
@@ -9,8 +10,8 @@ const localizeEvent = (event, language) => {
   const localized = event.messageKey
     ? translateGameMessage(language, event.messageKey, event.messageParams || {}, event.text)
     : translateGameText(language, event.text);
-
-  return cleanLocalizedText(localized, event.text, language);
+  const cleaned = cleanLocalizedText(localized, event.text, language);
+  return translateDeepSimulationText(cleaned, language);
 };
 
 const EventCard = memo(({ event, language, t }) => (
@@ -53,7 +54,6 @@ export const EventLog = memo(
         ro.observe(actionMenu);
       }
       updatePadding();
-
       return () => ro.disconnect();
     }, []);
 

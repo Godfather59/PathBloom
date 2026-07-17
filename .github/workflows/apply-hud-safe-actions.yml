@@ -1,0 +1,338 @@
+name: Apply HUD safe action fixes
+
+on:
+  push:
+    branches: [fix/hud-icons-safe-actions]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apply-hud-safe-actions
+  cancel-in-progress: false
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out fix branch
+        uses: actions/checkout@v6
+        with:
+          ref: fix/hud-icons-safe-actions
+          persist-credentials: true
+
+      - name: Apply source changes
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new, label):
+              text = path.read_text(encoding='utf-8')
+              if old not in text:
+                  if new in text:
+                      return
+                  raise SystemExit(f'{label}: expected source block not found')
+              path.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          hud = Path('src/components/Hud.jsx')
+          replace_once(
+              hud,
+              """    onOpenMenu,
+              onWorldNews,
+              language = 'en',""",
+              """    onOpenMenu,
+              onWorldNews,
+              onEventHistory,
+              language = 'en',""",
+              'HUD history prop',
+          )
+
+          old_top_actions = """
+            <div className="hud-top-btns">
+              {Array.isArray(person.worldNews) && person.worldNews.length > 0 && (
+                <button
+                  type="button"
+                  onClick={onWorldNews}
+                  className="hud-icon-button news-btn"
+                  aria-label={t('hud.news', 'World News')}
+                >
+                  <AppIcon name="news" size={19} />
+                  <span className="news-btn-count">
+                    {isArabic
+                      ? formatArabicNumber(person.worldNews.length, { maximumFractionDigits: 0 })
+                      : person.worldNews.length}
+                  </span>
+                </button>
+              )}
+              <button
+                type="button"
+                className="hud-icon-button hud-menu-fallback"
+                onClick={onOpenMenu}
+                aria-label={t('hud.openMenu', 'Open Menu')}
+              >
+                <AppIcon name="menu" size={19} />
+              </button>
+            </div>"""
+          text = hud.read_text(encoding='utf-8')
+          if old_top_actions in text:
+              text = text.replace(old_top_actions, '', 1)
+          elif 'className="hud-safe-actions"' not in text:
+              raise SystemExit('HUD top action block not found')
+
+          anchor = """            </div>
+          </div>
+
+          <button
+            type="button"
+            className="hud-stat-summary""" 
+          replacement = """            </div>
+          </div>
+
+          <div
+            className="hud-safe-actions"
+            aria-label={isArabic ? 'اختصارات الأخبار والسجل' : 'News and history shortcuts'}
+          >
+            {Array.isArray(person.worldNews) && person.worldNews.length > 0 && (
+              <button
+                type="button"
+                onClick={onWorldNews}
+                className="hud-safe-action is-news"
+                aria-label={t('hud.news', 'World News')}
+              >
+                <AppIcon name="news" size={18} />
+                <span>{t('hud.news', 'World News')}</span>
+                <strong className="hud-safe-action-count">
+                  {isArabic
+                    ? formatArabicNumber(person.worldNews.length, { maximumFractionDigits: 0 })
+                    : person.worldNews.length}
+                </strong>
+              </button>
+            )}
+            <button
+              type="button"
+              className="hud-safe-action is-history"
+              onClick={onEventHistory}
+              aria-label={t('hud.eventHistory', 'Event History')}
+            >
+              <AppIcon name="recent" size={18} />
+              <span>{t('hud.eventHistory', 'Event History')}</span>
+            </button>
+          </div>
+
+          <button
+            type="button"
+            className="hud-stat-summary"""
+          if anchor in text:
+              text = text.replace(anchor, replacement, 1)
+          elif 'className="hud-safe-actions"' not in text:
+              raise SystemExit('HUD safe-action insertion point not found')
+          hud.write_text(text, encoding='utf-8')
+
+          app = Path('src/App.jsx')
+          replace_once(
+              app,
+              """        onWorldNews={() => setModal('world_news')}
+              language={language}""",
+              """        onWorldNews={() => setModal('world_news')}
+              onEventHistory={() => setModal('event_history')}
+              language={language}""",
+              'App HUD history callback',
+          )
+
+          main = Path('src/main.jsx')
+          replace_once(
+              main,
+              """import './components/ScreenshotFollowup.css';""",
+              """import './components/ScreenshotFollowup.css';
+          import './components/HudSafeActions.css';""",
+              'HUD CSS import',
+          )
+
+          icons = Path('src/components/AppIcon.jsx')
+          text = icons.read_text(encoding='utf-8')
+          old_icons = """  life: (
+              <path d="M12 21s-7-4.35-9.33-8.12C.78 9.82 2.12 6 5.72 5.35A5.2 5.2 0 0 1 12 8.16a5.2 5.2 0 0 1 6.28-2.81c3.6.65 4.94 4.47 3.05 7.53C19 16.65 12 21 12 21Z" />
+            ),
+            health: (
+              <path d="M12 21s-7-4.35-9.33-8.12C.78 9.82 2.12 6 5.72 5.35A5.2 5.2 0 0 1 12 8.16a5.2 5.2 0 0 1 6.28-2.81c3.6.65 4.94 4.47 3.05 7.53C19 16.65 12 21 12 21Z" />
+            ),"""
+          new_icons = """  life: (
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z" />
+            ),
+            health: (
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z" />
+            ),"""
+          if old_icons in text:
+              text = text.replace(old_icons, new_icons, 1)
+          elif 'M20.84 4.61a5.5' not in text:
+              raise SystemExit('Heart icon definitions not found')
+          icons.write_text(text, encoding='utf-8')
+
+          Path('src/components/HudSafeActions.css').write_text("""/* Physical Android HUD follow-up: keep utility actions below the system gesture/status region. */
+          .hud-container {
+            padding-top: max(24px, calc(env(safe-area-inset-top) + 10px));
+          }
+
+          .hud-identity-row {
+            grid-template-columns: auto minmax(0, 1fr) auto;
+          }
+
+          .hud-top-btns {
+            display: none !important;
+          }
+
+          .hud-safe-actions {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 7px;
+            margin-top: 9px;
+          }
+
+          .hud-safe-action {
+            min-width: 0;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 8px 10px;
+            border: 1px solid var(--pb-border);
+            border-radius: 13px;
+            color: var(--pb-text-secondary);
+            background: rgba(204, 226, 255, 0.045);
+            font-size: 0.72rem;
+            font-weight: 800;
+          }
+
+          .hud-safe-action span {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+
+          .hud-safe-action.is-news {
+            color: var(--pb-gold);
+            border-color: rgba(243, 201, 105, 0.2);
+            background: rgba(243, 201, 105, 0.075);
+          }
+
+          .hud-safe-action.is-history {
+            color: var(--pb-blue);
+            border-color: rgba(103, 169, 255, 0.2);
+            background: rgba(103, 169, 255, 0.07);
+          }
+
+          .hud-safe-action-count {
+            min-width: 22px;
+            height: 22px;
+            display: grid;
+            place-items: center;
+            padding-inline: 5px;
+            border-radius: 999px;
+            color: #251b05;
+            background: var(--pb-gold);
+            font-size: 0.62rem;
+            line-height: 1;
+            font-weight: 900;
+          }
+
+          /* Heart/stat glyphs must stay clean. Only the avatar retains its online status dot. */
+          .compact-stat-icon,
+          .stat-symbol {
+            background: transparent;
+          }
+
+          .compact-stat-icon::before,
+          .compact-stat-icon::after,
+          .stat-symbol::before,
+          .stat-symbol::after,
+          .timeline-dot::before,
+          .timeline-dot::after {
+            content: none !important;
+            display: none !important;
+          }
+
+          @media (max-width: 360px) {
+            .hud-safe-action {
+              padding-inline: 7px;
+              font-size: 0.66rem;
+            }
+          }
+
+          @media (min-width: 700px) {
+            .hud-container {
+              padding-top: max(14px, env(safe-area-inset-top));
+            }
+          }
+          """, encoding='utf-8')
+
+          Path('src/logic/__tests__/hudSafeActions.test.jsx').write_text("""/* @vitest-environment jsdom */
+
+          import fs from 'node:fs';
+          import path from 'node:path';
+          import { describe, expect, it } from 'vitest';
+
+          const read = (...segments) =>
+            fs.readFileSync(path.join(process.cwd(), ...segments), 'utf8');
+
+          describe('Android HUD safe actions', () => {
+            it('moves News and Event History below the identity row', () => {
+              const hud = read('src', 'components', 'Hud.jsx');
+              const app = read('src', 'App.jsx');
+
+              expect(hud).toContain('className="hud-safe-actions"');
+              expect(hud).toContain("t('hud.news', 'World News')");
+              expect(hud).toContain("t('hud.eventHistory', 'Event History')");
+              expect(hud).not.toContain('className="hud-top-btns"');
+              expect(app).toContain("onEventHistory={() => setModal('event_history')}");
+            });
+
+            it('keeps HUD actions below the Android status region', () => {
+              const css = read('src', 'components', 'HudSafeActions.css');
+
+              expect(css).toContain('calc(env(safe-area-inset-top) + 10px)');
+              expect(css).toContain('min-height: 48px');
+              expect(css).toContain('.hud-safe-actions');
+            });
+
+            it('uses the clean heart path without decorative stat dots', () => {
+              const icons = read('src', 'components', 'AppIcon.jsx');
+              const css = read('src', 'components', 'HudSafeActions.css');
+
+              expect(icons).toContain('M20.84 4.61a5.5');
+              expect(icons).not.toContain('M12 21s-7-4.35');
+              expect(css).toContain('.compact-stat-icon::after');
+              expect(css).toContain('content: none !important');
+            });
+          });
+          """, encoding='utf-8')
+          PY
+
+      - name: Install and format changed files
+        run: |
+          npm ci
+          npx prettier --write \
+            src/App.jsx \
+            src/main.jsx \
+            src/components/AppIcon.jsx \
+            src/components/Hud.jsx \
+            src/components/HudSafeActions.css \
+            src/logic/__tests__/hudSafeActions.test.jsx
+
+      - name: Validate focused changes
+        run: |
+          npm run lint
+          npx vitest run src/logic/__tests__/hudSafeActions.test.jsx src/logic/__tests__/androidThemeRegression.test.jsx
+
+      - name: Commit source fixes
+        run: |
+          git config user.name 'PathBloom Automation'
+          git config user.email 'actions@users.noreply.github.com'
+          git add src/App.jsx src/main.jsx src/components/AppIcon.jsx src/components/Hud.jsx src/components/HudSafeActions.css src/logic/__tests__/hudSafeActions.test.jsx
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m 'Move HUD news and history below Android status area'
+          git push origin HEAD:fix/hud-icons-safe-actions

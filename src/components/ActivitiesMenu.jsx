@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { ACTIVITIES } from '../logic/Activities';
+import { formatArabicMoney, formatArabicNumber } from '../logic/ArabicLocalization';
+import { AppIcon } from './AppIcon';
 import './Modal.css';
 
 const FEATURE_CARDS = [
@@ -7,7 +9,7 @@ const FEATURE_CARDS = [
     key: 'royalty',
     title: 'Royalty',
     emoji: '👑',
-    color: 'gold',
+    category: 'status',
     when: person => Boolean(person.royalty),
     payload: { isRoyalty: true },
   },
@@ -15,7 +17,7 @@ const FEATURE_CARDS = [
     key: 'social',
     title: 'Social Media',
     emoji: '📱',
-    color: '#03a9f4',
+    category: 'social',
     minAge: 13,
     payload: { isSocial: true },
   },
@@ -23,7 +25,7 @@ const FEATURE_CARDS = [
     key: 'love',
     title: 'Love',
     emoji: '💘',
-    color: '#e91e63',
+    category: 'social',
     minAge: 18,
     payload: { isLove: true },
   },
@@ -31,16 +33,22 @@ const FEATURE_CARDS = [
     key: 'music',
     title: 'Instruments',
     emoji: '🎵',
-    color: '#9c27b0',
+    category: 'growth',
     minAge: 6,
     payload: { isMusic: true },
   },
-  { key: 'doctor', title: 'Doctor', emoji: '🏥', color: '#00e676', payload: { isDoctor: true } },
+  {
+    key: 'doctor',
+    title: 'Doctor',
+    emoji: '🏥',
+    category: 'wellness',
+    payload: { isDoctor: true },
+  },
   {
     key: 'politics',
     title: 'Politics',
     emoji: '🗳️',
-    color: '#1e88e5',
+    category: 'status',
     minAge: 18,
     payload: { isPolitics: true },
   },
@@ -48,7 +56,7 @@ const FEATURE_CARDS = [
     key: 'crime',
     title: 'Crime',
     emoji: '🕵️',
-    color: '#777',
+    category: 'risk',
     minAge: 12,
     payload: { isCrimeHub: true },
   },
@@ -56,7 +64,7 @@ const FEATURE_CARDS = [
     key: 'business',
     title: 'Business',
     emoji: '🏢',
-    color: '#43a047',
+    category: 'money',
     minAge: 18,
     payload: { isBusiness: true },
   },
@@ -64,7 +72,7 @@ const FEATURE_CARDS = [
     key: 'immigration',
     title: 'Immigration',
     emoji: '🌍',
-    color: '#26c6da',
+    category: 'world',
     minAge: 18,
     payload: { isImmigration: true },
   },
@@ -72,7 +80,7 @@ const FEATURE_CARDS = [
     key: 'casino',
     title: 'Casino',
     emoji: '🎰',
-    color: '#ffb300',
+    category: 'risk',
     minAge: 18,
     payload: { isGambling: true },
   },
@@ -80,7 +88,7 @@ const FEATURE_CARDS = [
     key: 'hobbies',
     title: 'Hobbies',
     emoji: '🎨',
-    color: '#8d6e63',
+    category: 'growth',
     minAge: 6,
     payload: { isHobbies: true },
   },
@@ -88,7 +96,7 @@ const FEATURE_CARDS = [
     key: 'fitness',
     title: 'Fitness',
     emoji: '💪',
-    color: '#4caf50',
+    category: 'wellness',
     minAge: 13,
     payload: { isFitness: true },
   },
@@ -96,7 +104,7 @@ const FEATURE_CARDS = [
     key: 'addiction',
     title: 'Substances',
     emoji: '⚠️',
-    color: '#ff1744',
+    category: 'risk',
     minAge: 18,
     payload: { isAddiction: true },
   },
@@ -104,7 +112,7 @@ const FEATURE_CARDS = [
     key: 'insurance',
     title: 'Insurance',
     emoji: '🛡️',
-    color: '#7c4dff',
+    category: 'money',
     minAge: 18,
     payload: { isInsurance: true },
   },
@@ -112,7 +120,7 @@ const FEATURE_CARDS = [
     key: 'retirement',
     title: 'Retirement',
     emoji: '🏖️',
-    color: '#ffab00',
+    category: 'money',
     minAge: 18,
     payload: { isRetirement: true },
   },
@@ -120,7 +128,7 @@ const FEATURE_CARDS = [
     key: 'sports',
     title: 'College Sports',
     emoji: '🏀',
-    color: '#1a237e',
+    category: 'wellness',
     minAge: 14,
     payload: { isSports: true },
   },
@@ -128,7 +136,7 @@ const FEATURE_CARDS = [
     key: 'space',
     title: 'Space Program',
     emoji: '🚀',
-    color: '#0d47a1',
+    category: 'growth',
     minAge: 22,
     payload: { isSpace: true },
   },
@@ -136,7 +144,7 @@ const FEATURE_CARDS = [
     key: 'philanthropy',
     title: 'Philanthropy',
     emoji: '🎁',
-    color: '#2e7d32',
+    category: 'social',
     minAge: 18,
     payload: { isPhilanthropy: true },
   },
@@ -144,7 +152,7 @@ const FEATURE_CARDS = [
     key: 'clubs',
     title: 'Clubs & Societies',
     emoji: '🎓',
-    color: '#6a1b9a',
+    category: 'social',
     minAge: 6,
     payload: { isClubs: true },
   },
@@ -152,7 +160,7 @@ const FEATURE_CARDS = [
     key: 'lawsuits',
     title: 'Lawsuits',
     emoji: '⚖️',
-    color: '#bf360c',
+    category: 'risk',
     minAge: 18,
     payload: { isLawsuits: true },
   },
@@ -160,7 +168,7 @@ const FEATURE_CARDS = [
     key: 'memories',
     title: 'Memories',
     emoji: '📸',
-    color: '#f06292',
+    category: 'growth',
     minAge: 6,
     payload: { isMemories: true },
   },
@@ -187,39 +195,102 @@ const ACTIVITY_EMOJIS = {
   court_case_activity: '⚖️',
 };
 
-const isBasicActivity = activity => {
-  return (
-    !activity.isDating &&
-    !activity.isSocial &&
-    !activity.isMusic &&
-    !activity.isMafia &&
-    !activity.isPolitics &&
-    !activity.isGambling &&
-    !activity.isDoctor &&
-    !activity.isCrime
-  );
-};
-
 const EFFECT_ICONS = {
-  happiness: '😊',
-  health: '❤️',
-  smarts: '🧠',
-  looks: '✨',
-  stress: '😵',
-  karma: '⚖️',
-  fame: '🌟',
-  notoriety: '🕶️',
+  happiness: '☺',
+  health: '♥',
+  smarts: '◇',
+  looks: '✦',
+  stress: '!',
+  karma: '⚖',
+  fame: '★',
+  notoriety: '◆',
 };
 
-const getEffectSummary = (activity, t) =>
-  Object.entries(activity.effects || {})
+const COPY = {
+  en: {
+    title: 'Activities',
+    subtitle: 'Choose how to spend your time and shape this life.',
+    search: 'Search activities',
+    featured: 'Featured paths',
+    quick: 'Quick actions',
+    noResults: 'No activities match this search.',
+    all: 'All',
+    wellness: 'Wellness',
+    social: 'Social',
+    growth: 'Growth',
+    money: 'Money',
+    risk: 'Risk',
+    world: 'World',
+    status: 'Influence',
+    locked: 'Unlocks at age',
+    free: 'Free',
+    energy: 'energy',
+  },
+  ar: {
+    title: 'الأنشطة',
+    subtitle: 'اختر كيف تقضي وقتك وتصنع مسار هذه الحياة.',
+    search: 'ابحث في الأنشطة',
+    featured: 'مسارات مميزة',
+    quick: 'أنشطة سريعة',
+    noResults: 'لا توجد أنشطة مطابقة للبحث.',
+    all: 'الكل',
+    wellness: 'الصحة',
+    social: 'اجتماعي',
+    growth: 'التطور',
+    money: 'المال',
+    risk: 'المخاطرة',
+    world: 'العالم',
+    status: 'النفوذ',
+    locked: 'يفتح في عمر',
+    free: 'مجاني',
+    energy: 'طاقة',
+  },
+};
+
+const CATEGORIES = ['all', 'wellness', 'social', 'growth', 'money', 'risk', 'world', 'status'];
+
+const isBasicActivity = activity =>
+  !activity.isDating &&
+  !activity.isSocial &&
+  !activity.isMusic &&
+  !activity.isMafia &&
+  !activity.isPolitics &&
+  !activity.isGambling &&
+  !activity.isDoctor &&
+  !activity.isCrime;
+
+function inferBasicCategory(activity) {
+  const id = String(activity.id || '').toLowerCase();
+  if (/gym|meditat|plastic|doctor/.test(id)) {
+    return 'wellness';
+  }
+  if (/date|club|pet/.test(id)) {
+    return 'social';
+  }
+  if (/crime|robbery|burglary|pickpocket|gamble|court/.test(id)) {
+    return 'risk';
+  }
+  if (/travel/.test(id)) {
+    return 'world';
+  }
+  if (/estate|lottery/.test(id)) {
+    return 'money';
+  }
+  return 'growth';
+}
+
+function getEffectSummary(activity, language, t) {
+  return Object.entries(activity.effects || {})
     .filter(([, value]) => Number(value) !== 0)
-    .slice(0, 4)
-    .map(
-      ([key, value]) =>
-        `${EFFECT_ICONS[key] || '•'} ${t(`stat.${key}`, key)} ${Number(value) > 0 ? '+' : ''}${value}`
-    )
-    .join(' · ');
+    .slice(0, 3)
+    .map(([key, value]) => ({
+      key,
+      positive: key === 'stress' ? Number(value) < 0 : Number(value) > 0,
+      text: `${EFFECT_ICONS[key] || '•'} ${t(`stat.${key}`, key)} ${Number(value) > 0 ? '+' : ''}${
+        language === 'ar' ? formatArabicNumber(value, { maximumFractionDigits: 0 }) : value
+      }`,
+    }));
+}
 
 export function ActivitiesMenu({
   person,
@@ -228,99 +299,228 @@ export function ActivitiesMenu({
   language = 'en',
   t = (key, fallback) => fallback || key,
 }) {
-  const visibleCards = FEATURE_CARDS.filter(card => !card.when || card.when(person));
-  const isRtl = language === 'ar';
+  const [query, setQuery] = useState('');
+  const [category, setCategory] = useState('all');
+  const locale = language === 'ar' ? 'ar' : 'en';
+  const copy = COPY[locale];
+  const normalizedQuery = query.trim().toLowerCase();
+
+  const visibleCards = useMemo(
+    () =>
+      FEATURE_CARDS.filter(card => !card.when || card.when(person))
+        .filter(card => category === 'all' || card.category === category)
+        .filter(card => {
+          const title = t(`activities.${card.key}`, card.title);
+          return (
+            !normalizedQuery || `${title} ${card.title}`.toLowerCase().includes(normalizedQuery)
+          );
+        }),
+    [person, category, normalizedQuery, t]
+  );
+
+  const basicActivities = useMemo(
+    () =>
+      ACTIVITIES.filter(isBasicActivity)
+        .map(activity => ({ ...activity, uiCategory: inferBasicCategory(activity) }))
+        .filter(activity => category === 'all' || activity.uiCategory === category)
+        .filter(activity => {
+          const title = t(`activity.${activity.id}`, activity.title);
+          return (
+            !normalizedQuery || `${title} ${activity.title}`.toLowerCase().includes(normalizedQuery)
+          );
+        }),
+    [category, normalizedQuery, t]
+  );
+
+  const hasResults = visibleCards.length > 0 || basicActivities.length > 0;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content" style={{ maxWidth: '520px' }} dir={isRtl ? 'rtl' : 'ltr'}>
-        <div className="modal-header">
-          <h2 className="modal-title">🎯 {t('activities.title', 'Activities')}</h2>
-          <button className="close-btn" onClick={onClose}>
-            &times;
-          </button>
-        </div>
-
-        <div className="modal-body">
-          <div className="activity-grid">
-            {visibleCards.map(card => {
-              const locked = Number.isFinite(card.minAge) && person.age < card.minAge;
-              return (
-                <button
-                  key={card.key}
-                  className="list-item activity-card"
-                  onClick={() =>
-                    onDoActivity({ ...card.payload, minAge: card.minAge, title: card.title })
-                  }
-                  disabled={locked}
-                  style={{
-                    ...(isRtl ? { borderRightColor: card.color } : { borderLeftColor: card.color }),
-                    opacity: locked ? 0.5 : 1,
-                  }}
-                >
-                  <span className="activity-token" aria-hidden="true">
-                    {card.emoji}
-                  </span>
-                  <span className="list-item-title">{t(`activities.${card.key}`, card.title)}</span>
-                  <span className="activity-hint">
-                    {locked
-                      ? `${t('activities.unlocksAt', 'Unlocks at')} ${card.minAge}`
-                      : t(`activities.${card.key}Hint`, '')}
-                  </span>
-                </button>
-              );
-            })}
+    <div className="modal-overlay destination-overlay">
+      <section className="destination-screen activities-hub" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+        <header className="destination-header">
+          <div className="destination-title-group">
+            <span className="destination-icon">
+              <AppIcon name="activities" size={23} />
+            </span>
+            <div>
+              <h1>{copy.title}</h1>
+              <p>{copy.subtitle}</p>
+            </div>
           </div>
+          <button
+            type="button"
+            className="destination-close"
+            onClick={onClose}
+            aria-label={t('common.close', 'Close')}
+          >
+            <AppIcon name="close" size={21} />
+          </button>
+        </header>
 
-          <h3 className="section-heading">✨ {t('activities.more', 'More Activities')}</h3>
-
-          <div className="stack-list">
-            {ACTIVITIES.filter(isBasicActivity).map(act => (
+        <div className="destination-toolbar">
+          <label className="activity-search">
+            <AppIcon name="activities" size={17} />
+            <input
+              value={query}
+              onChange={event => setQuery(event.target.value)}
+              placeholder={copy.search}
+              aria-label={copy.search}
+            />
+            {query && (
               <button
-                key={act.id}
-                className="list-item activity-row"
-                onClick={() => onDoActivity(act)}
-                disabled={Number.isFinite(act.minAge) && person.age < act.minAge}
-                style={{
-                  opacity: Number.isFinite(act.minAge) && person.age < act.minAge ? 0.5 : 1,
-                }}
+                type="button"
+                onClick={() => setQuery('')}
+                aria-label={t('common.close', 'Clear')}
               >
-                <span className="activity-row-copy">
-                  <span className="activity-row-main">
-                    <span className="activity-row-emoji" aria-hidden="true">
-                      {ACTIVITY_EMOJIS[act.id] || '✨'}
-                    </span>
-                    <span className="list-item-title" style={{ margin: 0 }}>
-                      {t(`activity.${act.id}`, act.title)}
-                    </span>
-                  </span>
-                  {getEffectSummary(act, t) && (
-                    <small className="activity-effect-summary">{getEffectSummary(act, t)}</small>
-                  )}
-                </span>
-                <span className="activity-meta-stack">
-                  <span className={`cost-pill ${act.cost > 0 ? 'paid' : 'free'}`}>
-                    {act.cost > 0
-                      ? `$${Number(act.cost).toLocaleString()}`
-                      : t('common.free', 'Free')}
-                  </span>
-                  <span className="activity-meta-pill energy">
-                    ⚡ {Number(act.energyCost) || 0}
-                  </span>
-                  {Number.isFinite(act.minAge) && (
-                    <span className="activity-meta-pill age">🎂 {act.minAge}+</span>
-                  )}
-                  {act.risk && (
-                    <span className={`activity-meta-pill risk-${act.risk}`}>
-                      ⚠️ {t(`risk.${act.risk}`, act.risk)}
-                    </span>
-                  )}
-                </span>
+                <AppIcon name="close" size={15} />
+              </button>
+            )}
+          </label>
+
+          <div className="activity-category-tabs" role="tablist" aria-label={copy.title}>
+            {CATEGORIES.map(id => (
+              <button
+                key={id}
+                type="button"
+                role="tab"
+                aria-selected={category === id}
+                className={category === id ? 'is-active' : ''}
+                onClick={() => setCategory(id)}
+              >
+                {copy[id]}
               </button>
             ))}
           </div>
         </div>
-      </div>
+
+        <div className="destination-scroll">
+          {visibleCards.length > 0 && (
+            <section className="activity-section">
+              <div className="activity-section-heading">
+                <span>{copy.featured}</span>
+                <strong>{visibleCards.length}</strong>
+              </div>
+              <div className="feature-path-grid">
+                {visibleCards.map(card => {
+                  const locked = Number.isFinite(card.minAge) && person.age < card.minAge;
+                  return (
+                    <button
+                      key={card.key}
+                      type="button"
+                      className={`feature-path-card category-${card.category}`}
+                      onClick={() =>
+                        onDoActivity({ ...card.payload, minAge: card.minAge, title: card.title })
+                      }
+                      disabled={locked}
+                    >
+                      <span className="feature-path-icon" aria-hidden="true">
+                        {card.emoji}
+                      </span>
+                      <span className="feature-path-copy">
+                        <strong>{t(`activities.${card.key}`, card.title)}</strong>
+                        <small>
+                          {locked
+                            ? `${copy.locked} ${
+                                locale === 'ar'
+                                  ? formatArabicNumber(card.minAge, { maximumFractionDigits: 0 })
+                                  : card.minAge
+                              }`
+                            : t(`activities.${card.key}Hint`, '')}
+                        </small>
+                      </span>
+                      <AppIcon name="chevron" size={17} className="feature-path-arrow" />
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          {basicActivities.length > 0 && (
+            <section className="activity-section">
+              <div className="activity-section-heading">
+                <span>{copy.quick}</span>
+                <strong>{basicActivities.length}</strong>
+              </div>
+              <div className="quick-activity-list">
+                {basicActivities.map(activity => {
+                  const locked = Number.isFinite(activity.minAge) && person.age < activity.minAge;
+                  const effects = getEffectSummary(activity, locale, t);
+                  const cost = Number(activity.cost) || 0;
+                  return (
+                    <button
+                      key={activity.id}
+                      type="button"
+                      className={`quick-activity-row category-${activity.uiCategory}`}
+                      onClick={() => onDoActivity(activity)}
+                      disabled={locked}
+                    >
+                      <span className="quick-activity-icon" aria-hidden="true">
+                        {ACTIVITY_EMOJIS[activity.id] || '✦'}
+                      </span>
+                      <span className="quick-activity-copy">
+                        <strong>{t(`activity.${activity.id}`, activity.title)}</strong>
+                        {effects.length > 0 && (
+                          <span className="quick-effect-list">
+                            {effects.map(effect => (
+                              <span
+                                key={effect.key}
+                                className={effect.positive ? 'is-positive' : 'is-negative'}
+                              >
+                                {effect.text}
+                              </span>
+                            ))}
+                          </span>
+                        )}
+                        {locked && (
+                          <small>
+                            {copy.locked}{' '}
+                            {locale === 'ar'
+                              ? formatArabicNumber(activity.minAge, { maximumFractionDigits: 0 })
+                              : activity.minAge}
+                          </small>
+                        )}
+                      </span>
+                      <span className="quick-activity-meta">
+                        <span className={cost > 0 ? 'is-paid' : 'is-free'}>
+                          {cost > 0
+                            ? locale === 'ar'
+                              ? formatArabicMoney(cost)
+                              : `$${cost.toLocaleString('en-US')}`
+                            : copy.free}
+                        </span>
+                        <span>
+                          ϟ{' '}
+                          {locale === 'ar'
+                            ? formatArabicNumber(Number(activity.energyCost) || 0, {
+                                maximumFractionDigits: 0,
+                              })
+                            : Number(activity.energyCost) || 0}{' '}
+                          {copy.energy}
+                        </span>
+                        {activity.risk && (
+                          <span className={`risk-${activity.risk}`}>
+                            {t(`risk.${activity.risk}`, activity.risk)}
+                          </span>
+                        )}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          {!hasResults && (
+            <div className="destination-empty">
+              <span>
+                <AppIcon name="activities" size={28} />
+              </span>
+              <strong>{copy.noResults}</strong>
+            </div>
+          )}
+        </div>
+      </section>
     </div>
   );
 }

@@ -62,7 +62,10 @@ describe('App save and continue smoke test', () => {
     await act(async () => confirmButton.click());
 
     expect(container.querySelector('.hud-container')).not.toBeNull();
-    await act(async () => container.querySelector('.settings-btn').click());
+    await act(async () => container.querySelector('.hud-menu-fallback').click());
+    const settingsButton = findButton('Settings');
+    expect(settingsButton).toBeDefined();
+    await act(async () => settingsButton.click());
     const volumeInputs = container.querySelectorAll('input[type="range"]');
     expect(volumeInputs).toHaveLength(2);
     await act(async () => setInputValue(volumeInputs[0], '0.4'));

@@ -6,6 +6,12 @@ import './index.css';
 import './components/NewFeatures.css';
 import './components/MobilePolish.css';
 import './components/ArabicRTL.css';
+import './components/DesignSystem.css';
+import './components/ShellExtensions.css';
+import './components/PrisonRedesign.css';
+import './components/DecisionSheet.css';
+import './components/DestinationScreens.css';
+import './components/SystemMenuRedesign.css';
 
 const rootElement = document.getElementById('root');
 

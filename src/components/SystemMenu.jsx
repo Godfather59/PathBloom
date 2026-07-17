@@ -6,7 +6,101 @@ import SimulationDashboard from './SimulationDashboard';
 import ContentStudio from './ContentStudio';
 import WorldSimulation2Dashboard from './WorldSimulation2Dashboard';
 import ArabicLocalizationDashboard from './ArabicLocalizationDashboard';
+import { AppIcon } from './AppIcon';
 import './Modal.css';
+
+const COPY = {
+  en: {
+    paused: 'Paused',
+    subtitle: 'Your life is safe while this menu is open.',
+    home: 'Home',
+    records: 'Life',
+    world: 'World',
+    settings: 'Settings',
+    tools: 'Tools',
+    resume: 'Resume life',
+    save: 'Save now',
+    savedHint: 'Store the latest progress in this life.',
+    godModeHint: 'Edit this life and test unusual paths.',
+    recordsTitle: 'Life records',
+    worldTitle: 'World and country',
+    settingsTitle: 'Preferences',
+    toolsTitle: 'Creator tools',
+    audio: 'Audio',
+    vibration: 'Vibration',
+    language: 'Language',
+    appearance: 'Appearance',
+    tutorial: 'Tutorial',
+    resetTutorial: 'Restart tutorial',
+    exit: 'Exit to main menu',
+    exitHint: 'The current life is saved before leaving.',
+    on: 'On',
+    off: 'Off',
+    sfx: 'Sound effects',
+    music: 'Music',
+  },
+  ar: {
+    paused: 'متوقف مؤقتا',
+    subtitle: 'حياتك محفوظة أثناء فتح هذه القائمة.',
+    home: 'الرئيسية',
+    records: 'الحياة',
+    world: 'العالم',
+    settings: 'الإعدادات',
+    tools: 'الأدوات',
+    resume: 'تابع الحياة',
+    save: 'احفظ الآن',
+    savedHint: 'احفظ أحدث تقدم في هذه الحياة.',
+    godModeHint: 'عدّل هذه الحياة واختبر مسارات غير عادية.',
+    recordsTitle: 'سجلات الحياة',
+    worldTitle: 'العالم والبلد',
+    settingsTitle: 'التفضيلات',
+    toolsTitle: 'أدوات الإنشاء',
+    audio: 'الصوت',
+    vibration: 'الاهتزاز',
+    language: 'اللغة',
+    appearance: 'المظهر',
+    tutorial: 'الشرح',
+    resetTutorial: 'أعد الشرح',
+    exit: 'اخرج إلى القائمة الرئيسية',
+    exitHint: 'تُحفظ الحياة الحالية قبل الخروج.',
+    on: 'تشغيل',
+    off: 'إيقاف',
+    sfx: 'المؤثرات الصوتية',
+    music: 'الموسيقى',
+  },
+};
+
+const TABS = [
+  { id: 'home', icon: 'life' },
+  { id: 'records', icon: 'trend' },
+  { id: 'world', icon: 'world' },
+  { id: 'settings', icon: 'menu' },
+  { id: 'tools', icon: 'activities' },
+];
+
+function MenuTile({ item, language }) {
+  if (!item.handler) {
+    return null;
+  }
+  return (
+    <button
+      type="button"
+      className={`system-menu-tile tone-${item.tone || 'neutral'}`}
+      onClick={item.handler}
+    >
+      <span className="system-menu-tile-icon" aria-hidden="true">
+        {item.emoji}
+      </span>
+      <span className="system-menu-tile-copy">
+        <strong>{language === 'ar' ? item.ar : item.en}</strong>
+        {item.description && (
+          <small>{language === 'ar' ? item.descriptionAr : item.description}</small>
+        )}
+      </span>
+      <AppIcon name="chevron" size={17} className="system-menu-tile-arrow" />
+    </button>
+  );
+}
 
 export function SystemMenu({
   language = 'en',
@@ -42,12 +136,154 @@ export function SystemMenu({
   onCountryProfile,
   onSimulationDashboard,
 }) {
+  const [activeTab, setActiveTab] = useState('home');
   const [showSimulation, setShowSimulation] = useState(false);
   const [showContentStudio, setShowContentStudio] = useState(false);
   const [showWorldSimulation2, setShowWorldSimulation2] = useState(false);
   const [showArabicAudit, setShowArabicAudit] = useState(false);
   const currentPerson = getCurrentTimePerson();
+  const locale = language === 'ar' ? 'ar' : 'en';
+  const copy = COPY[locale];
   const openSimulation = onSimulationDashboard || (() => setShowSimulation(true));
+
+  const records = [
+    {
+      handler: onStats,
+      emoji: '📊',
+      en: 'Lifetime stats',
+      ar: 'إحصائيات الحياة',
+      description: 'Money, years, careers, and milestones.',
+      descriptionAr: 'المال والسنوات والمهن والمحطات المهمة.',
+    },
+    {
+      handler: onHistory,
+      emoji: '📈',
+      en: 'Life trends',
+      ar: 'اتجاهات الحياة',
+      description: 'See how your stats changed over time.',
+      descriptionAr: 'شاهد كيف تغيرت إحصائياتك عبر الزمن.',
+    },
+    {
+      handler: onLifeTimeline,
+      emoji: '🕰️',
+      en: 'Life timeline',
+      ar: 'الخط الزمني للحياة',
+      description: 'Review the defining moments of this life.',
+      descriptionAr: 'راجع اللحظات التي صنعت هذه الحياة.',
+    },
+    {
+      handler: onEventHistory,
+      emoji: '📜',
+      en: 'Event history',
+      ar: 'سجل الأحداث',
+      description: 'Browse the complete event archive.',
+      descriptionAr: 'تصفح أرشيف الأحداث الكامل.',
+    },
+    {
+      handler: onRelationshipDashboard,
+      emoji: '🤝',
+      en: 'Relationships',
+      ar: 'العلاقات',
+      description: 'Family, friends, trust, and memories.',
+      descriptionAr: 'العائلة والأصدقاء والثقة والذكريات.',
+    },
+    {
+      handler: onFamilyTree,
+      emoji: '🌳',
+      en: 'Family dynasty',
+      ar: 'سلالة العائلة',
+      description: 'Explore generations and descendants.',
+      descriptionAr: 'استكشف الأجيال والأبناء.',
+    },
+    {
+      handler: onAchievements,
+      emoji: '🏆',
+      en: 'Achievements',
+      ar: 'الإنجازات',
+      description: 'See unlocked and remaining achievements.',
+      descriptionAr: 'شاهد الإنجازات المفتوحة والمتبقية.',
+      tone: 'gold',
+    },
+    {
+      handler: onChallenge,
+      emoji: '🎯',
+      en: 'Challenges',
+      ar: 'التحديات',
+      description: 'Attempt special rules and goals.',
+      descriptionAr: 'جرّب قواعد وأهدافا خاصة.',
+    },
+  ];
+
+  const worldItems = [
+    {
+      handler: () => setShowWorldSimulation2(true),
+      emoji: '🌐',
+      en: 'World Simulation 2.0',
+      ar: 'محاكاة العالم 2.0',
+      description: 'Countries, leaders, wars, trade, and migration.',
+      descriptionAr: 'الدول والقادة والحروب والتجارة والهجرة.',
+      tone: 'world',
+    },
+    {
+      handler: onWorldNews,
+      emoji: '📰',
+      en: 'World news',
+      ar: 'أخبار العالم',
+      description: 'Read the latest global headlines.',
+      descriptionAr: 'اقرأ أحدث الأخبار العالمية.',
+    },
+    {
+      handler: onWorldOverview,
+      emoji: '🌍',
+      en: 'World overview',
+      ar: 'نظرة عامة على العالم',
+      description: 'Inspect the wider geopolitical map.',
+      descriptionAr: 'استكشف الخريطة الجيوسياسية الأوسع.',
+    },
+    {
+      handler: onCountryProfile,
+      emoji: '🗺️',
+      en: 'Country profile',
+      ar: 'ملف البلد',
+      description: 'Economy, laws, opportunities, and risks.',
+      descriptionAr: 'الاقتصاد والقوانين والفرص والمخاطر.',
+    },
+  ];
+
+  const tools = [
+    {
+      handler: openSimulation,
+      emoji: '🧩',
+      en: 'Simulation overview',
+      ar: 'نظرة عامة على المحاكاة',
+      description: 'Inspect finance, reputation, NPC memory, and active chains.',
+      descriptionAr: 'افحص المال والسمعة وذاكرة الشخصيات والقصص النشطة.',
+    },
+    {
+      handler: () => setShowContentStudio(true),
+      emoji: '🧰',
+      en: 'Content Studio',
+      ar: 'استوديو المحتوى',
+      description: 'Browse, validate, import, and edit story packs.',
+      descriptionAr: 'تصفح حزم القصص ودققها واستوردها وعدّلها.',
+    },
+    {
+      handler: () => setShowArabicAudit(true),
+      emoji: '🌙',
+      en: 'Arabic localization audit',
+      ar: 'تدقيق الترجمة العربية',
+      description: 'Find untranslated runtime text and formatting issues.',
+      descriptionAr: 'اعثر على النصوص غير المترجمة ومشاكل التنسيق.',
+    },
+    {
+      handler: onDebug,
+      emoji: '🛠️',
+      en: 'Debug tools',
+      ar: 'أدوات التصحيح',
+      description: 'Developer diagnostics and test controls.',
+      descriptionAr: 'تشخيصات المطور وأدوات الاختبار.',
+    },
+  ];
 
   if (showSimulation && currentPerson) {
     return (
@@ -59,11 +295,9 @@ export function SystemMenu({
       />
     );
   }
-
   if (showContentStudio) {
     return <ContentStudio onClose={() => setShowContentStudio(false)} language={language} t={t} />;
   }
-
   if (showWorldSimulation2 && currentPerson) {
     return (
       <WorldSimulation2Dashboard
@@ -73,257 +307,293 @@ export function SystemMenu({
       />
     );
   }
-
   if (showArabicAudit) {
     return (
       <ArabicLocalizationDashboard onClose={() => setShowArabicAudit(false)} language={language} />
     );
   }
 
-  const navigation = [
-    [onStats, '📊', 'system.stats', 'Lifetime Stats'],
-    [onHistory, '📈', 'system.history', 'Current Life Trends'],
-    [openSimulation, '🧩', 'system.simulation', 'Simulation Overview'],
-    [
-      () => setShowWorldSimulation2(true),
-      '🌐',
-      'system.worldSimulation2',
-      language === 'ar' ? 'محاكاة العالم 2.0' : 'World Simulation 2.0',
-    ],
-    [
-      () => setShowContentStudio(true),
-      '🧰',
-      'system.contentStudio',
-      language === 'ar' ? 'استوديو المحتوى' : 'Content Studio',
-    ],
-    [
-      () => setShowArabicAudit(true),
-      '🌙',
-      'system.arabicAudit',
-      language === 'ar' ? 'تدقيق الترجمة العربية' : 'Arabic Localization Audit',
-    ],
-    [onFamilyTree, '🌳', 'system.familyTree', 'Family Dynasty'],
-    [onWorldNews, '📰', 'system.worldNews', 'World News'],
-    [onWorldOverview, '🌍', 'system.worldOverview', 'World Overview'],
-    [onRelationshipDashboard, '🤝', 'system.relationships', 'Relationships'],
-    [onLifeTimeline, '🕰️', 'system.lifeTimeline', 'Life Timeline'],
-    [onEventHistory, '📜', 'system.eventHistory', 'Event History'],
-    [onCountryProfile, '🗺️', 'system.countryProfile', 'Country Profile'],
-    [onAchievements, '🏆', 'system.achievements', 'Achievements'],
-    [onChallenge, '🎯', 'system.challenge', 'Challenges'],
-    [onTutorial, '🧭', 'system.tutorial', 'Tutorial'],
-  ];
-
   return (
-    <div className="modal-overlay">
-      <div
-        className="modal-content"
-        style={{ maxWidth: '340px' }}
-        dir={language === 'ar' ? 'rtl' : 'ltr'}
-      >
-        <div className="modal-header">
-          <h2 className="modal-title">⏸️ {t('system.paused', 'Paused')}</h2>
-          <button className="close-btn" onClick={onResume}>
-            &times;
-          </button>
-        </div>
-
-        <div
-          className="modal-body"
-          style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
-        >
+    <div className="modal-overlay system-destination-overlay">
+      <section className="system-destination" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+        <header className="system-destination-header">
+          <div className="system-destination-title">
+            <span className="system-pause-icon">
+              <AppIcon name="menu" size={22} />
+            </span>
+            <div>
+              <h1>{copy.paused}</h1>
+              <p>{copy.subtitle}</p>
+            </div>
+          </div>
           <button
-            className="btn-primary"
+            type="button"
+            className="destination-close"
             onClick={onResume}
-            style={{ padding: '16px', fontSize: '1.1rem' }}
+            aria-label={copy.resume}
           >
-            ▶️ {t('system.resume', 'Resume Game')}
+            <AppIcon name="close" size={21} />
           </button>
-          <button
-            className="btn-secondary"
-            onClick={onSave}
-            style={{ padding: '16px', fontSize: '1.1rem' }}
-          >
-            💾 {t('system.save', 'Save Game')}
-          </button>
-          <button
-            className="list-item"
-            onClick={onGodMode}
-            style={{
-              padding: '16px',
-              fontSize: '1.1rem',
-              background: 'linear-gradient(45deg, #ffd700, #ffa500)',
-              color: 'black',
-              fontWeight: 'bold',
-              border: 'none',
-              marginBottom: 0,
-              textAlign: 'center',
-            }}
-          >
-            ⚡ {t('system.godMode', 'God Mode')}
-          </button>
+        </header>
 
-          {navigation.map(([handler, icon, key, fallback]) =>
-            handler ? (
-              <button
-                key={key}
-                className="btn-secondary"
-                onClick={handler}
-                style={{ padding: '12px' }}
-              >
-                {icon} {t(key, fallback)}
-              </button>
-            ) : null
-          )}
-
-          {onDebug && (
+        <nav className="system-tabs" aria-label={copy.paused}>
+          {TABS.map(tab => (
             <button
-              className="btn-secondary"
-              onClick={onDebug}
-              style={{ padding: '12px', fontSize: '0.85rem', color: '#888' }}
+              key={tab.id}
+              type="button"
+              className={activeTab === tab.id ? 'is-active' : ''}
+              onClick={() => setActiveTab(tab.id)}
+              aria-current={activeTab === tab.id ? 'page' : undefined}
             >
-              🛠️ {t('system.debug', 'Debug Tools')}
+              <AppIcon name={tab.icon} size={18} />
+              <span>{copy[tab.id]}</span>
             </button>
+          ))}
+        </nav>
+
+        <div className="system-destination-scroll">
+          {activeTab === 'home' && (
+            <>
+              <div className="system-primary-actions">
+                <button type="button" className="system-resume-card" onClick={onResume}>
+                  <span>
+                    <AppIcon name="life" size={25} />
+                  </span>
+                  <strong>{copy.resume}</strong>
+                  <small>
+                    {locale === 'ar' ? 'ارجع مباشرة إلى قصتك.' : 'Return directly to your story.'}
+                  </small>
+                </button>
+                <button type="button" className="system-save-card" onClick={onSave}>
+                  <span>💾</span>
+                  <strong>{copy.save}</strong>
+                  <small>{copy.savedHint}</small>
+                </button>
+              </div>
+
+              {onGodMode && (
+                <button type="button" className="system-godmode-card" onClick={onGodMode}>
+                  <span>⚡</span>
+                  <span>
+                    <strong>{t('system.godMode', 'God Mode')}</strong>
+                    <small>{copy.godModeHint}</small>
+                  </span>
+                  <AppIcon name="chevron" size={18} />
+                </button>
+              )}
+
+              <div className="system-home-summary">
+                <button type="button" onClick={() => setActiveTab('records')}>
+                  <AppIcon name="trend" size={19} />
+                  <span>{copy.recordsTitle}</span>
+                </button>
+                <button type="button" onClick={() => setActiveTab('world')}>
+                  <AppIcon name="world" size={19} />
+                  <span>{copy.worldTitle}</span>
+                </button>
+                <button type="button" onClick={() => setActiveTab('settings')}>
+                  <AppIcon name="menu" size={19} />
+                  <span>{copy.settingsTitle}</span>
+                </button>
+              </div>
+            </>
           )}
 
-          <button
-            className="btn-secondary"
-            onClick={onResetTutorial}
-            style={{ padding: '12px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}
-          >
-            🔄 {t('system.resetTutorial', 'Reset Tutorial')}
-          </button>
+          {activeTab === 'records' && (
+            <section className="system-section">
+              <div className="system-section-heading">
+                <span>{copy.recordsTitle}</span>
+                <strong>{records.filter(item => item.handler).length}</strong>
+              </div>
+              <div className="system-menu-grid">
+                {records.map(item => (
+                  <MenuTile key={item.en} item={item} language={locale} />
+                ))}
+              </div>
+            </section>
+          )}
 
-          <div className="settings-language">
-            <div className="settings-language-label">🔊 {t('system.sound', 'Sound')}</div>
-            <div className="settings-language-options">
-              <button
-                type="button"
-                className={`language-chip ${audioEnabled ? 'active' : ''}`}
-                onClick={() => onSoundToggle?.(true)}
-              >
-                🔊 {t('common.on', 'On')}
-              </button>
-              <button
-                type="button"
-                className={`language-chip ${!audioEnabled ? 'active' : ''}`}
-                onClick={() => onSoundToggle?.(false)}
-              >
-                🔇 {t('common.off', 'Off')}
-              </button>
-            </div>
-          </div>
+          {activeTab === 'world' && (
+            <section className="system-section">
+              <div className="system-section-heading">
+                <span>{copy.worldTitle}</span>
+                <strong>{worldItems.filter(item => item.handler).length}</strong>
+              </div>
+              <div className="system-menu-grid">
+                {worldItems.map(item => (
+                  <MenuTile key={item.en} item={item} language={locale} />
+                ))}
+              </div>
+            </section>
+          )}
 
-          <div className="settings-language">
-            <div className="settings-language-label">🎵 {t('system.sfxVolume', 'SFX Volume')}</div>
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.05"
-              value={sfxVolume}
-              onChange={event => onSfxVolumeChange?.(Number(event.target.value))}
-              style={{ width: '100%', accentColor: 'var(--accent-primary)' }}
-            />
-            <div style={{ textAlign: 'end', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-              {Math.round(sfxVolume * 100)}%
-            </div>
-          </div>
+          {activeTab === 'settings' && (
+            <section className="system-section system-settings-section">
+              <div className="system-section-heading">
+                <span>{copy.settingsTitle}</span>
+              </div>
 
-          <div className="settings-language">
-            <div className="settings-language-label">
-              🎶 {t('system.musicVolume', 'Music Volume')}
-            </div>
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.05"
-              value={musicVolume}
-              onChange={event => onMusicVolumeChange?.(Number(event.target.value))}
-              style={{ width: '100%', accentColor: 'var(--accent-primary)' }}
-            />
-            <div style={{ textAlign: 'end', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-              {Math.round(musicVolume * 100)}%
-            </div>
-          </div>
+              <div className="setting-card">
+                <div className="setting-card-heading">
+                  <span>🔊</span>
+                  <strong>{copy.audio}</strong>
+                </div>
+                <div className="segmented-control">
+                  <button
+                    type="button"
+                    className={audioEnabled ? 'is-active' : ''}
+                    onClick={() => onSoundToggle?.(true)}
+                  >
+                    {copy.on}
+                  </button>
+                  <button
+                    type="button"
+                    className={!audioEnabled ? 'is-active' : ''}
+                    onClick={() => onSoundToggle?.(false)}
+                  >
+                    {copy.off}
+                  </button>
+                </div>
+                <label className="setting-slider">
+                  <span>{copy.sfx}</span>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    value={sfxVolume}
+                    onChange={event => onSfxVolumeChange?.(Number(event.target.value))}
+                  />
+                  <strong>{Math.round(sfxVolume * 100)}%</strong>
+                </label>
+                <label className="setting-slider">
+                  <span>{copy.music}</span>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    value={musicVolume}
+                    onChange={event => onMusicVolumeChange?.(Number(event.target.value))}
+                  />
+                  <strong>{Math.round(musicVolume * 100)}%</strong>
+                </label>
+              </div>
 
-          <div className="settings-language">
-            <div className="settings-language-label">📳 {t('system.haptics', 'Vibration')}</div>
-            <div className="settings-language-options">
-              <button
-                type="button"
-                className={`language-chip ${hapticsEnabled ? 'active' : ''}`}
-                onClick={() => onHapticsToggle?.(true)}
-              >
-                {t('common.on', 'On')}
-              </button>
-              <button
-                type="button"
-                className={`language-chip ${!hapticsEnabled ? 'active' : ''}`}
-                onClick={() => onHapticsToggle?.(false)}
-              >
-                {t('common.off', 'Off')}
-              </button>
-            </div>
-          </div>
+              <div className="setting-card setting-inline-card">
+                <div className="setting-card-heading">
+                  <span>📳</span>
+                  <strong>{copy.vibration}</strong>
+                </div>
+                <div className="segmented-control compact">
+                  <button
+                    type="button"
+                    className={hapticsEnabled ? 'is-active' : ''}
+                    onClick={() => onHapticsToggle?.(true)}
+                  >
+                    {copy.on}
+                  </button>
+                  <button
+                    type="button"
+                    className={!hapticsEnabled ? 'is-active' : ''}
+                    onClick={() => onHapticsToggle?.(false)}
+                  >
+                    {copy.off}
+                  </button>
+                </div>
+              </div>
 
-          <div className="settings-language">
-            <div className="settings-language-label">🌐 {t('system.language', 'Language')}</div>
-            <div className="settings-language-options">
-              {LANGUAGES.map(option => (
-                <button
-                  key={option.id}
-                  type="button"
-                  className={`language-chip ${language === option.id ? 'active' : ''}`}
-                  onClick={() => {
-                    onLanguageChange?.(option.id);
-                    window.dispatchEvent(new CustomEvent('pathbloom-language-changed'));
-                  }}
-                >
-                  {option.nativeName}
+              <div className="setting-card">
+                <div className="setting-card-heading">
+                  <span>🌐</span>
+                  <strong>{copy.language}</strong>
+                </div>
+                <div className="choice-chip-grid">
+                  {LANGUAGES.map(option => (
+                    <button
+                      key={option.id}
+                      type="button"
+                      className={language === option.id ? 'is-active' : ''}
+                      onClick={() => {
+                        onLanguageChange?.(option.id);
+                        window.dispatchEvent(new CustomEvent('pathbloom-language-changed'));
+                      }}
+                    >
+                      {option.nativeName}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="setting-card">
+                <div className="setting-card-heading">
+                  <span>🎨</span>
+                  <strong>{copy.appearance}</strong>
+                </div>
+                <div className="choice-chip-grid theme-chip-grid">
+                  {Object.entries(THEMES).map(([id, theme]) => (
+                    <button
+                      key={id}
+                      type="button"
+                      className={currentTheme === id ? 'is-active' : ''}
+                      onClick={() => onThemeChange?.(id)}
+                    >
+                      {theme.icon}
+                      <span>{theme.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="setting-card setting-actions-card">
+                <button type="button" onClick={onTutorial}>
+                  🧭 <span>{copy.tutorial}</span>
                 </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="settings-language">
-            <div className="settings-language-label">🎨 {t('system.theme', 'Theme')}</div>
-            <div className="settings-language-options" style={{ flexWrap: 'wrap', gap: '4px' }}>
-              {Object.entries(THEMES).map(([id, theme]) => (
-                <button
-                  key={id}
-                  type="button"
-                  className={`language-chip ${currentTheme === id ? 'active' : ''}`}
-                  onClick={() => onThemeChange?.(id)}
-                >
-                  {theme.icon} {theme.name}
+                <button type="button" onClick={onResetTutorial}>
+                  ↻ <span>{copy.resetTutorial}</span>
                 </button>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', margin: '8px 0' }} />
-          <button
-            className="btn-danger"
-            onClick={() => {
-              if (
-                confirm(
-                  t(
-                    'system.exitConfirm',
-                    'Are you sure you want to exit? Unsaved progress will be lost.'
-                  )
-                )
-              ) {
-                onExit();
-              }
-            }}
-            style={{ padding: '16px', fontSize: '1.1rem' }}
-          >
-            🚪 {t('system.exit', 'Exit to Main Menu')}
-          </button>
+              <button
+                type="button"
+                className="system-exit-card"
+                onClick={() => {
+                  if (
+                    confirm(
+                      t(
+                        'system.exitConfirm',
+                        'Are you sure you want to exit? Unsaved progress will be lost.'
+                      )
+                    )
+                  ) {
+                    onExit?.();
+                  }
+                }}
+              >
+                <span>↪</span>
+                <span>
+                  <strong>{copy.exit}</strong>
+                  <small>{copy.exitHint}</small>
+                </span>
+              </button>
+            </section>
+          )}
+
+          {activeTab === 'tools' && (
+            <section className="system-section">
+              <div className="system-section-heading">
+                <span>{copy.toolsTitle}</span>
+                <strong>{tools.filter(item => item.handler).length}</strong>
+              </div>
+              <div className="system-menu-grid">
+                {tools.map(item => (
+                  <MenuTile key={item.en} item={item} language={locale} />
+                ))}
+              </div>
+            </section>
+          )}
         </div>
-      </div>
+      </section>
     </div>
   );
 }

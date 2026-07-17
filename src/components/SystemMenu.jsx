@@ -61,13 +61,7 @@ export function SystemMenu({
   }
 
   if (showContentStudio) {
-    return (
-      <ContentStudio
-        onClose={() => setShowContentStudio(false)}
-        language={language}
-        t={t}
-      />
-    );
+    return <ContentStudio onClose={() => setShowContentStudio(false)} language={language} t={t} />;
   }
 
   if (showWorldSimulation2 && currentPerson) {
@@ -82,10 +76,7 @@ export function SystemMenu({
 
   if (showArabicAudit) {
     return (
-      <ArabicLocalizationDashboard
-        onClose={() => setShowArabicAudit(false)}
-        language={language}
-      />
+      <ArabicLocalizationDashboard onClose={() => setShowArabicAudit(false)} language={language} />
     );
   }
 
@@ -137,7 +128,10 @@ export function SystemMenu({
           </button>
         </div>
 
-        <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div
+          className="modal-body"
+          style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
+        >
           <button
             className="btn-primary"
             onClick={onResume}
@@ -171,7 +165,12 @@ export function SystemMenu({
 
           {navigation.map(([handler, icon, key, fallback]) =>
             handler ? (
-              <button key={key} className="btn-secondary" onClick={handler} style={{ padding: '12px' }}>
+              <button
+                key={key}
+                className="btn-secondary"
+                onClick={handler}
+                style={{ padding: '12px' }}
+              >
                 {icon} {t(key, fallback)}
               </button>
             ) : null
@@ -232,7 +231,9 @@ export function SystemMenu({
           </div>
 
           <div className="settings-language">
-            <div className="settings-language-label">🎶 {t('system.musicVolume', 'Music Volume')}</div>
+            <div className="settings-language-label">
+              🎶 {t('system.musicVolume', 'Music Volume')}
+            </div>
             <input
               type="range"
               min="0"
@@ -313,8 +314,9 @@ export function SystemMenu({
                     'Are you sure you want to exit? Unsaved progress will be lost.'
                   )
                 )
-              )
+              ) {
                 onExit();
+              }
             }}
             style={{ padding: '16px', fontSize: '1.1rem' }}
           >

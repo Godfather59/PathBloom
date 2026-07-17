@@ -36,9 +36,28 @@ import { getStoredLanguage, setStoredLanguage, translate } from './logic/i18n';
 import { lifetimeStats } from './logic/LifetimeStats';
 import { familyTree } from './logic/DynastyMode';
 import { HAPTICS } from './logic/Haptics';
-import { setAudioEnabled as setAudioEngineEnabled, setSfxVolume, setMusicVolume, getSfxVolume, getMusicVolume, isAudioEnabled } from './logic/Audio';
+import {
+  setAudioEnabled as setAudioEngineEnabled,
+  setSfxVolume,
+  setMusicVolume,
+  getSfxVolume,
+  getMusicVolume,
+  isAudioEnabled,
+  playTap,
+} from './logic/Audio';
 import { treatDisease } from './logic/Disease';
 import { recordDailyPlay, getDailyLifeConfig } from './logic/DailyStreak';
+import { ImmigrationManager } from './logic/ImmigrationSystem';
+import { travelToCity } from './logic/TravelSystem';
+import {
+  createSlotId,
+  getMostRecentSaveMetadata,
+  loadSaveData,
+  migrateLegacySave,
+  readSaveMetadata,
+  resetRuntimeState,
+  saveGameData,
+} from './logic/SaveSystem';
 import { ChallengeMenu } from './components/ChallengeMenu';
 import { OnboardingOverlay } from './components/OnboardingOverlay';
 import LazyModalLoader from './components/ModalLoader';
@@ -60,7 +79,10 @@ const LazyRelationshipsMenu = lazyNamed(
 const LazyMafiaMenu = lazyNamed(() => import('./components/MafiaMenu'), 'MafiaMenu');
 const LazyRoyaltyMenu = lazyNamed(() => import('./components/RoyaltyMenu'), 'RoyaltyMenu');
 const LazyPoliticsMenu = lazyNamed(() => import('./components/PoliticsMenu'), 'PoliticsMenu');
-const LazyGeopoliticsModal = lazyNamed(() => import('./components/GeopoliticsModal'), 'GeopoliticsModal');
+const LazyGeopoliticsModal = lazyNamed(
+  () => import('./components/GeopoliticsModal'),
+  'GeopoliticsModal'
+);
 const LazyGamblingMenu = lazyNamed(() => import('./components/GamblingMenu'), 'GamblingMenu');
 const LazyEducationMenu = lazyNamed(() => import('./components/EducationMenu'), 'EducationMenu');
 const LazyAssetsMenu = lazyNamed(() => import('./components/AssetsMenu'), 'AssetsMenu');
@@ -79,7 +101,10 @@ const LazyFamilyTreeMenu = lazyNamed(() => import('./components/FamilyTreeMenu')
 const LazyWorldOverview = lazyNamed(() => import('./components/WorldOverview'), 'WorldOverview');
 const LazyCountryProfile = lazyNamed(() => import('./components/CountryProfile'), 'CountryProfile');
 const LazyLifeTimeline = lazyNamed(() => import('./components/LifeTimeline'), 'LifeTimeline');
-const LazyEventHistoryModal = lazyNamed(() => import('./components/EventHistoryModal'), 'EventHistoryModal');
+const LazyEventHistoryModal = lazyNamed(
+  () => import('./components/EventHistoryModal'),
+  'EventHistoryModal'
+);
 const LazyTravelMap = lazyNamed(() => import('./components/TravelMap'), 'TravelMap');
 
 function ModalLoader() {
@@ -132,7 +157,6 @@ function App() {
     setSfxVolumeState(val);
     setSfxVolume(val);
     // Preview the volume
-    const { playTap } = require('./logic/Audio');
     playTap();
   };
 
@@ -148,8 +172,15 @@ function App() {
   // Save Slots State
   const [currentSlotId, setCurrentSlotId] = useState(null);
 
+  // Toast State
+  const [toast, setToast] = useState(null); // { message, type }
+  const showToast = (message, type = 'neutral') => {
+    setToast({ message, type });
+  };
+
   // Initialize Logic
   const initNewGame = config => {
+    resetRuntimeState();
     const isDaily = config.isDaily || false;
     const newPerson = new Person(config.firstName, config.lastName, config.gender, config.country);
 
@@ -161,7 +192,7 @@ function App() {
     }
 
     // Create new slot ID
-    const slotId = `slot_${Date.now()}`; // eslint-disable-line react-hooks/purity
+    const slotId = createSlotId();
     setCurrentSlotId(slotId);
 
     INITIAL_EVENTS.forEach(eventGen => {
@@ -180,131 +211,9 @@ function App() {
     }
   };
 
-const SAVE_VERSION = 3;
-
-  const saveGameData = (personObj, slotId) => {
-    if (!slotId) {
-      return;
-    }
-    try {
-      const save = {
-        version: SAVE_VERSION,
-        person: personObj,
-        createdAt: personObj._createdAt || new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      const serialized = JSON.stringify(save);
-      localStorage.setItem(`bitlife_save_${slotId}`, serialized);
-    } catch (e) {
-      console.error('Failed to serialize or save person:', e);
-      return;
-    }
-
-    let meta = [];
-    try {
-      const existing = localStorage.getItem('bitlife_save_meta');
-      if (existing) {
-        meta = JSON.parse(existing);
-      }
-    } catch (e) {
-      meta = [];
-    }
-
-    meta = meta.filter(m => m.id !== slotId);
-
-    meta.unshift({
-      id: slotId,
-      name:
-        typeof personObj.getFullName === 'function'
-          ? personObj.getFullName()
-          : `${String(personObj.name?.first || '')} ${String(personObj.name?.last || '')}`,
-      age: personObj.age ?? 0,
-      job: personObj.job?.title ?? 'Unemployed',
-      lastPlayed: Date.now(),
-    });
-
-    try {
-      localStorage.setItem('bitlife_save_meta', JSON.stringify(meta));
-    } catch (e) {
-      console.error('Failed to save meta:', e);
-    }
-  };
-
-  const migrateSave = (save) => {
-    if (!save || typeof save !== 'object') return save;
-    // Old format: raw person object (no version field)
-    if (!save.version) {
-      const person = save;
-      applySaveDefaults(person);
-      return person;
-    }
-    // Version 2: { version, person, ... }
-    if (save.version === 2) {
-      const p = save.person;
-      applySaveDefaults(p);
-      return p;
-    }
-    return save.person || save;
-  };
-
-  const applySaveDefaults = (p) => {
-    p.traits ??= [];
-    p.assets ??= [];
-    p.relationships ??= [];
-    p.history ??= [];
-    p.worldNews ??= [];
-    p.geopoliticalState ??= null;
-    p.portfolio ??= [];
-    p.pets ??= [];
-    p.languages ??= ['English'];
-    p.lifeStats ??= { totalMoneyEarned: 0, totalTaxes: 0 };
-    p.milestones ??= [];
-    p.completedChallenges ??= [];
-    p.educationHistory ??= [];
-    p.degrees ??= [];
-    p.wars ??= {};
-    p.countryRelations ??= {};
-    p.unResolutions ??= [];
-    p.diplomaticHistory ??= [];
-    p.cabinet ??= null;
-    p.policies ??= {
-      taxRate: 30, militarySpending: 30, educationSpending: 50, healthcareSpending: 50,
-      infrastructureSpending: 40, diplomacyBudget: 30, environmentalRegs: 40,
-      tradeOpenness: 50, immigrationPolicy: 50,
-    };
-    p.pendingGeopoliticalEvent ??= null;
-    p.unlockedFeatures ??= [];
-    p.warReactionChosen ??= false;
-  };
-
   const loadGameData = slotId => {
     try {
-      const data = localStorage.getItem(`bitlife_save_${slotId}`);
-      if (!data) {
-        showToast(t('app.failedLoad', 'Failed to load save.'), 'bad');
-        return;
-      }
-
-      let parsed;
-      try {
-        parsed = JSON.parse(data);
-      } catch {
-        showToast(t('app.failedLoad', 'Failed to load save.'), 'bad');
-        return;
-      }
-
-      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-        showToast(t('app.failedLoad', 'Failed to load save.'), 'bad');
-        return;
-      }
-
-      const migrated = migrateSave(parsed);
-      const loadedPerson = Person.load(migrated);
-
-      if (!loadedPerson || typeof loadedPerson.name !== 'object') {
-        showToast(t('app.failedLoad', 'Failed to load save.'), 'bad');
-        return;
-      }
+      const { person: loadedPerson } = loadSaveData(slotId);
 
       setPerson(loadedPerson);
       setCurrentSlotId(slotId);
@@ -337,38 +246,20 @@ const SAVE_VERSION = 3;
       }
     }
 
-    // Check for Game Saves (Meta)
-    const metaStr = localStorage.getItem('bitlife_save_meta');
-    // Migration check: if no meta but old save exists
-    const oldSave = localStorage.getItem('bitlife_save');
-    if (!metaStr && oldSave) {
-      // Migrate Logic could go here, or just ignore.
-      // Let's keep it simple: if meta exists, use it.
-    }
-
-    if (metaStr) {
-      try {
-        const meta = JSON.parse(metaStr);
-        if (meta.length > 0) {
-          setHasSave(true);
-          const recent = meta.sort((a, b) => b.lastPlayed - a.lastPlayed)[0];
-          setSaveSummary(recent);
-        }
-      } catch (e) {
-        console.error(e);
-      }
+    migrateLegacySave();
+    const recent = getMostRecentSaveMetadata(readSaveMetadata());
+    if (recent) {
+      setHasSave(true);
+      setSaveSummary(recent);
     }
   }, []);
 
   const handleContinue = () => {
     // Continue most recent save
-    try {
-      const meta = JSON.parse(localStorage.getItem('bitlife_save_meta') || '[]');
-      if (meta.length > 0) {
-        const recent = meta.sort((a, b) => b.lastPlayed - a.lastPlayed)[0];
-        loadGameData(recent.id);
-      }
-    } catch {
+    const recent = getMostRecentSaveMetadata(readSaveMetadata());
+    if (recent) {
+      loadGameData(recent.id);
+    } else {
       showToast(t('app.failedLoad', 'Failed to load save.'), 'bad');
     }
   };
@@ -387,18 +278,11 @@ const SAVE_VERSION = 3;
     setCurrentSlotId(null);
 
     // Refresh Meta for Main Menu
-    try {
-      const meta = JSON.parse(localStorage.getItem('bitlife_save_meta') || '[]');
-      if (meta.length > 0) {
-        setHasSave(true);
-        // Find most recent
-        const recent = meta.sort((a, b) => b.lastPlayed - a.lastPlayed)[0];
-        setSaveSummary(recent);
-      } else {
-        setHasSave(false);
-        setSaveSummary(null);
-      }
-    } catch {
+    const recent = getMostRecentSaveMetadata(readSaveMetadata());
+    if (recent) {
+      setHasSave(true);
+      setSaveSummary(recent);
+    } else {
       setHasSave(false);
       setSaveSummary(null);
     }
@@ -437,7 +321,9 @@ const SAVE_VERSION = 3;
 
         const newUnlocks = checkAchievements(person, achievements);
         if (newUnlocks.length > 0) {
-          if (hapticsEnabled) HAPTICS.achievement();
+          if (hapticsEnabled) {
+            HAPTICS.achievement();
+          }
           const updatedAch = [...achievements, ...newUnlocks];
           setAchievements(updatedAch);
           try {
@@ -467,7 +353,9 @@ const SAVE_VERSION = 3;
     if (!person.isAlive) {
       return;
     }
-    if (hapticsEnabled) HAPTICS.ageUp();
+    if (hapticsEnabled) {
+      HAPTICS.ageUp();
+    }
     runAction(p => GameEngine.ageUp(p));
   };
 
@@ -475,15 +363,10 @@ const SAVE_VERSION = 3;
     if (!person.isAlive) {
       return;
     }
-    if (hapticsEnabled) HAPTICS.ageUp();
+    if (hapticsEnabled) {
+      HAPTICS.ageUp();
+    }
     runAction(p => GameEngine.ageUp(p, years));
-  };
-
-  // Toast State
-  const [toast, setToast] = useState(null); // { message, type }
-
-  const showToast = (message, type = 'neutral') => {
-    setToast({ message, type });
   };
 
   const handleAction = type => {
@@ -613,9 +496,8 @@ const SAVE_VERSION = 3;
       }
       setModal('immigration');
       setModalData({
-        onEmigrate: (countryName) => {
+        onEmigrate: countryName => {
           runAction(p => {
-            const { ImmigrationManager } = require('./logic/ImmigrationSystem');
             const mgr = new ImmigrationManager(p);
             const result = mgr.attemptEmigration(countryName);
             if (result.success) {
@@ -628,7 +510,6 @@ const SAVE_VERSION = 3;
         },
         onCitizenship: () => {
           runAction(p => {
-            const { ImmigrationManager } = require('./logic/ImmigrationSystem');
             const mgr = new ImmigrationManager(p);
             const result = mgr.applyForCitizenship();
             showToast(result.message, result.success ? 'good' : 'bad');
@@ -698,6 +579,11 @@ const SAVE_VERSION = 3;
           onSelectSlot={slotId => {
             loadGameData(slotId);
             setShowLoadMenu(false);
+          }}
+          onSlotsChanged={slots => {
+            const recent = getMostRecentSaveMetadata(slots);
+            setHasSave(Boolean(recent));
+            setSaveSummary(recent);
           }}
           onNewGame={() => setShowLoadMenu(false)}
           onClose={() => setShowLoadMenu(false)}
@@ -824,12 +710,7 @@ const SAVE_VERSION = 3;
         />
       )}
 
-      {modal === 'debug' && (
-        <DebugMenu
-          onClose={() => setModal(null)}
-          t={t}
-        />
-      )}
+      {modal === 'debug' && <DebugMenu onClose={() => setModal(null)} t={t} />}
 
       {modal === 'travel' && (
         <Suspense fallback={<ModalLoader />}>
@@ -837,10 +718,12 @@ const SAVE_VERSION = 3;
             person={person}
             onTravel={city => {
               runAction(p => {
-                const { travelToCity } = require('./logic/TravelSystem');
                 const result = travelToCity(p, city);
                 if (result.success) {
-                  showToast(`Traveled to ${city.name}. Cost: $${result.cost.toLocaleString()}`, 'good');
+                  showToast(
+                    `Traveled to ${city.name}. Cost: $${result.cost.toLocaleString()}`,
+                    'good'
+                  );
                 } else if (result.reason === 'no_money') {
                   showToast(`Need $${result.cost.toLocaleString()} to travel there.`, 'bad');
                 }
@@ -1003,21 +886,13 @@ const SAVE_VERSION = 3;
 
       {modal === 'life_timeline' && (
         <Suspense fallback={<ModalLoader />}>
-          <LazyLifeTimeline
-            person={person}
-            onClose={() => setModal(null)}
-            t={t}
-          />
+          <LazyLifeTimeline person={person} onClose={() => setModal(null)} t={t} />
         </Suspense>
       )}
 
       {modal === 'event_history' && (
         <Suspense fallback={<ModalLoader />}>
-          <LazyEventHistoryModal
-            person={person}
-            onClose={() => setModal(null)}
-            t={t}
-          />
+          <LazyEventHistoryModal person={person} onClose={() => setModal(null)} t={t} />
         </Suspense>
       )}
 
@@ -1340,23 +1215,52 @@ const SAVE_VERSION = 3;
       )}
 
       {/* Generic modal loader for modals without custom rendering blocks */}
-      {modal && ![
-        'system','god_mode','occupation','activities','love','career_music','social',
-        'career','mafia','royalty','politics','geopolitics','gambling','education',
-        'assets','achievements','minigame_burglary','minesweeper','doctor','will',
-        'hobbies','pets','stats','familytree','world_news','world_overview','challenge',
-        'debug','relationships_dashboard','relationships','life_timeline','event_history',
-        'travel','country_profile',
-      ].includes(modal) && (
-        <LazyModalLoader
-          modalType={modal}
-          modalData={modalData}
-          person={person}
-          onClose={() => setModal(null)}
-          language={language}
-          t={t}
-        />
-      )}
+      {modal &&
+        ![
+          'system',
+          'god_mode',
+          'occupation',
+          'activities',
+          'love',
+          'career_music',
+          'social',
+          'career',
+          'mafia',
+          'royalty',
+          'politics',
+          'geopolitics',
+          'gambling',
+          'education',
+          'assets',
+          'achievements',
+          'minigame_burglary',
+          'minesweeper',
+          'doctor',
+          'will',
+          'hobbies',
+          'pets',
+          'stats',
+          'familytree',
+          'world_news',
+          'world_overview',
+          'challenge',
+          'debug',
+          'relationships_dashboard',
+          'relationships',
+          'life_timeline',
+          'event_history',
+          'travel',
+          'country_profile',
+        ].includes(modal) && (
+          <LazyModalLoader
+            modalType={modal}
+            modalData={modalData}
+            person={person}
+            onClose={() => setModal(null)}
+            language={language}
+            t={t}
+          />
+        )}
 
       {person.pendingEvent && (
         <DecisionModal
@@ -1378,7 +1282,9 @@ const SAVE_VERSION = 3;
               setPerson(heir);
               saveGameData(heir, currentSlotId);
             } else {
-              if (hapticsEnabled) HAPTICS.death();
+              if (hapticsEnabled) {
+                HAPTICS.death();
+              }
               setPerson(null);
               setCurrentSlotId(null);
             }

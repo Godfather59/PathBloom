@@ -42,7 +42,9 @@ function getStoredLanguage() {
   try {
     for (const key of LANGUAGE_KEYS) {
       const value = localStorage.getItem(key);
-      if (value) return value;
+      if (value) {
+        return value;
+      }
     }
   } catch {
     // Storage is optional.
@@ -51,16 +53,28 @@ function getStoredLanguage() {
 }
 
 function shouldSkipElement(element) {
-  if (!element || SKIP_TAGS.has(element.tagName)) return true;
-  if (element.closest?.('[data-no-auto-translate="true"]')) return true;
-  if (element.closest?.('.content-json-editor, .code-editor, pre, code, textarea')) return true;
+  if (!element || SKIP_TAGS.has(element.tagName)) {
+    return true;
+  }
+  if (element.closest?.('[data-no-auto-translate="true"]')) {
+    return true;
+  }
+  if (element.closest?.('.content-json-editor, .code-editor, pre, code, textarea')) {
+    return true;
+  }
   return false;
 }
 
 function isLikelyUserIdentity(text, element) {
-  if (!text || !element) return false;
-  if (element.matches?.('[data-person-name], .person-name, .relationship-name, .leader-name')) return true;
-  if (element.closest?.('[data-person-name], .person-name, .relationship-name, .leader-name')) return true;
+  if (!text || !element) {
+    return false;
+  }
+  if (element.matches?.('[data-person-name], .person-name, .relationship-name, .leader-name')) {
+    return true;
+  }
+  if (element.closest?.('[data-person-name], .person-name, .relationship-name, .leader-name')) {
+    return true;
+  }
   return /^[A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,2}$/.test(text) && text.length < 40;
 }
 
@@ -70,16 +84,22 @@ function repairMixedScript(value) {
 }
 
 function translateAttribute(element, attribute) {
-  if (!element.hasAttribute(attribute)) return;
+  if (!element.hasAttribute(attribute)) {
+    return;
+  }
   const original = element.getAttribute(attribute);
-  if (!original) return;
+  if (!original) {
+    return;
+  }
 
   const repaired = repairMixedScript(original);
   if (repaired !== original) {
     element.setAttribute(attribute, repaired);
     return;
   }
-  if (!hasLatinText(original) || (hasArabicText(original) && !INVALID_INDIC_RE.test(original))) return;
+  if (!hasLatinText(original) || (hasArabicText(original) && !INVALID_INDIC_RE.test(original))) {
+    return;
+  }
 
   const translated = translateArabicText(original, {
     context: `dom:${attribute}`,
@@ -94,13 +114,17 @@ function translateAttribute(element, attribute) {
 
 function translateTextNode(node) {
   const parent = node.parentElement;
-  if (!parent || shouldSkipElement(parent) || !UI_TAGS.has(parent.tagName)) return;
+  if (!parent || shouldSkipElement(parent) || !UI_TAGS.has(parent.tagName)) {
+    return;
+  }
 
   const raw = node.nodeValue || '';
   const leading = raw.match(/^\s*/)?.[0] || '';
   const trailing = raw.match(/\s*$/)?.[0] || '';
   const text = raw.trim();
-  if (!text) return;
+  if (!text) {
+    return;
+  }
 
   const repaired = repairMixedScript(text);
   if (repaired !== text) {
@@ -112,9 +136,12 @@ function translateTextNode(node) {
     !hasLatinText(text) ||
     (hasArabicText(text) && !INVALID_INDIC_RE.test(text)) ||
     isLikelyUserIdentity(text, parent)
-  )
+  ) {
     return;
-  if (/^(?:https?:\/\/|[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}|[A-Z0-9_-]{8,})$/.test(text)) return;
+  }
+  if (/^(?:https?:\/\/|[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}|[A-Z0-9_-]{8,})$/.test(text)) {
+    return;
+  }
 
   const translated = translateArabicText(text, {
     context: `dom:${parent.tagName.toLowerCase()}`,
@@ -129,24 +156,34 @@ function translateTextNode(node) {
 }
 
 function localizeElement(element) {
-  if (!(element instanceof Element) || shouldSkipElement(element)) return;
+  if (!(element instanceof Element) || shouldSkipElement(element)) {
+    return;
+  }
   ATTRIBUTES.forEach(attribute => translateAttribute(element, attribute));
 
   for (const child of element.childNodes) {
-    if (child.nodeType === Node.TEXT_NODE) translateTextNode(child);
+    if (child.nodeType === Node.TEXT_NODE) {
+      translateTextNode(child);
+    }
   }
 
   element.querySelectorAll?.('*').forEach(descendant => {
-    if (shouldSkipElement(descendant)) return;
+    if (shouldSkipElement(descendant)) {
+      return;
+    }
     ATTRIBUTES.forEach(attribute => translateAttribute(descendant, attribute));
     for (const child of descendant.childNodes) {
-      if (child.nodeType === Node.TEXT_NODE) translateTextNode(child);
+      if (child.nodeType === Node.TEXT_NODE) {
+        translateTextNode(child);
+      }
     }
   });
 }
 
 function applyDocumentDirection(language) {
-  if (typeof document === 'undefined') return;
+  if (typeof document === 'undefined') {
+    return;
+  }
   const isArabic = language === 'ar';
   document.documentElement.lang = isArabic ? 'ar-MA' : 'en';
   document.documentElement.dir = isArabic ? 'rtl' : 'ltr';
@@ -155,7 +192,9 @@ function applyDocumentDirection(language) {
 }
 
 function processRoot(root = document.body) {
-  if (processing || activeLanguage !== 'ar' || !root) return;
+  if (processing || activeLanguage !== 'ar' || !root) {
+    return;
+  }
   processing = true;
   try {
     localizeElement(root);
@@ -166,29 +205,44 @@ function processRoot(root = document.body) {
 
 function refreshLanguage() {
   const nextLanguage = getStoredLanguage();
-  if (nextLanguage === activeLanguage) return;
+  if (nextLanguage === activeLanguage) {
+    return;
+  }
   activeLanguage = nextLanguage;
   applyDocumentDirection(nextLanguage);
-  if (nextLanguage === 'ar') requestAnimationFrame(() => processRoot());
+  if (nextLanguage === 'ar') {
+    requestAnimationFrame(() => processRoot());
+  }
 }
 
 export function localizeArabicUiValue(value, fallback = '', context = 'ui') {
-  if (getStoredLanguage() !== 'ar') return value || fallback;
+  if (getStoredLanguage() !== 'ar') {
+    return value || fallback;
+  }
   return localizeArabicCandidate(value, fallback, context);
 }
 
 export function installArabicLocalizationRuntime() {
-  if (typeof document === 'undefined' || observer) return () => {};
+  if (typeof document === 'undefined' || observer) {
+    return () => {};
+  }
   activeLanguage = getStoredLanguage();
   applyDocumentDirection(activeLanguage);
 
   observer = new MutationObserver(mutations => {
-    if (activeLanguage !== 'ar' || processing) return;
+    if (activeLanguage !== 'ar' || processing) {
+      return;
+    }
     for (const mutation of mutations) {
-      if (mutation.type === 'characterData') translateTextNode(mutation.target);
+      if (mutation.type === 'characterData') {
+        translateTextNode(mutation.target);
+      }
       mutation.addedNodes.forEach(node => {
-        if (node.nodeType === Node.ELEMENT_NODE) processRoot(node);
-        else if (node.nodeType === Node.TEXT_NODE) translateTextNode(node);
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          processRoot(node);
+        } else if (node.nodeType === Node.TEXT_NODE) {
+          translateTextNode(node);
+        }
       });
       if (mutation.type === 'attributes' && mutation.target instanceof Element) {
         processRoot(mutation.target);
@@ -206,12 +260,16 @@ export function installArabicLocalizationRuntime() {
 
   languageTimer = window.setInterval(refreshLanguage, 400);
   window.addEventListener('pathbloom-language-changed', refreshLanguage);
-  if (activeLanguage === 'ar') requestAnimationFrame(() => processRoot());
+  if (activeLanguage === 'ar') {
+    requestAnimationFrame(() => processRoot());
+  }
 
   return () => {
     observer?.disconnect();
     observer = null;
-    if (languageTimer) window.clearInterval(languageTimer);
+    if (languageTimer) {
+      window.clearInterval(languageTimer);
+    }
     languageTimer = null;
     window.removeEventListener('pathbloom-language-changed', refreshLanguage);
   };

@@ -1,8 +1,7 @@
 const MAX_CHAINS = 80;
 const MAX_OBSERVED_EVENTS = 160;
 
-const clamp = (value, min = 0, max = 100) =>
-  Math.max(min, Math.min(max, Number(value) || 0));
+const clamp = (value, min = 0, max = 100) => Math.max(min, Math.min(max, Number(value) || 0));
 
 const CHAIN_TRIGGERS = [
   {
@@ -14,7 +13,8 @@ const CHAIN_TRIGGERS = [
   },
   {
     type: 'family_conflict',
-    test: text => /parents are fighting|family conflict|relationship.*conflict|resentment/i.test(text),
+    test: text =>
+      /parents are fighting|family conflict|relationship.*conflict|resentment/i.test(text),
     maxAge: 25,
     delay: 2,
   },
@@ -25,7 +25,8 @@ const CHAIN_TRIGGERS = [
   },
   {
     type: 'career_setback',
-    test: text => /lost their job|lost your job|were fired|laid off|rejected from being/i.test(text),
+    test: text =>
+      /lost their job|lost your job|were fired|laid off|rejected from being/i.test(text),
     minAge: 16,
     delay: 3,
   },
@@ -44,10 +45,18 @@ function makeId(type, person) {
 }
 
 export function ensureEventChains(person) {
-  if (!person || typeof person !== 'object') return [];
-  if (!Array.isArray(person.eventChains)) person.eventChains = [];
-  if (!Array.isArray(person.completedEventChains)) person.completedEventChains = [];
-  if (!Array.isArray(person.observedChainEvents)) person.observedChainEvents = [];
+  if (!person || typeof person !== 'object') {
+    return [];
+  }
+  if (!Array.isArray(person.eventChains)) {
+    person.eventChains = [];
+  }
+  if (!Array.isArray(person.completedEventChains)) {
+    person.completedEventChains = [];
+  }
+  if (!Array.isArray(person.observedChainEvents)) {
+    person.observedChainEvents = [];
+  }
   person.eventChainSequence = Math.max(0, Math.floor(Number(person.eventChainSequence) || 0));
   return person.eventChains;
 }
@@ -61,7 +70,9 @@ function hasRecentChain(person, type) {
 
 export function startEventChain(person, type, context = {}, delayMonths = 1) {
   ensureEventChains(person);
-  if (hasRecentChain(person, type)) return null;
+  if (hasRecentChain(person, type)) {
+    return null;
+  }
 
   const chain = {
     id: makeId(type, person),
@@ -81,24 +92,38 @@ export function startEventChain(person, type, context = {}, delayMonths = 1) {
 }
 
 export function observeEventForChains(person, rawText) {
-  if (!person?.isAlive || !rawText) return null;
+  if (!person?.isAlive || !rawText) {
+    return null;
+  }
   ensureEventChains(person);
-  const text = String(rawText).replace(/^Event:\s*/i, '').trim();
-  if (!text) return null;
+  const text = String(rawText)
+    .replace(/^Event:\s*/i, '')
+    .trim();
+  if (!text) {
+    return null;
+  }
 
   const fingerprint = `${person.age}|${text}`;
-  if (person.observedChainEvents.includes(fingerprint)) return null;
+  if (person.observedChainEvents.includes(fingerprint)) {
+    return null;
+  }
   person.observedChainEvents.unshift(fingerprint);
   person.observedChainEvents = person.observedChainEvents.slice(0, MAX_OBSERVED_EVENTS);
 
   const trigger = CHAIN_TRIGGERS.find(candidate => {
     const age = Number(person.age) || 0;
-    if (Number.isFinite(candidate.minAge) && age < candidate.minAge) return false;
-    if (Number.isFinite(candidate.maxAge) && age > candidate.maxAge) return false;
+    if (Number.isFinite(candidate.minAge) && age < candidate.minAge) {
+      return false;
+    }
+    if (Number.isFinite(candidate.maxAge) && age > candidate.maxAge) {
+      return false;
+    }
     return candidate.test(text);
   });
 
-  if (!trigger) return null;
+  if (!trigger) {
+    return null;
+  }
   return startEventChain(person, trigger.type, { sourceText: text }, trigger.delay);
 }
 
@@ -127,9 +152,27 @@ function buildChainEvent(chain) {
         ...common,
         text: 'The bullying has continued for several months. How will you deal with it?',
         choices: [
-          choice('Report it to an adult', 'report', { stress: -5, smarts: 1 }, 'An adult promised to investigate.', 'good'),
-          choice('Confront the bully', 'confront', { stress: 4, happiness: 2 }, 'You stood up for yourself.', 'neutral'),
-          choice('Keep ignoring it', 'ignore', { stress: 8, happiness: -5 }, 'You tried to pretend it did not bother you.', 'bad'),
+          choice(
+            'Report it to an adult',
+            'report',
+            { stress: -5, smarts: 1 },
+            'An adult promised to investigate.',
+            'good'
+          ),
+          choice(
+            'Confront the bully',
+            'confront',
+            { stress: 4, happiness: 2 },
+            'You stood up for yourself.',
+            'neutral'
+          ),
+          choice(
+            'Keep ignoring it',
+            'ignore',
+            { stress: 8, happiness: -5 },
+            'You tried to pretend it did not bother you.',
+            'bad'
+          ),
         ],
       };
     }
@@ -137,9 +180,27 @@ function buildChainEvent(chain) {
       ...common,
       text: 'A year later, you meet the same bully again. The old conflict still affects you.',
       choices: [
-        choice('Try to make peace', 'make_peace', { happiness: 5, karma: 5, stress: -5 }, 'You both agreed to leave the past behind.', 'good'),
-        choice('Demand an apology', 'demand_apology', { stress: 2, happiness: 2 }, 'The conversation was tense, but you finally spoke honestly.', 'neutral'),
-        choice('Walk away', 'walk_away', { stress: -2 }, 'You decided the past no longer controls you.', 'neutral'),
+        choice(
+          'Try to make peace',
+          'make_peace',
+          { happiness: 5, karma: 5, stress: -5 },
+          'You both agreed to leave the past behind.',
+          'good'
+        ),
+        choice(
+          'Demand an apology',
+          'demand_apology',
+          { stress: 2, happiness: 2 },
+          'The conversation was tense, but you finally spoke honestly.',
+          'neutral'
+        ),
+        choice(
+          'Walk away',
+          'walk_away',
+          { stress: -2 },
+          'You decided the past no longer controls you.',
+          'neutral'
+        ),
       ],
     };
   }
@@ -150,9 +211,27 @@ function buildChainEvent(chain) {
         ...common,
         text: 'The family conflict is getting worse. What role will you take?',
         choices: [
-          choice('Try to mediate', 'mediate', { karma: 4, stress: 4 }, 'You encouraged everyone to speak calmly.', 'good'),
-          choice('Support one side', 'take_side', { happiness: -2, stress: 5 }, 'One person appreciated you, but another felt betrayed.', 'neutral'),
-          choice('Stay out of it', 'avoid', { stress: -2, happiness: -3 }, 'You avoided the argument, but the tension remained.', 'neutral'),
+          choice(
+            'Try to mediate',
+            'mediate',
+            { karma: 4, stress: 4 },
+            'You encouraged everyone to speak calmly.',
+            'good'
+          ),
+          choice(
+            'Support one side',
+            'take_side',
+            { happiness: -2, stress: 5 },
+            'One person appreciated you, but another felt betrayed.',
+            'neutral'
+          ),
+          choice(
+            'Stay out of it',
+            'avoid',
+            { stress: -2, happiness: -3 },
+            'You avoided the argument, but the tension remained.',
+            'neutral'
+          ),
         ],
       };
     }
@@ -160,8 +239,20 @@ function buildChainEvent(chain) {
       ...common,
       text: 'Your family wants to decide whether to repair the relationship or separate permanently.',
       choices: [
-        choice('Organize an honest conversation', 'family_talk', { karma: 5, stress: -4 }, 'The family began rebuilding trust.', 'good'),
-        choice('Accept the separation', 'accept_separation', { happiness: -4, stress: -3 }, 'You accepted that some relationships cannot be forced.', 'neutral'),
+        choice(
+          'Organize an honest conversation',
+          'family_talk',
+          { karma: 5, stress: -4 },
+          'The family began rebuilding trust.',
+          'good'
+        ),
+        choice(
+          'Accept the separation',
+          'accept_separation',
+          { happiness: -4, stress: -3 },
+          'You accepted that some relationships cannot be forced.',
+          'neutral'
+        ),
       ],
     };
   }
@@ -171,9 +262,27 @@ function buildChainEvent(chain) {
       ...common,
       text: 'Your symptoms have not completely disappeared. What will you do?',
       choices: [
-        choice('Visit a doctor ($500)', 'doctor', { health: 8, stress: -4, money: -500 }, 'The doctor created a treatment plan.', 'good'),
-        choice('Rest and change your routine', 'rest', { health: 4, happiness: -1, stress: -3 }, 'Rest helped, but recovery will take time.', 'neutral'),
-        choice('Ignore the symptoms', 'ignore_health', { health: -6, stress: 3 }, 'The untreated symptoms became harder to ignore.', 'bad'),
+        choice(
+          'Visit a doctor ($500)',
+          'doctor',
+          { health: 8, stress: -4, money: -500 },
+          'The doctor created a treatment plan.',
+          'good'
+        ),
+        choice(
+          'Rest and change your routine',
+          'rest',
+          { health: 4, happiness: -1, stress: -3 },
+          'Rest helped, but recovery will take time.',
+          'neutral'
+        ),
+        choice(
+          'Ignore the symptoms',
+          'ignore_health',
+          { health: -6, stress: 3 },
+          'The untreated symptoms became harder to ignore.',
+          'bad'
+        ),
       ],
     };
   }
@@ -183,9 +292,27 @@ function buildChainEvent(chain) {
       ...common,
       text: 'Your career setback is forcing you to choose a new direction.',
       choices: [
-        choice('Retrain for a better career', 'retrain', { smarts: 5, money: -1000, stress: 3 }, 'You enrolled in professional training.', 'good'),
-        choice('Network aggressively', 'network', { fame: 2, stress: 2, money: -300 }, 'You started building valuable professional contacts.', 'good'),
-        choice('Take any available work', 'quick_job', { happiness: -2, stress: -2 }, 'You accepted temporary work to stabilize your finances.', 'neutral'),
+        choice(
+          'Retrain for a better career',
+          'retrain',
+          { smarts: 5, money: -1000, stress: 3 },
+          'You enrolled in professional training.',
+          'good'
+        ),
+        choice(
+          'Network aggressively',
+          'network',
+          { fame: 2, stress: 2, money: -300 },
+          'You started building valuable professional contacts.',
+          'good'
+        ),
+        choice(
+          'Take any available work',
+          'quick_job',
+          { happiness: -2, stress: -2 },
+          'You accepted temporary work to stabilize your finances.',
+          'neutral'
+        ),
       ],
     };
   }
@@ -194,9 +321,27 @@ function buildChainEvent(chain) {
     ...common,
     text: 'Your financial situation needs an immediate decision.',
     choices: [
-      choice('Create a strict budget', 'budget', { happiness: -2, stress: -3 }, 'You cut unnecessary spending and created a repayment plan.', 'good'),
-      choice('Consolidate the debt', 'consolidate', { money: -250, stress: -2 }, 'You negotiated one structured payment plan.', 'neutral'),
-      choice('Ignore the bills', 'ignore_debt', { stress: 8, happiness: -5 }, 'Late fees and collection calls began to accumulate.', 'bad'),
+      choice(
+        'Create a strict budget',
+        'budget',
+        { happiness: -2, stress: -3 },
+        'You cut unnecessary spending and created a repayment plan.',
+        'good'
+      ),
+      choice(
+        'Consolidate the debt',
+        'consolidate',
+        { money: -250, stress: -2 },
+        'You negotiated one structured payment plan.',
+        'neutral'
+      ),
+      choice(
+        'Ignore the bills',
+        'ignore_debt',
+        { stress: 8, happiness: -5 },
+        'Late fees and collection calls began to accumulate.',
+        'bad'
+      ),
     ],
   };
 }
@@ -210,7 +355,15 @@ function completeChain(person, chain) {
 }
 
 function setRelationshipEffects(person, amount) {
-  const familyTypes = new Set(['Father', 'Mother', 'Parent', 'Sibling', 'Child', 'Spouse', 'Partner']);
+  const familyTypes = new Set([
+    'Father',
+    'Mother',
+    'Parent',
+    'Sibling',
+    'Child',
+    'Spouse',
+    'Partner',
+  ]);
   (person.relationships || []).forEach(rel => {
     if (familyTypes.has(rel.type) && rel.status !== 'Deceased') {
       rel.stat = clamp((Number(rel.stat) || 50) + amount);
@@ -221,13 +374,21 @@ function setRelationshipEffects(person, amount) {
 function applySpecialChoice(person, chain, choiceId) {
   if (chain.type === 'school_bullying') {
     person.confidence = clamp((Number(person.confidence) || 50) + (choiceId === 'ignore' ? -8 : 6));
-    if (choiceId === 'make_peace') person.reputation.family = clamp((person.reputation?.family || 50) + 3);
+    if (choiceId === 'make_peace') {
+      person.reputation.family = clamp((person.reputation?.family || 50) + 3);
+    }
   }
 
   if (chain.type === 'family_conflict') {
-    if (choiceId === 'mediate' || choiceId === 'family_talk') setRelationshipEffects(person, 6);
-    if (choiceId === 'take_side') setRelationshipEffects(person, -3);
-    if (choiceId === 'accept_separation') setRelationshipEffects(person, -1);
+    if (choiceId === 'mediate' || choiceId === 'family_talk') {
+      setRelationshipEffects(person, 6);
+    }
+    if (choiceId === 'take_side') {
+      setRelationshipEffects(person, -3);
+    }
+    if (choiceId === 'accept_separation') {
+      setRelationshipEffects(person, -1);
+    }
   }
 
   if (chain.type === 'health_recovery') {
@@ -265,7 +426,9 @@ function applySpecialChoice(person, chain, choiceId) {
 
 export function resolveEventChainChoice(person, event, selectedChoice) {
   ensureEventChains(person);
-  if (!event || event.type !== 'deep_chain') return false;
+  if (!event || event.type !== 'deep_chain') {
+    return false;
+  }
   const chain = person.eventChains.find(entry => entry.id === event.chainId);
   if (!chain) {
     person.pendingEvent = null;
@@ -273,7 +436,9 @@ export function resolveEventChainChoice(person, event, selectedChoice) {
   }
 
   const choiceId = selectedChoice?.chainChoice || selectedChoice?.id || 'unknown';
-  if (selectedChoice?.effects) person.updateStats?.(selectedChoice.effects);
+  if (selectedChoice?.effects) {
+    person.updateStats?.(selectedChoice.effects);
+  }
   person.logEvent?.(`Event: ${event.text}`, 'neutral');
   person.logEvent?.(`You chose to: ${selectedChoice?.text || choiceId}`, 'neutral');
   if (selectedChoice?.outcomeText) {
@@ -285,7 +450,8 @@ export function resolveEventChainChoice(person, event, selectedChoice) {
   chain.stage += 1;
   chain.elapsedMonths = 0;
 
-  const hasSecondStage = ['school_bullying', 'family_conflict'].includes(chain.type) && chain.stage < 2;
+  const hasSecondStage =
+    ['school_bullying', 'family_conflict'].includes(chain.type) && chain.stage < 2;
   if (hasSecondStage) {
     chain.monthsUntilNext = 12;
   } else {
@@ -298,7 +464,9 @@ export function resolveEventChainChoice(person, event, selectedChoice) {
 
 function advanceChains(person, months) {
   ensureEventChains(person);
-  if (!person.isAlive || person.pendingEvent) return null;
+  if (!person.isAlive || person.pendingEvent) {
+    return null;
+  }
 
   const active = person.eventChains.filter(chain => chain.status === 'active');
   for (const chain of active) {

@@ -2,11 +2,7 @@ import { GameEngine } from './GameEngine';
 import { Person } from './Person';
 import { GOVERNMENT_TYPES } from './WorldSimulation';
 import { getCountryData } from './GeoPolitics';
-import {
-  advanceOneMonth,
-  ensureTimeProgress,
-  recordYearAdvance,
-} from './TimeProgression';
+import { advanceOneMonth, ensureTimeProgress, recordYearAdvance } from './TimeProgression';
 
 // Centralized compatibility fixes for the simulation engine. These keep old saves
 // playable while avoiding a large GameEngine rewrite in one patch.
@@ -69,7 +65,9 @@ function ensurePersonalWorldState(person) {
 }
 
 function normalizeGeopoliticalYear(state) {
-  if (!state || typeof state !== 'object') return state;
+  if (!state || typeof state !== 'object') {
+    return state;
+  }
   const currentYear = new Date().getFullYear();
   if (!Number.isFinite(state.year) || state.year === 2025) {
     state.year = currentYear;
@@ -113,7 +111,9 @@ GameEngine.simulateYear = function simulateYearWithMonthlyCompatibility(person) 
   try {
     return originalSimulateYear(person);
   } finally {
-    if (timeState) timeState.skipPrisonAnnualTick = false;
+    if (timeState) {
+      timeState.skipPrisonAnnualTick = false;
+    }
   }
 };
 
@@ -182,7 +182,9 @@ Person.prototype.prisonAction = function prisonActionWithTimeControls(action) {
 
 function getActiveWarEntries(person) {
   const wars = Object.entries(person?.wars || {}).filter(([, war]) => war);
-  if (wars.length > 0) return wars;
+  if (wars.length > 0) {
+    return wars;
+  }
 
   return Object.entries(person?.countryRelations || {})
     .filter(([, rel]) => rel?.atWar)
@@ -199,16 +201,26 @@ function getEnemyName(countryId, war, state) {
 }
 
 GameEngine.processWarReactions = function processWarReactionsWithEnemyNames(person, state) {
-  if (!state || !state.countries) return;
-  if (person.age < 18) return;
-  if (person.pendingEvent) return;
+  if (!state || !state.countries) {
+    return;
+  }
+  if (person.age < 18) {
+    return;
+  }
+  if (person.pendingEvent) {
+    return;
+  }
 
   const warEntries = getActiveWarEntries(person);
   const activeWarEntries = warEntries.filter(
     ([countryId]) => person.countryRelations?.[countryId]?.atWar || person.wars?.[countryId]
   );
-  if (activeWarEntries.length === 0) return;
-  if (person.warReactionChosen) return;
+  if (activeWarEntries.length === 0) {
+    return;
+  }
+  if (person.warReactionChosen) {
+    return;
+  }
 
   const inMilitary = person.job && person.job.isMilitary;
   const warDur = activeWarEntries.reduce((sum, [, war]) => sum + (war?.years || 0), 0);

@@ -13,19 +13,33 @@ const TYPE_EMOJIS = {
 };
 
 function getChoiceEmoji(choice) {
-  if (choice.emoji) return choice.emoji;
-  if (choice.type && TYPE_EMOJIS[choice.type]) return TYPE_EMOJIS[choice.type];
+  if (choice.emoji) {
+    return choice.emoji;
+  }
+  if (choice.type && TYPE_EMOJIS[choice.type]) {
+    return TYPE_EMOJIS[choice.type];
+  }
 
   const effects = choice.effects || {};
   const score = Object.entries(effects).reduce((total, [key, value]) => {
-    if (key === 'stress') return total - value;
+    if (key === 'stress') {
+      return total - value;
+    }
     return total + value;
   }, 0);
 
-  if ((effects.money ?? 0) > 0) return '💰';
-  if ((effects.money ?? 0) < 0) return '💸';
-  if (score > 5) return '✅';
-  if (score < -5) return '⚠️';
+  if ((effects.money ?? 0) > 0) {
+    return '💰';
+  }
+  if ((effects.money ?? 0) < 0) {
+    return '💸';
+  }
+  if (score > 5) {
+    return '✅';
+  }
+  if (score < -5) {
+    return '⚠️';
+  }
   return '💭';
 }
 
@@ -40,7 +54,6 @@ export function DecisionModal({
       localizedText && typeof localizedText === 'object'
         ? localizedText[language] || localizedText.en
         : null;
-
     if (packText) {
       return language === 'ar'
         ? localizeArabicCandidate(packText, localizedText.en || value, context)
@@ -69,10 +82,7 @@ export function DecisionModal({
         </div>
 
         <div className="modal-body">
-          <p
-            dir="auto"
-            style={{ fontSize: '1.2em', lineHeight: '1.5', margin: '0 0 24px 0' }}
-          >
+          <p dir="auto" style={{ fontSize: '1.2em', lineHeight: '1.5', margin: '0 0 24px 0' }}>
             {localize(
               event.text,
               event.messageKey,

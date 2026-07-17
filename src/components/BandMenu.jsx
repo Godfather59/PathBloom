@@ -9,20 +9,13 @@ import {
   getAvgMemberSkill,
   getBandCohesion,
   replaceMember,
-  getRandomDrama,
 } from '../logic/Band';
 import './Modal.css';
 
-export function BandMenu({
-  person,
-  onAction,
-  onClose,
-  t = (key, fallback) => fallback || key,
-}) {
+export function BandMenu({ person, onAction, onClose, t = (key, fallback) => fallback || key }) {
   const [view, setView] = useState('overview');
   const [bandName, setBandName] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('rock');
-  const [drama, setDrama] = useState(null);
   const [gigResult, setGigResult] = useState(null);
   const [albumResult, setAlbumResult] = useState(null);
   const [practiceMsg, setPracticeMsg] = useState(null);
@@ -33,7 +26,9 @@ export function BandMenu({
         <div className="modal-content" style={{ maxWidth: '450px' }}>
           <div className="modal-header">
             <h2 className="modal-title">{t('band.title', '🎸 Band')}</h2>
-            <button className="close-btn" onClick={onClose}>&times;</button>
+            <button className="close-btn" onClick={onClose}>
+              &times;
+            </button>
           </div>
           <div className="modal-body">
             <h3>{t('band.formTitle', 'Form a Band')}</h3>
@@ -78,39 +73,58 @@ export function BandMenu({
     );
   }
 
-  const band = person.band;
+  const { band } = person;
   const avgSkill = getAvgMemberSkill(person);
   const cohesion = getBandCohesion(person);
   const availableVenues = getAvailableVenues(person);
 
   const renderOverview = () => (
     <div>
-      <div style={{
-        background: 'var(--bg-card)',
-        borderRadius: '12px',
-        padding: '16px',
-        marginBottom: '16px',
-        textAlign: 'center',
-      }}>
+      <div
+        style={{
+          background: 'var(--bg-card)',
+          borderRadius: '12px',
+          padding: '16px',
+          marginBottom: '16px',
+          textAlign: 'center',
+        }}
+      >
         <h3 style={{ fontSize: '1.3em', marginBottom: '4px' }}>{band.name}</h3>
         <div style={{ color: 'var(--text-secondary)', fontSize: '0.9em' }}>
-          {GENRES.find(g => g.id === band.genre)?.name || band.genre} &bull; Formed at age {band.formedAtAge}
+          {GENRES.find(g => g.id === band.genre)?.name || band.genre} &bull; Formed at age{' '}
+          {band.formedAtAge}
         </div>
       </div>
 
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '8px',
-        marginBottom: '16px',
-      }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '8px',
+          marginBottom: '16px',
+        }}
+      >
         <div className="list-item" style={{ textAlign: 'center', padding: '12px' }}>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
             {t('band.cohesion', 'Cohesion')}
           </div>
           <div style={{ fontSize: '1.2em', fontWeight: 700 }}>{cohesion}%</div>
-          <div style={{ height: '4px', background: 'var(--bg-surface)', borderRadius: '2px', marginTop: '6px' }}>
-            <div style={{ height: '100%', width: `${cohesion}%`, background: 'var(--accent-primary)', borderRadius: '2px' }} />
+          <div
+            style={{
+              height: '4px',
+              background: 'var(--bg-surface)',
+              borderRadius: '2px',
+              marginTop: '6px',
+            }}
+          >
+            <div
+              style={{
+                height: '100%',
+                width: `${cohesion}%`,
+                background: 'var(--accent-primary)',
+                borderRadius: '2px',
+              }}
+            />
           </div>
         </div>
         <div className="list-item" style={{ textAlign: 'center', padding: '12px' }}>
@@ -118,8 +132,22 @@ export function BandMenu({
             {t('band.avgSkill', 'Avg Skill')}
           </div>
           <div style={{ fontSize: '1.2em', fontWeight: 700 }}>{avgSkill}%</div>
-          <div style={{ height: '4px', background: 'var(--bg-surface)', borderRadius: '2px', marginTop: '6px' }}>
-            <div style={{ height: '100%', width: `${avgSkill}%`, background: '#4caf50', borderRadius: '2px' }} />
+          <div
+            style={{
+              height: '4px',
+              background: 'var(--bg-surface)',
+              borderRadius: '2px',
+              marginTop: '6px',
+            }}
+          >
+            <div
+              style={{
+                height: '100%',
+                width: `${avgSkill}%`,
+                background: '#4caf50',
+                borderRadius: '2px',
+              }}
+            />
           </div>
         </div>
         <div className="list-item" style={{ textAlign: 'center', padding: '12px' }}>
@@ -139,17 +167,26 @@ export function BandMenu({
       </div>
 
       {gigResult && (
-        <div style={{
-          background: '#1b5e20',
-          borderRadius: '8px',
-          padding: '12px',
-          marginBottom: '12px',
-          color: '#c8e6c9',
-          fontSize: '0.85rem',
-        }}>
+        <div
+          style={{
+            background: '#1b5e20',
+            borderRadius: '8px',
+            padding: '12px',
+            marginBottom: '12px',
+            color: '#c8e6c9',
+            fontSize: '0.85rem',
+          }}
+        >
           {gigResult}
           <button
-            style={{ marginLeft: '8px', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '0.8rem' }}
+            style={{
+              marginLeft: '8px',
+              background: 'none',
+              border: 'none',
+              color: '#fff',
+              cursor: 'pointer',
+              fontSize: '0.8rem',
+            }}
             onClick={() => setGigResult(null)}
           >
             &times;
@@ -157,17 +194,26 @@ export function BandMenu({
         </div>
       )}
       {albumResult && (
-        <div style={{
-          background: '#1b5e20',
-          borderRadius: '8px',
-          padding: '12px',
-          marginBottom: '12px',
-          color: '#c8e6c9',
-          fontSize: '0.85rem',
-        }}>
+        <div
+          style={{
+            background: '#1b5e20',
+            borderRadius: '8px',
+            padding: '12px',
+            marginBottom: '12px',
+            color: '#c8e6c9',
+            fontSize: '0.85rem',
+          }}
+        >
           {albumResult}
           <button
-            style={{ marginLeft: '8px', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '0.8rem' }}
+            style={{
+              marginLeft: '8px',
+              background: 'none',
+              border: 'none',
+              color: '#fff',
+              cursor: 'pointer',
+              fontSize: '0.8rem',
+            }}
             onClick={() => setAlbumResult(null)}
           >
             &times;
@@ -175,17 +221,26 @@ export function BandMenu({
         </div>
       )}
       {practiceMsg && (
-        <div style={{
-          background: '#1a237e',
-          borderRadius: '8px',
-          padding: '12px',
-          marginBottom: '12px',
-          color: '#c5cae9',
-          fontSize: '0.85rem',
-        }}>
+        <div
+          style={{
+            background: '#1a237e',
+            borderRadius: '8px',
+            padding: '12px',
+            marginBottom: '12px',
+            color: '#c5cae9',
+            fontSize: '0.85rem',
+          }}
+        >
           {practiceMsg}
           <button
-            style={{ marginLeft: '8px', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '0.8rem' }}
+            style={{
+              marginLeft: '8px',
+              background: 'none',
+              border: 'none',
+              color: '#fff',
+              cursor: 'pointer',
+              fontSize: '0.8rem',
+            }}
             onClick={() => setPracticeMsg(null)}
           >
             &times;
@@ -194,15 +249,24 @@ export function BandMenu({
       )}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        <button className="list-item" onClick={() => {
-          const result = practiceBand(person);
-          if (result?.message) setPracticeMsg(result.message);
-          if (!result?.success) setPracticeMsg(result?.message || 'Something went wrong.');
-          onAction('_refresh');
-        }}>
+        <button
+          className="list-item"
+          onClick={() => {
+            const result = practiceBand(person);
+            if (result?.message) {
+              setPracticeMsg(result.message);
+            }
+            if (!result?.success) {
+              setPracticeMsg(result?.message || 'Something went wrong.');
+            }
+            onAction('_refresh');
+          }}
+        >
           <div>
             <div className="bold">{t('band.practice', '🎸 Practice')}</div>
-            <div className="list-item-subtitle">{t('band.practiceDesc', 'Improve cohesion and member skills')}</div>
+            <div className="list-item-subtitle">
+              {t('band.practiceDesc', 'Improve cohesion and member skills')}
+            </div>
           </div>
         </button>
 
@@ -220,7 +284,9 @@ export function BandMenu({
         <button className="list-item" onClick={() => setView('album')}>
           <div>
             <div className="bold">{t('band.recordAlbum', '💿 Record Album')}</div>
-            <div className="list-item-subtitle">{t('band.recordDesc', 'Costs ~$20-50k, earn royalties')}</div>
+            <div className="list-item-subtitle">
+              {t('band.recordDesc', 'Costs ~$20-50k, earn royalties')}
+            </div>
           </div>
         </button>
 
@@ -246,9 +312,13 @@ export function BandMenu({
       </div>
 
       <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
-        <button className="btn-secondary" style={{ flex: 1 }} onClick={() => {
-          onAction('disband');
-        }}>
+        <button
+          className="btn-secondary"
+          style={{ flex: 1 }}
+          onClick={() => {
+            onAction('disband');
+          }}
+        >
           {t('band.disband', '💔 Disband')}
         </button>
         <button className="btn-secondary" style={{ flex: 1 }} onClick={() => onAction('rest')}>
@@ -266,7 +336,10 @@ export function BandMenu({
       <h3>{t('band.bookGigTitle', 'Book a Gig')}</h3>
       {availableVenues.length === 0 ? (
         <p style={{ color: 'var(--text-secondary)' }}>
-          {t('band.noVenues', 'No venues available. Gain more fame or practice to increase cohesion.')}
+          {t(
+            'band.noVenues',
+            'No venues available. Gain more fame or practice to increase cohesion.'
+          )}
         </p>
       ) : (
         <div className="list-container">
@@ -312,7 +385,10 @@ export function BandMenu({
       <h3>{t('band.recordTitle', 'Record Album')}</h3>
       <div className="list-item">
         <p style={{ marginBottom: '8px' }}>
-          {t('band.recordCost', 'Recording costs between $20,000 and $50,000. Quality depends on band skill and cohesion.')}
+          {t(
+            'band.recordCost',
+            'Recording costs between $20,000 and $50,000. Quality depends on band skill and cohesion.'
+          )}
         </p>
         <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '12px' }}>
           {t('band.avgSkill', 'Avg Skill:')} {avgSkill}% &bull;
@@ -362,7 +438,9 @@ export function BandMenu({
                 style={{ padding: '4px 8px', fontSize: '0.75rem' }}
                 onClick={() => {
                   const result = replaceMember(person, m.id);
-                  if (result?.message) setPracticeMsg(result.message);
+                  if (result?.message) {
+                    setPracticeMsg(result.message);
+                  }
                   onAction('_refresh');
                 }}
               >
@@ -381,8 +459,10 @@ export function BandMenu({
         &larr; {t('band.back', 'Back')}
       </button>
       <h3>{t('band.discography', '💿 Discography')}</h3>
-      {(!band.albums || band.albums.length === 0) ? (
-        <p style={{ color: 'var(--text-secondary)' }}>{t('band.noAlbums', 'No albums recorded yet.')}</p>
+      {!band.albums || band.albums.length === 0 ? (
+        <p style={{ color: 'var(--text-secondary)' }}>
+          {t('band.noAlbums', 'No albums recorded yet.')}
+        </p>
       ) : (
         <div className="list-container">
           {[...band.albums].reverse().map((album, i) => (
@@ -402,10 +482,15 @@ export function BandMenu({
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content" style={{ maxWidth: '500px', maxHeight: '80vh', overflowY: 'auto' }}>
+      <div
+        className="modal-content"
+        style={{ maxWidth: '500px', maxHeight: '80vh', overflowY: 'auto' }}
+      >
         <div className="modal-header">
           <h2 className="modal-title">🎸 {band.name}</h2>
-          <button className="close-btn" onClick={onClose}>&times;</button>
+          <button className="close-btn" onClick={onClose}>
+            &times;
+          </button>
         </div>
         <div className="modal-body">
           {view === 'overview' && renderOverview()}

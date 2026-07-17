@@ -50,20 +50,30 @@ export const EventLog = memo(
 
     useEffect(() => {
       const el = containerRef.current;
-      if (!el) return;
+      if (!el) {
+        return;
+      }
 
       const updatePadding = () => {
         const hud = document.querySelector('.hud-container');
         const actionMenu = document.querySelector('.action-menu');
-        if (hud) el.style.paddingTop = `${hud.offsetHeight + 8}px`;
-        if (actionMenu) el.style.paddingBottom = `${actionMenu.offsetHeight + 8}px`;
+        if (hud) {
+          el.style.paddingTop = `${hud.offsetHeight + 8}px`;
+        }
+        if (actionMenu) {
+          el.style.paddingBottom = `${actionMenu.offsetHeight + 8}px`;
+        }
       };
 
       const ro = new ResizeObserver(updatePadding);
       const hud = document.querySelector('.hud-container');
       const actionMenu = document.querySelector('.action-menu');
-      if (hud) ro.observe(hud);
-      if (actionMenu) ro.observe(actionMenu);
+      if (hud) {
+        ro.observe(hud);
+      }
+      if (actionMenu) {
+        ro.observe(actionMenu);
+      }
       updatePadding();
       return () => ro.disconnect();
     }, []);

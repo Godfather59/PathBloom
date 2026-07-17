@@ -1,6 +1,8 @@
 name: Format screenshot localization pattern
 
 on:
+  push:
+    branches: [fix/screenshot-arabic-dock]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -10,7 +12,7 @@ permissions:
 
 jobs:
   format:
-    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - name: Check out branch
@@ -26,10 +28,10 @@ jobs:
           path = Path('src/logic/DeepLocalization.js')
           text = path.read_text(encoding='utf-8')
           old = """  [
-    /^(?:Age|العمر)\\s*[0-9٠-٩]+\\s*:\\s*(.+)$/i,
+    /^(?:Age|العمر)\s*[0-9٠-٩]+\s*:\s*(.+)$/i,
     match => translateDeepSimulationText(match[1], 'ar'),
   ],"""
-          new = """  [/^(?:Age|العمر)\\s*[0-9٠-٩]+\\s*:\\s*(.+)$/i, match => translateDeepSimulationText(match[1], 'ar')],"""
+          new = """  [/^(?:Age|العمر)\s*[0-9٠-٩]+\s*:\s*(.+)$/i, match => translateDeepSimulationText(match[1], 'ar')],"""
           if old in text:
               path.write_text(text.replace(old, new, 1), encoding='utf-8')
           elif new not in text:

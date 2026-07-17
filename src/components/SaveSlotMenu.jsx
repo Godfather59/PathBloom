@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { readSaveMetadata, SAVE_KEY_PREFIX, SAVE_META_KEY } from '../logic/SaveSystem';
 import './Modal.css';
 
 export function SaveSlotMenu({
@@ -12,28 +13,7 @@ export function SaveSlotMenu({
 
   useEffect(() => {
     try {
-      const meta = localStorage.getItem('bitlife_save_meta');
-      if (meta) {
-        const parsed = JSON.parse(meta);
-        const validSlots = Array.isArray(parsed)
-          ? parsed.filter(slot => {
-              if (!slot || typeof slot.id !== 'string' || typeof slot.name !== 'string') {
-                return false;
-              }
-              const rawSave = localStorage.getItem(`bitlife_save_${slot.id}`);
-              if (!rawSave) {
-                return false;
-              }
-              try {
-                const save = JSON.parse(rawSave);
-                return Boolean(save && typeof save === 'object' && !Array.isArray(save));
-              } catch {
-                return false;
-              }
-            })
-          : [];
-        setSlots(validSlots);
-      }
+      setSlots(readSaveMetadata());
     } catch (error) {
       console.warn('Ignoring invalid save metadata.', error);
       setSlots([]);
@@ -52,9 +32,9 @@ export function SaveSlotMenu({
     ) {
       // Remove data
       try {
-        localStorage.removeItem(`bitlife_save_${slotId}`);
+        localStorage.removeItem(`${SAVE_KEY_PREFIX}${slotId}`);
         const newSlots = slots.filter(s => s.id !== slotId);
-        localStorage.setItem('bitlife_save_meta', JSON.stringify(newSlots));
+        localStorage.setItem(SAVE_META_KEY, JSON.stringify(newSlots));
         setSlots(newSlots);
         onSlotsChanged?.(newSlots);
       } catch (error) {

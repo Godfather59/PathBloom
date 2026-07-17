@@ -27,7 +27,9 @@ Person.prototype.clone = function cloneWithWorldSimulation2() {
 const originalResolveEvent = Person.prototype.resolveEvent;
 Person.prototype.resolveEvent = function resolveWorldSimulation2Event(choice) {
   ensureWorldSimulation2(this);
-  if (resolveWorldSimulationChoice(this, this.pendingEvent, choice)) return;
+  if (resolveWorldSimulationChoice(this, this.pendingEvent, choice)) {
+    return;
+  }
   return originalResolveEvent.call(this, choice);
 };
 
@@ -38,7 +40,9 @@ GameEngine.simulateYear = function simulateYearWithWorldSimulation2(person) {
   ensureWorldSimulation2(person);
   if (person.isAlive) {
     simulateWorldMonths(person, 12);
-    if (!person.pendingEvent) maybeCreateDirectWorldDecision(person);
+    if (!person.pendingEvent) {
+      maybeCreateDirectWorldDecision(person);
+    }
   }
   return result;
 };
@@ -51,7 +55,9 @@ GameEngine.ageUp = function ageUpWithWorldSimulation2(person, amount = 1) {
   ensureWorldSimulation2(person);
   if (amount === 'month' && person.isAlive && (Number(person.age) || 0) === ageBefore) {
     simulateWorldMonths(person, 1);
-    if (!person.pendingEvent) maybeCreateDirectWorldDecision(person);
+    if (!person.pendingEvent) {
+      maybeCreateDirectWorldDecision(person);
+    }
   }
   return result;
 };

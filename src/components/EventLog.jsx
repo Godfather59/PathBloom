@@ -7,10 +7,13 @@ import './EventLog.css';
 const MAX_VISIBLE_EVENTS = 100;
 
 const localizeEvent = (event, language) => {
-  const packText = event.localizedText && typeof event.localizedText === 'object'
-    ? event.localizedText[language] || event.localizedText.en
-    : null;
-  if (packText) return String(packText);
+  const packText =
+    event.localizedText && typeof event.localizedText === 'object'
+      ? event.localizedText[language] || event.localizedText.en
+      : null;
+  if (packText) {
+    return String(packText);
+  }
 
   const localized = event.messageKey
     ? translateGameMessage(language, event.messageKey, event.messageParams || {}, event.text)
@@ -34,20 +37,30 @@ export const EventLog = memo(
 
     useEffect(() => {
       const el = containerRef.current;
-      if (!el) return;
+      if (!el) {
+        return;
+      }
 
       const updatePadding = () => {
         const hud = document.querySelector('.hud-container');
         const actionMenu = document.querySelector('.action-menu');
-        if (hud) el.style.paddingTop = `${hud.offsetHeight + 8}px`;
-        if (actionMenu) el.style.paddingBottom = `${actionMenu.offsetHeight + 8}px`;
+        if (hud) {
+          el.style.paddingTop = `${hud.offsetHeight + 8}px`;
+        }
+        if (actionMenu) {
+          el.style.paddingBottom = `${actionMenu.offsetHeight + 8}px`;
+        }
       };
 
       const ro = new ResizeObserver(updatePadding);
       const hud = document.querySelector('.hud-container');
       const actionMenu = document.querySelector('.action-menu');
-      if (hud) ro.observe(hud);
-      if (actionMenu) ro.observe(actionMenu);
+      if (hud) {
+        ro.observe(hud);
+      }
+      if (actionMenu) {
+        ro.observe(actionMenu);
+      }
       updatePadding();
       return () => ro.disconnect();
     }, []);
@@ -60,7 +73,9 @@ export const EventLog = memo(
 
     const displayHistory = useMemo(() => {
       const reversed = [...history].reverse();
-      return reversed.length > MAX_VISIBLE_EVENTS ? reversed.slice(0, MAX_VISIBLE_EVENTS) : reversed;
+      return reversed.length > MAX_VISIBLE_EVENTS
+        ? reversed.slice(0, MAX_VISIBLE_EVENTS)
+        : reversed;
     }, [history]);
 
     return (

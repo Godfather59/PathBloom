@@ -1,8 +1,7 @@
 let currentPerson = null;
 let currentLanguage = 'en';
 
-const clampInt = (value, min, max) =>
-  Math.max(min, Math.min(max, Math.floor(Number(value) || 0)));
+const clampInt = (value, min, max) => Math.max(min, Math.min(max, Math.floor(Number(value) || 0)));
 
 export function setCurrentTimePerson(person, language = currentLanguage) {
   currentPerson = person || null;
@@ -18,7 +17,9 @@ function logTimeEvent(person, english, arabic, type = 'neutral') {
 }
 
 export function ensureTimeProgress(person) {
-  if (!person || typeof person !== 'object') return null;
+  if (!person || typeof person !== 'object') {
+    return null;
+  }
 
   if (!person.timeProgress || typeof person.timeProgress !== 'object') {
     person.timeProgress = {};
@@ -50,30 +51,30 @@ function hasActiveWar(person) {
 function hasPoliticalCampaign(person) {
   return Boolean(
     person?.campaign?.active ||
-      person?.campaignData?.active ||
-      person?.politicalCampaign?.active ||
-      person?.job?.campaignActive ||
-      Number(person?.campaign?.weeksLeft) > 0 ||
-      Number(person?.campaignData?.weeksLeft) > 0
+    person?.campaignData?.active ||
+    person?.politicalCampaign?.active ||
+    person?.job?.campaignActive ||
+    Number(person?.campaign?.weeksLeft) > 0 ||
+    Number(person?.campaignData?.weeksLeft) > 0
   );
 }
 
 function hasPregnancy(person) {
   return Boolean(
     person?.pregnancy?.active ||
-      person?.isPregnant ||
-      person?.pregnant ||
-      Number(person?.pregnancyMonths) > 0
+    person?.isPregnant ||
+    person?.pregnant ||
+    Number(person?.pregnancyMonths) > 0
   );
 }
 
 function hasDeployment(person) {
   return Boolean(
     person?.deployment?.active ||
-      person?.activeDeployment ||
-      person?.isDeployed ||
-      person?.spaceProgram?.activeMission ||
-      person?.spaceProgram?.currentMission
+    person?.activeDeployment ||
+    person?.isDeployed ||
+    person?.spaceProgram?.activeMission ||
+    person?.spaceProgram?.currentMission
   );
 }
 
@@ -88,23 +89,44 @@ function hasBusinessCrisis(person) {
 }
 
 export function getActiveMonthlySituation(person) {
-  if (!person?.isAlive || person?.pendingEvent) return null;
+  if (!person?.isAlive || person?.pendingEvent) {
+    return null;
+  }
 
-  if (person.isInPrison) return { id: 'prison', icon: '🔒' };
-  if (hasPregnancy(person)) return { id: 'pregnancy', icon: '🤰' };
-  if (hasPoliticalCampaign(person)) return { id: 'campaign', icon: '🗳️' };
-  if (hasDeployment(person)) return { id: 'deployment', icon: '🪖' };
-  if (person.inTreatment) return { id: 'treatment', icon: '🏥' };
-  if ((person.activeLawsuits || []).length > 0) return { id: 'lawsuit', icon: '⚖️' };
-  if (person.collegeSport?.active || person.collegeSport?.isProfessional)
+  if (person.isInPrison) {
+    return { id: 'prison', icon: '🔒' };
+  }
+  if (hasPregnancy(person)) {
+    return { id: 'pregnancy', icon: '🤰' };
+  }
+  if (hasPoliticalCampaign(person)) {
+    return { id: 'campaign', icon: '🗳️' };
+  }
+  if (hasDeployment(person)) {
+    return { id: 'deployment', icon: '🪖' };
+  }
+  if (person.inTreatment) {
+    return { id: 'treatment', icon: '🏥' };
+  }
+  if ((person.activeLawsuits || []).length > 0) {
+    return { id: 'lawsuit', icon: '⚖️' };
+  }
+  if (person.collegeSport?.active || person.collegeSport?.isProfessional) {
     return { id: 'sports', icon: '🏆' };
-  if (hasBusinessCrisis(person)) return { id: 'business', icon: '📉' };
-  if (hasActiveWar(person)) return { id: 'war', icon: '⚔️' };
+  }
+  if (hasBusinessCrisis(person)) {
+    return { id: 'business', icon: '📉' };
+  }
+  if (hasActiveWar(person)) {
+    return { id: 'war', icon: '⚔️' };
+  }
   return null;
 }
 
 export function getSituationLabel(situation, language = 'en') {
-  if (!situation) return '';
+  if (!situation) {
+    return '';
+  }
   const labels = {
     en: {
       prison: 'Prison sentence',
@@ -134,7 +156,9 @@ export function getSituationLabel(situation, language = 'en') {
 
 function progressCampaign(person) {
   const campaign = person.campaign || person.campaignData || person.politicalCampaign;
-  if (!campaign || typeof campaign !== 'object') return;
+  if (!campaign || typeof campaign !== 'object') {
+    return;
+  }
   if (Number.isFinite(Number(campaign.weeksLeft))) {
     campaign.weeksLeft = Math.max(0, Number(campaign.weeksLeft) - 4);
   }
@@ -194,12 +218,7 @@ function progressPrison(person, state) {
     person.isInPrison = false;
     person.prisonSentence = 0;
     state.prisonMonthsRemaining = null;
-    logTimeEvent(
-      person,
-      'You have been released from prison!',
-      'تم إطلاق سراحك من السجن!',
-      'good'
-    );
+    logTimeEvent(person, 'You have been released from prison!', 'تم إطلاق سراحك من السجن!', 'good');
     person.updateStats?.({ happiness: 20, stress: -10 });
   }
 }
@@ -250,11 +269,7 @@ function progressSituation(person, situation, state) {
       person.collegeSport.seasonMonth =
         Math.max(0, Math.floor(Number(person.collegeSport.seasonMonth) || 0)) + 1;
       person.updateStats?.({ health: 1, stress: 1, energy: 20 });
-      logTimeEvent(
-        person,
-        'One month passed in the sports season.',
-        'مر شهر من الموسم الرياضي.'
-      );
+      logTimeEvent(person, 'One month passed in the sports season.', 'مر شهر من الموسم الرياضي.');
       break;
     case 'business':
       person.updateStats?.({ stress: 2, energy: 20 });
@@ -280,8 +295,12 @@ function progressSituation(person, situation, state) {
 }
 
 export function advanceOneMonth(person, advanceYear) {
-  if (!person?.isAlive) return person;
-  if (person.pendingEvent) return person;
+  if (!person?.isAlive) {
+    return person;
+  }
+  if (person.pendingEvent) {
+    return person;
+  }
 
   const situation = getActiveMonthlySituation(person);
   if (!situation) {

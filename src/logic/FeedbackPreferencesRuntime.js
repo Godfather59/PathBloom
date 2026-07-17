@@ -24,9 +24,13 @@ function storeEnabled(enabled) {
 function wrapHaptics() {
   Object.keys(HAPTICS).forEach(key => {
     const original = HAPTICS[key];
-    if (typeof original !== 'function' || original[WRAPPED_FLAG]) return;
+    if (typeof original !== 'function' || original[WRAPPED_FLAG]) {
+      return;
+    }
     function preferredHaptic(...args) {
-      if (!storedEnabled()) return undefined;
+      if (!storedEnabled()) {
+        return undefined;
+      }
       return original(...args);
     }
     Object.defineProperty(preferredHaptic, WRAPPED_FLAG, { value: true });
@@ -39,16 +43,22 @@ function findVibrationButtons(root = document) {
   for (const card of cards) {
     const heading = card.querySelector('.setting-card-heading');
     const text = String(heading?.textContent || '').toLowerCase();
-    if (!/(vibration|اهتزاز)/i.test(text)) continue;
+    if (!/(vibration|اهتزاز)/i.test(text)) {
+      continue;
+    }
     const buttons = [...card.querySelectorAll('.segmented-control.compact button')];
-    if (buttons.length >= 2) return buttons;
+    if (buttons.length >= 2) {
+      return buttons;
+    }
   }
   return [];
 }
 
 function syncVibrationUi(root = document) {
   const buttons = findVibrationButtons(root);
-  if (buttons.length < 2) return;
+  if (buttons.length < 2) {
+    return;
+  }
   const enabled = storedEnabled();
   buttons[0].classList.toggle('is-active', enabled);
   buttons[1].classList.toggle('is-active', !enabled);
@@ -58,34 +68,47 @@ function syncVibrationUi(root = document) {
 
 function installPreferenceClicks() {
   document.addEventListener('click', event => {
-    const button = event.target?.closest?.('.setting-inline-card .segmented-control.compact button');
-    if (!button) return;
+    const button = event.target?.closest?.(
+      '.setting-inline-card .segmented-control.compact button'
+    );
+    if (!button) {
+      return;
+    }
     const buttons = [...button.parentElement.querySelectorAll('button')];
     const index = buttons.indexOf(button);
-    if (index !== 0 && index !== 1) return;
+    if (index !== 0 && index !== 1) {
+      return;
+    }
     storeEnabled(index === 0);
     queueMicrotask(() => syncVibrationUi(document));
   });
 }
 
 function installUiObserver() {
-  if (typeof MutationObserver === 'undefined' || observer) return;
+  if (typeof MutationObserver === 'undefined' || observer) {
+    return;
+  }
   observer = new MutationObserver(mutations => {
     const relevant = mutations.some(mutation =>
-      [...mutation.addedNodes].some(node =>
-        node.nodeType === Node.ELEMENT_NODE &&
-        (node.matches?.('.setting-inline-card, .system-destination') ||
-          node.querySelector?.('.setting-inline-card'))
+      [...mutation.addedNodes].some(
+        node =>
+          node.nodeType === Node.ELEMENT_NODE &&
+          (node.matches?.('.setting-inline-card, .system-destination') ||
+            node.querySelector?.('.setting-inline-card'))
       )
     );
-    if (relevant) syncVibrationUi(document);
+    if (relevant) {
+      syncVibrationUi(document);
+    }
   });
   observer.observe(document.documentElement, { childList: true, subtree: true });
   syncVibrationUi(document);
 }
 
 export function installFeedbackPreferencesRuntime() {
-  if (globalThis[RUNTIME_FLAG]) return;
+  if (globalThis[RUNTIME_FLAG]) {
+    return;
+  }
   globalThis[RUNTIME_FLAG] = true;
   wrapHaptics();
   installPreferenceClicks();

@@ -10,31 +10,51 @@ const STEPS = {
       icon: '🌱',
       title: 'Every life becomes a story',
       body: 'Advance through years, react to events, and watch small choices grow into a career, family, reputation, and legacy.',
-      preview: ['Your timeline remembers important moments', 'Decisions create visible consequences', 'The world continues around you'],
+      preview: [
+        'Your timeline remembers important moments',
+        'Decisions create visible consequences',
+        'The world continues around you',
+      ],
     },
     {
       icon: '❤️',
       title: 'Watch what matters',
       body: 'Health, happiness, stress, money, relationships, and reputation constantly shape which opportunities appear.',
-      preview: ['Tap the compact stat row for details', 'Active situations advance month by month', 'Warnings appear before serious risk'],
+      preview: [
+        'Tap the compact stat row for details',
+        'Active situations advance month by month',
+        'Warnings appear before serious risk',
+      ],
     },
     {
       icon: '✨',
       title: 'Choose your direction',
       body: 'Activities, education, work, relationships, assets, politics, and the world screen are the tools that shape your path.',
-      preview: ['Career and education unlock opportunities', 'Relationships remember support and betrayal', 'Assets build security and risk'],
+      preview: [
+        'Career and education unlock opportunities',
+        'Relationships remember support and betrayal',
+        'Assets build security and risk',
+      ],
     },
     {
       icon: '🎯',
       title: 'Start with a guided journey',
       body: 'A small goal card can guide your first life, reward progress, and explain major features as they unlock. You remain free to play any way you choose.',
-      preview: ['Eight optional starter goals', 'Rewards for healthy progress', 'Contextual tips at important ages'],
+      preview: [
+        'Eight optional starter goals',
+        'Rewards for healthy progress',
+        'Contextual tips at important ages',
+      ],
     },
     {
       icon: '🌳',
       title: 'Build a life worth remembering',
       body: 'There is no single winning path. Become kind, powerful, wealthy, infamous, influential—or simply create a life that feels meaningful.',
-      preview: ['Autosave protects every important change', 'Milestones celebrate real progress', 'Children can continue a family legacy'],
+      preview: [
+        'Autosave protects every important change',
+        'Milestones celebrate real progress',
+        'Children can continue a family legacy',
+      ],
     },
   ],
   ar: [
@@ -42,31 +62,51 @@ const STEPS = {
       icon: '🌱',
       title: 'كل حياة تتحول إلى قصة',
       body: 'تقدم عبر السنوات وتفاعل مع الأحداث وشاهد كيف تتحول الاختيارات الصغيرة إلى مهنة وعائلة وسمعة وإرث.',
-      preview: ['يحفظ الخط الزمني اللحظات المهمة', 'تُظهر القرارات نتائج واضحة', 'يستمر العالم من حولك'],
+      preview: [
+        'يحفظ الخط الزمني اللحظات المهمة',
+        'تُظهر القرارات نتائج واضحة',
+        'يستمر العالم من حولك',
+      ],
     },
     {
       icon: '❤️',
       title: 'راقب ما يهم',
       body: 'تؤثر الصحة والسعادة والتوتر والمال والعلاقات والسمعة باستمرار في الفرص التي تظهر لك.',
-      preview: ['اضغط على صف الإحصائيات لعرض التفاصيل', 'تتقدم الأوضاع النشطة شهرا بعد شهر', 'تظهر التحذيرات قبل المخاطر الكبيرة'],
+      preview: [
+        'اضغط على صف الإحصائيات لعرض التفاصيل',
+        'تتقدم الأوضاع النشطة شهرا بعد شهر',
+        'تظهر التحذيرات قبل المخاطر الكبيرة',
+      ],
     },
     {
       icon: '✨',
       title: 'اختر اتجاهك',
       body: 'الأنشطة والتعليم والعمل والعلاقات والممتلكات والسياسة وشاشة العالم هي أدوات تشكيل مسارك.',
-      preview: ['تفتح المهنة والتعليم فرصا جديدة', 'تتذكر العلاقات الدعم والخيانة', 'تبني الممتلكات الأمان والمخاطر'],
+      preview: [
+        'تفتح المهنة والتعليم فرصا جديدة',
+        'تتذكر العلاقات الدعم والخيانة',
+        'تبني الممتلكات الأمان والمخاطر',
+      ],
     },
     {
       icon: '🎯',
       title: 'ابدأ برحلة موجهة',
       body: 'يمكن لبطاقة أهداف صغيرة إرشاد حياتك الأولى ومكافأة تقدمك وشرح الميزات المهمة عند فتحها، مع بقاء حرية اللعب كاملة.',
-      preview: ['ثمانية أهداف بداية اختيارية', 'مكافآت على التقدم الصحي', 'نصائح سياقية في الأعمار المهمة'],
+      preview: [
+        'ثمانية أهداف بداية اختيارية',
+        'مكافآت على التقدم الصحي',
+        'نصائح سياقية في الأعمار المهمة',
+      ],
     },
     {
       icon: '🌳',
       title: 'ابنِ حياة تستحق أن تُذكر',
       body: 'لا يوجد مسار فوز واحد. كن طيبا أو قويا أو ثريا أو سيئ السمعة أو مؤثرا، أو اصنع ببساطة حياة ذات معنى.',
-      preview: ['يحمي الحفظ التلقائي كل تغيير مهم', 'تحتفل الإنجازات بالتقدم الحقيقي', 'يمكن للأطفال مواصلة إرث العائلة'],
+      preview: [
+        'يحمي الحفظ التلقائي كل تغيير مهم',
+        'تحتفل الإنجازات بالتقدم الحقيقي',
+        'يمكن للأطفال مواصلة إرث العائلة',
+      ],
     },
   ],
 };
@@ -77,13 +117,28 @@ export function OnboardingOverlay({ language = 'en', onClose }) {
   const [index, setIndex] = useState(0);
   const step = steps[index];
   const isLast = index === steps.length - 1;
-  const copy = locale === 'ar'
-    ? { brand: 'PathBloom', skip: 'تخطَّ', back: 'السابق', next: 'التالي', start: 'ابدأ الرحلة الموجهة' }
-    : { brand: 'PathBloom', skip: 'Skip', back: 'Back', next: 'Next', start: 'Start guided journey' };
+  const copy =
+    locale === 'ar'
+      ? {
+          brand: 'PathBloom',
+          skip: 'تخطَّ',
+          back: 'السابق',
+          next: 'التالي',
+          start: 'ابدأ الرحلة الموجهة',
+        }
+      : {
+          brand: 'PathBloom',
+          skip: 'Skip',
+          back: 'Back',
+          next: 'Next',
+          start: 'Start guided journey',
+        };
 
   const finish = guided => {
     const person = getCurrentTimePerson();
-    if (person) setGuidedJourney(person, guided);
+    if (person) {
+      setGuidedJourney(person, guided);
+    }
     try {
       localStorage.setItem('pathbloom_guided_journey', guided ? 'true' : 'false');
     } catch {
@@ -107,13 +162,18 @@ export function OnboardingOverlay({ language = 'en', onClose }) {
 
         <main className="release-onboarding-body">
           <div className="release-onboarding-visual">
-            <div className="release-onboarding-icon" aria-hidden="true">{step.icon}</div>
+            <div className="release-onboarding-icon" aria-hidden="true">
+              {step.icon}
+            </div>
           </div>
           <h2>{step.title}</h2>
           <p>{step.body}</p>
           <div className="release-onboarding-preview">
             {step.preview.map(item => (
-              <span key={item}><b aria-hidden="true">✓</b>{item}</span>
+              <span key={item}>
+                <b aria-hidden="true">✓</b>
+                {item}
+              </span>
             ))}
           </div>
         </main>
@@ -143,8 +203,11 @@ export function OnboardingOverlay({ language = 'en', onClose }) {
               type="button"
               className="release-onboarding-next"
               onClick={() => {
-                if (isLast) finish(true);
-                else setIndex(value => value + 1);
+                if (isLast) {
+                  finish(true);
+                } else {
+                  setIndex(value => value + 1);
+                }
               }}
             >
               {isLast ? copy.start : copy.next}

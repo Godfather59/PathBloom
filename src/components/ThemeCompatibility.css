@@ -30,15 +30,22 @@
 
 :root[data-theme='light'] #root {
   background:
-    radial-gradient(circle at 85% 0%, color-mix(in srgb, var(--pb-growth) 8%, transparent), transparent 30%),
+    radial-gradient(
+      circle at 85% 0%,
+      color-mix(in srgb, var(--pb-growth) 8%, transparent),
+      transparent 30%
+    ),
     linear-gradient(180deg, var(--pb-bg-soft), var(--pb-bg));
   box-shadow: 0 0 46px rgba(31, 45, 61, 0.14);
 }
 
 :root[data-theme='light'] .hud-container {
   color: var(--pb-text);
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--pb-surface) 98%, transparent), color-mix(in srgb, var(--pb-surface-raised) 96%, transparent));
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--pb-surface) 98%, transparent),
+    color-mix(in srgb, var(--pb-surface-raised) 96%, transparent)
+  );
   border-color: var(--pb-border);
   box-shadow: 0 9px 24px rgba(25, 42, 61, 0.08);
 }
@@ -71,7 +78,11 @@
 :root[data-theme='light'] .timeline-card {
   color: var(--pb-text);
   background:
-    linear-gradient(110deg, color-mix(in srgb, var(--category-color) 6%, transparent), transparent 46%),
+    linear-gradient(
+      110deg,
+      color-mix(in srgb, var(--category-color) 6%, transparent),
+      transparent 46%
+    ),
     var(--pb-surface);
   border-color: var(--pb-border);
   box-shadow: var(--pb-shadow-card);
@@ -99,7 +110,11 @@
 :root[data-theme='light'] .active-situation-card {
   color: var(--pb-text);
   background:
-    linear-gradient(135deg, color-mix(in srgb, var(--pb-warning) 10%, transparent), transparent 58%),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--pb-warning) 10%, transparent),
+      transparent 58%
+    ),
     var(--pb-surface);
   border-color: color-mix(in srgb, var(--pb-warning) 28%, var(--pb-border));
   box-shadow: var(--pb-shadow-card);
@@ -146,8 +161,11 @@
 :root[data-theme='light'] .situation-detail-sheet,
 :root[data-theme='light'] .phase-two-screen {
   color: var(--pb-text);
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--pb-surface) 98%, transparent), color-mix(in srgb, var(--pb-bg-soft) 98%, transparent));
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--pb-surface) 98%, transparent),
+    color-mix(in srgb, var(--pb-bg-soft) 98%, transparent)
+  );
   border-color: var(--pb-border);
   box-shadow: 0 20px 50px rgba(29, 43, 58, 0.14);
 }
@@ -187,7 +205,11 @@
 :root[data-theme='light'] .release-onboarding .onboarding-card {
   color: var(--pb-text);
   background:
-    radial-gradient(circle at 50% -10%, color-mix(in srgb, var(--pb-growth) 12%, transparent), transparent 36%),
+    radial-gradient(
+      circle at 50% -10%,
+      color-mix(in srgb, var(--pb-growth) 12%, transparent),
+      transparent 36%
+    ),
     linear-gradient(180deg, var(--pb-bg-soft), var(--pb-bg));
 }
 
@@ -197,9 +219,7 @@
 
 :root[data-theme='light'] .journey-card {
   color: var(--pb-text);
-  background:
-    linear-gradient(135deg, var(--pb-growth-soft), transparent 58%),
-    var(--pb-surface);
+  background: linear-gradient(135deg, var(--pb-growth-soft), transparent 58%), var(--pb-surface);
   border-color: color-mix(in srgb, var(--pb-growth) 24%, var(--pb-border));
   box-shadow: var(--pb-shadow-card);
 }

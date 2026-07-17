@@ -1516,7 +1516,8 @@ export const CAREER_EVENTS = [
   },
   {
     id: 'ya_moving_home',
-    trigger: person => person.money < 5000 && person.age > 22 && person.age < 30 && Math.random() < 0.03,
+    trigger: person =>
+      person.money < 5000 && person.age > 22 && person.age < 30 && Math.random() < 0.03,
     text: 'Money is tight. Your parents offered to let you move back in.',
     choices: [
       {
@@ -1535,14 +1536,19 @@ export const CAREER_EVENTS = [
   },
   {
     id: 'ya_credit_card',
-    trigger: person => person.age > 20 && person.age < 30 && person.money < 20000 && Math.random() < 0.05,
+    trigger: person =>
+      person.age > 20 && person.age < 30 && person.money < 20000 && Math.random() < 0.05,
     text: 'You checked your credit card statement. The interest is brutal.',
     effects: { stress: 15, happiness: -8 },
     type: 'bad',
   },
   {
     id: 'ya_friend_wedding',
-    trigger: person => person.age > 22 && person.age < 35 && !person.relationships.some(r => r.type === 'Spouse') && Math.random() < 0.03,
+    trigger: person =>
+      person.age > 22 &&
+      person.age < 35 &&
+      !person.relationships.some(r => r.type === 'Spouse') &&
+      Math.random() < 0.03,
     text: 'Your best friend just got engaged. You are happy for them, but also... single.',
     effects: { happiness: 5, stress: 5 },
     type: 'mixed',
@@ -1556,7 +1562,8 @@ export const CAREER_EVENTS = [
   },
   {
     id: 'ya_fitness_journey',
-    trigger: person => person.health < 70 && person.age > 18 && person.age < 35 && Math.random() < 0.04,
+    trigger: person =>
+      person.health < 70 && person.age > 18 && person.age < 35 && Math.random() < 0.04,
     text: 'You are tired of feeling out of shape. A gym opened near your place.',
     choices: [
       {
@@ -1575,7 +1582,8 @@ export const CAREER_EVENTS = [
   },
   {
     id: 'ya_learning_cook',
-    trigger: person => person.age > 18 && person.age < 30 && person.money < 30000 && Math.random() < 0.05,
+    trigger: person =>
+      person.age > 18 && person.age < 30 && person.money < 30000 && Math.random() < 0.05,
     text: 'Eating out is draining your wallet. Time to learn to cook.',
     choices: [
       {
@@ -1620,7 +1628,11 @@ export const CAREER_EVENTS = [
   },
   {
     id: 'ya_online_dating',
-    trigger: person => person.age > 18 && person.age < 40 && !person.relationships.some(r => ['Spouse', 'Partner', 'Fiance'].includes(r.type)) && Math.random() < 0.04,
+    trigger: person =>
+      person.age > 18 &&
+      person.age < 40 &&
+      !person.relationships.some(r => ['Spouse', 'Partner', 'Fiance'].includes(r.type)) &&
+      Math.random() < 0.04,
     text: 'You matched with someone amazing on a dating app. They want to meet!',
     choices: [
       {
@@ -1758,7 +1770,8 @@ export const CAREER_EVENTS = [
   },
   {
     id: 'ma_refinance',
-    trigger: person => person.money > 50000 && person.age > 25 && person.age < 60 && Math.random() < 0.03,
+    trigger: person =>
+      person.money > 50000 && person.age > 25 && person.age < 60 && Math.random() < 0.03,
     text: 'Interest rates dropped. A great time to refinance your mortgage.',
     choices: [
       {

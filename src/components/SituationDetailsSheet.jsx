@@ -57,7 +57,15 @@ const LABELS = {
   },
 };
 
-const PERCENT_KEYS = new Set(['health', 'partnerSupport', 'polling', 'evidence', 'performance', 'shortages', 'response']);
+const PERCENT_KEYS = new Set([
+  'health',
+  'partnerSupport',
+  'polling',
+  'evidence',
+  'performance',
+  'shortages',
+  'response',
+]);
 const MONEY_KEYS = new Set(['funds', 'legalCosts']);
 const ORDER = [
   'month',
@@ -117,9 +125,9 @@ export default function SituationDetailsSheet({
       : Math.max(0, Math.round((Number(person?.prisonSentence) || 0) * 12));
   }
 
-  const rows = ORDER
-    .filter(key => data[key] !== undefined && data[key] !== null && typeof data[key] !== 'object')
-    .map(key => ({ key, label: labels[key] || key, value: formatValue(key, data[key], locale) }));
+  const rows = ORDER.filter(
+    key => data[key] !== undefined && data[key] !== null && typeof data[key] !== 'object'
+  ).map(key => ({ key, label: labels[key] || key, value: formatValue(key, data[key], locale) }));
 
   return (
     <div className="modal-overlay situation-sheet-overlay" onClick={onClose}>
@@ -133,23 +141,32 @@ export default function SituationDetailsSheet({
       >
         <div className="sheet-handle" aria-hidden="true" />
         <header className="situation-sheet-header">
-          <span className="situation-sheet-icon" aria-hidden="true">{situation?.icon || '◷'}</span>
+          <span className="situation-sheet-icon" aria-hidden="true">
+            {situation?.icon || '◷'}
+          </span>
           <div>
             <span>{labels.title}</span>
             <h2>{getSituationLabel(situation, locale)}</h2>
           </div>
-          <button type="button" className="sheet-close-button" onClick={onClose} aria-label={labels.close}>
+          <button
+            type="button"
+            className="sheet-close-button"
+            onClick={onClose}
+            aria-label={labels.close}
+          >
             <AppIcon name="close" size={20} />
           </button>
         </header>
 
         <div className="situation-detail-grid">
-          {rows.length > 0 ? rows.map(row => (
-            <div key={row.key} className="situation-detail-row">
-              <span>{row.label}</span>
-              <strong dir="auto">{row.value}</strong>
-            </div>
-          )) : (
+          {rows.length > 0 ? (
+            rows.map(row => (
+              <div key={row.key} className="situation-detail-row">
+                <span>{row.label}</span>
+                <strong dir="auto">{row.value}</strong>
+              </div>
+            ))
+          ) : (
             <p className="situation-empty-copy">{labels.hint}</p>
           )}
         </div>

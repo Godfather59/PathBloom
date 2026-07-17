@@ -29,9 +29,7 @@ export function GameOver({
 
   return (
     <div className="game-over-overlay" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-      <h1 className="game-over-heading">
-        {t('gameover.rip', 'R.I.P.')}
-      </h1>
+      <h1 className="game-over-heading">{t('gameover.rip', 'R.I.P.')}</h1>
 
       <div style={{ marginBottom: '25px' }}>
         <h2 className="game-over-name">{person.getFullName()}</h2>
@@ -44,9 +42,7 @@ export function GameOver({
         <div className="game-over-legacy-row">
           <span className="game-over-legacy-icon">
             <span className="game-over-legacy-icon-main">{legacyRank.icon}</span>
-            <span className="game-over-legacy-label">
-              {t('legacy.score', 'Legacy Score')}:
-            </span>
+            <span className="game-over-legacy-label">{t('legacy.score', 'Legacy Score')}:</span>
           </span>
           <span className="game-over-legacy-value">
             {legacyScore.toLocaleString()} · {t(legacyRank.labelKey, legacyRank.label)}

@@ -39,13 +39,14 @@ function showStartupError(error) {
   const message = error?.stack || error?.message || String(error || 'Unknown startup error');
   console.error('PathBloom startup error:', error);
 
-  if (!rootElement) return;
+  if (!rootElement) {
+    return;
+  }
   const isArabic = isArabicLanguage();
   const title = isArabic ? 'تعذر تشغيل PathBloom' : 'PathBloom failed to start';
   const help = isArabic
     ? 'واجه Android WebView خطأ أثناء التشغيل. امسح بيانات التطبيق أو أعد البناء باستخدام npm run build ثم npx cap sync android.'
     : 'The Android WebView hit a startup error. Clear the app data or rebuild with npm run build && npx cap sync android.';
-
   rootElement.innerHTML = `
     <div dir="${isArabic ? 'rtl' : 'ltr'}" style="min-height:100vh;padding:24px;background:#10101c;color:#f5f5f5;font-family:Arial,sans-serif;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:14px;">
       <h1 style="margin:0;font-size:24px;">${title}</h1>

@@ -1,11 +1,7 @@
 import { Person } from './Person';
 import { GameEngine } from './GameEngine';
 import { getCurrentTimePerson } from './TimeProgression';
-import {
-  ensurePlayerJourney,
-  recordJourneyAction,
-  updatePlayerJourney,
-} from './PlayerJourney';
+import { ensurePlayerJourney, recordJourneyAction, updatePlayerJourney } from './PlayerJourney';
 import { checksumText, parseStoredSave } from './SaveReliability';
 import { HAPTICS } from './Haptics';
 import {
@@ -53,16 +49,33 @@ function dispatchSaveStatus(status, details = {}) {
 }
 
 function saveStatusCopy(status, locale) {
-  const values = locale === 'ar'
-    ? { saving: 'جارٍ الحفظ', saved: 'تم الحفظ', recovered: 'تم الاسترداد', error: 'فشل الحفظ', idle: 'حفظ تلقائي' }
-    : { saving: 'Saving', saved: 'Saved', recovered: 'Recovered', error: 'Save failed', idle: 'Autosave' };
+  const values =
+    locale === 'ar'
+      ? {
+          saving: 'جارٍ الحفظ',
+          saved: 'تم الحفظ',
+          recovered: 'تم الاسترداد',
+          error: 'فشل الحفظ',
+          idle: 'حفظ تلقائي',
+        }
+      : {
+          saving: 'Saving',
+          saved: 'Saved',
+          recovered: 'Recovered',
+          error: 'Save failed',
+          idle: 'Autosave',
+        };
   return values[status] || values.idle;
 }
 
 function injectSaveStatus() {
-  if (typeof document === 'undefined') return;
+  if (typeof document === 'undefined') {
+    return;
+  }
   const roleLine = document.querySelector('.hud-role-line');
-  if (!roleLine) return;
+  if (!roleLine) {
+    return;
+  }
   let indicator = roleLine.querySelector('.hud-save-status');
   if (!indicator) {
     indicator = document.createElement('span');
@@ -70,9 +83,15 @@ function injectSaveStatus() {
   }
   const nextClass = `hud-save-status is-${lastSaveStatus.status || 'idle'}`;
   const nextText = saveStatusCopy(lastSaveStatus.status, language());
-  if (indicator.className !== nextClass) indicator.className = nextClass;
-  if (indicator.textContent !== nextText) indicator.textContent = nextText;
-  if (indicator.getAttribute('aria-live') !== 'polite') indicator.setAttribute('aria-live', 'polite');
+  if (indicator.className !== nextClass) {
+    indicator.className = nextClass;
+  }
+  if (indicator.textContent !== nextText) {
+    indicator.textContent = nextText;
+  }
+  if (indicator.getAttribute('aria-live') !== 'polite') {
+    indicator.setAttribute('aria-live', 'polite');
+  }
 }
 
 function isPrimarySaveKey(key) {
@@ -89,8 +108,10 @@ function protectedEnvelope(payload) {
 }
 
 function installStorageProtection() {
-  if (typeof Storage === 'undefined' || Storage.prototype[SAVE_PATCH_FLAG]) return;
-  const prototype = Storage.prototype;
+  if (typeof Storage === 'undefined' || Storage.prototype[SAVE_PATCH_FLAG]) {
+    return;
+  }
+  const { prototype } = Storage;
   const nativeGet = prototype.getItem;
   const nativeSet = prototype.setItem;
   const nativeRemove = prototype.removeItem;
@@ -110,7 +131,9 @@ function installStorageProtection() {
 
     try {
       const incoming = parseStoredSave(String(value));
-      if (!incoming.ok) throw new Error(`Invalid save payload: ${incoming.reason}`);
+      if (!incoming.ok) {
+        throw new Error(`Invalid save payload: ${incoming.reason}`);
+      }
       const serialized = protectedEnvelope(incoming.payload);
       const existing = nativeGet.call(this, primary);
       if (existing && parseStoredSave(existing).ok) {
@@ -122,10 +145,14 @@ function installStorageProtection() {
       internalWrite = true;
       nativeSet.call(this, temp, serialized);
       const tempCheck = parseStoredSave(nativeGet.call(this, temp));
-      if (!tempCheck.ok) throw new Error(`Temporary save verification failed: ${tempCheck.reason}`);
+      if (!tempCheck.ok) {
+        throw new Error(`Temporary save verification failed: ${tempCheck.reason}`);
+      }
       nativeSet.call(this, primary, serialized);
       const primaryCheck = parseStoredSave(nativeGet.call(this, primary));
-      if (!primaryCheck.ok) throw new Error(`Primary save verification failed: ${primaryCheck.reason}`);
+      if (!primaryCheck.ok) {
+        throw new Error(`Primary save verification failed: ${primaryCheck.reason}`);
+      }
       nativeRemove.call(this, temp);
       internalWrite = false;
       dispatchSaveStatus('saved', { protected: true, backupAvailable: Boolean(existing) });
@@ -138,7 +165,9 @@ function installStorageProtection() {
   };
 
   prototype.getItem = function patchedGetItem(key) {
-    if (!isPrimarySaveKey(key)) return nativeGet.call(this, key);
+    if (!isPrimarySaveKey(key)) {
+      return nativeGet.call(this, key);
+    }
     const primary = String(key);
     const candidates = [
       ['primary', primary],
@@ -148,14 +177,20 @@ function installStorageProtection() {
 
     for (const [source, candidateKey] of candidates) {
       const raw = nativeGet.call(this, candidateKey);
-      if (!raw) continue;
+      if (!raw) {
+        continue;
+      }
       const parsed = parseStoredSave(raw);
-      if (!parsed.ok) continue;
+      if (!parsed.ok) {
+        continue;
+      }
       if (source !== 'primary') {
         try {
           internalWrite = true;
           nativeSet.call(this, primary, raw);
-          if (source === 'temp') nativeRemove.call(this, candidateKey);
+          if (source === 'temp') {
+            nativeRemove.call(this, candidateKey);
+          }
           internalWrite = false;
         } catch {
           internalWrite = false;
@@ -169,7 +204,9 @@ function installStorageProtection() {
   };
 
   prototype.removeItem = function patchedRemoveItem(key) {
-    if (!isPrimarySaveKey(key)) return nativeRemove.call(this, key);
+    if (!isPrimarySaveKey(key)) {
+      return nativeRemove.call(this, key);
+    }
     const primary = String(key);
     nativeRemove.call(this, primary);
     nativeRemove.call(this, `${primary}_backup`);
@@ -182,7 +219,9 @@ function installStorageProtection() {
 
 function emitJourneyNotifications(person) {
   const notifications = updatePlayerJourney(person, language());
-  if (!notifications.length || typeof window === 'undefined') return;
+  if (!notifications.length || typeof window === 'undefined') {
+    return;
+  }
   notifications.forEach((notification, index) => {
     setTimeout(() => {
       window.dispatchEvent(
@@ -190,10 +229,14 @@ function emitJourneyNotifications(person) {
       );
       if (notification.type === 'goal') {
         playSuccess();
-        if (hapticsAllowed()) HAPTICS.success();
+        if (hapticsAllowed()) {
+          HAPTICS.success();
+        }
       } else {
         playNotification();
-        if (hapticsAllowed()) HAPTICS.light();
+        if (hapticsAllowed()) {
+          HAPTICS.light();
+        }
       }
     }, index * 650);
   });
@@ -201,7 +244,9 @@ function emitJourneyNotifications(person) {
 
 function patchMethod(target, name, after) {
   const original = target?.[name];
-  if (typeof original !== 'function' || original[METHOD_PATCH_FLAG]) return;
+  if (typeof original !== 'function' || original[METHOD_PATCH_FLAG]) {
+    return;
+  }
   function wrappedMethod(...args) {
     const result = original.apply(this, args);
     try {
@@ -217,21 +262,28 @@ function patchMethod(target, name, after) {
 
 function scheduleJourneyUpdate(person) {
   const run = () => emitJourneyNotifications(person);
-  if (typeof queueMicrotask === 'function') queueMicrotask(run);
-  else Promise.resolve().then(run);
+  if (typeof queueMicrotask === 'function') {
+    queueMicrotask(run);
+  } else {
+    Promise.resolve().then(run);
+  }
 }
 
 function installJourneyHooks() {
   patchMethod(Person.prototype, 'clone', function afterClone(result) {
     ensurePlayerJourney(this);
-    if (result) ensurePlayerJourney(result);
+    if (result) {
+      ensurePlayerJourney(result);
+    }
   });
 
   if (typeof Person.load === 'function' && !Person.load[METHOD_PATCH_FLAG]) {
     const originalLoad = Person.load;
     function patchedLoad(...args) {
       const person = originalLoad.apply(this, args);
-      if (person) ensurePlayerJourney(person);
+      if (person) {
+        ensurePlayerJourney(person);
+      }
       return person;
     }
     Object.defineProperty(patchedLoad, METHOD_PATCH_FLAG, { value: true });
@@ -242,16 +294,21 @@ function installJourneyHooks() {
     const text = String(args?.[0]?.text || args?.[0] || '');
     if (/achievement unlocked/i.test(text)) {
       playAchievement();
-      if (hapticsAllowed()) HAPTICS.achievement();
+      if (hapticsAllowed()) {
+        HAPTICS.achievement();
+      }
     }
     scheduleJourneyUpdate(this);
   });
 
   patchMethod(Person.prototype, 'performActivity', function afterActivity(result, args) {
     const activity = args?.[0] || {};
-    const signature = `${activity.id || ''} ${activity.name || ''} ${activity.category || ''}`.toLowerCase();
+    const signature =
+      `${activity.id || ''} ${activity.name || ''} ${activity.category || ''}`.toLowerCase();
     recordJourneyAction(this, 'activity_done');
-    if (/gym|fitness|meditat|yoga|run|walk|library|doctor|health|diet|therapy|relax/.test(signature)) {
+    if (
+      /gym|fitness|meditat|yoga|run|walk|library|doctor|health|diet|therapy|relax/.test(signature)
+    ) {
       recordJourneyAction(this, 'healthy_activity');
     }
     emitJourneyNotifications(this);
@@ -266,13 +323,17 @@ function installJourneyHooks() {
     if (result !== false && this.job) {
       recordJourneyAction(this, 'career_started');
       playSuccess();
-      if (hapticsAllowed()) HAPTICS.success();
+      if (hapticsAllowed()) {
+        HAPTICS.success();
+      }
     }
     emitJourneyNotifications(this);
   });
 
   patchMethod(Person.prototype, 'joinMilitary', function afterMilitary(result) {
-    if (result !== false) recordJourneyAction(this, 'career_started');
+    if (result !== false) {
+      recordJourneyAction(this, 'career_started');
+    }
     emitJourneyNotifications(this);
   });
 
@@ -288,7 +349,9 @@ function installJourneyHooks() {
       if (result !== false) {
         recordJourneyAction(this, 'asset_action');
         playMoney();
-        if (hapticsAllowed()) HAPTICS.medium();
+        if (hapticsAllowed()) {
+          HAPTICS.medium();
+        }
       }
       emitJourneyNotifications(this);
     });
@@ -296,21 +359,30 @@ function installJourneyHooks() {
 
   patchMethod(Person.prototype, 'resolveEvent', function afterDecision(result, args) {
     const choice = args?.[0] || {};
-    const harmful = choice.type === 'bad' || Number(choice.effects?.karma) < 0 || Number(choice.effects?.health) < 0;
+    const harmful =
+      choice.type === 'bad' ||
+      Number(choice.effects?.karma) < 0 ||
+      Number(choice.effects?.health) < 0;
     if (harmful) {
       playBadEvent();
-      if (hapticsAllowed()) HAPTICS.warning();
+      if (hapticsAllowed()) {
+        HAPTICS.warning();
+      }
     } else {
       playGoodEvent();
-      if (hapticsAllowed()) HAPTICS.success();
+      if (hapticsAllowed()) {
+        HAPTICS.success();
+      }
     }
     recordJourneyAction(this, 'decision_made');
     emitJourneyNotifications(this);
   });
 
-  patchMethod(GameEngine, 'ageUp', function afterAgeUp(result, args) {
+  patchMethod(GameEngine, 'ageUp', (result, args) => {
     const person = args?.[0];
-    if (!person) return;
+    if (!person) {
+      return;
+    }
     recordJourneyAction(person, 'age_up');
     emitJourneyNotifications(person);
     playAgeUp();
@@ -320,8 +392,11 @@ function installJourneyHooks() {
 function clickJourneyDestination(action) {
   const person = getCurrentTimePerson();
   if (person) {
-    if (action === 'activities') recordJourneyAction(person, 'open_activities');
-    else recordJourneyAction(person, `open_${action}`);
+    if (action === 'activities') {
+      recordJourneyAction(person, 'open_activities');
+    } else {
+      recordJourneyAction(person, `open_${action}`);
+    }
     emitJourneyNotifications(person);
   }
 
@@ -349,16 +424,26 @@ function installInteractionFeedback() {
     clickJourneyDestination(event.detail?.action);
   });
 
-  document.addEventListener('click', event => {
-    const button = event.target?.closest?.('button');
-    if (!button || button.disabled) return;
-    if (button.matches('.time-primary-action, .decision-option')) return;
-    playTap();
-  }, { passive: true });
+  document.addEventListener(
+    'click',
+    event => {
+      const button = event.target?.closest?.('button');
+      if (!button || button.disabled) {
+        return;
+      }
+      if (button.matches('.time-primary-action, .decision-option')) {
+        return;
+      }
+      playTap();
+    },
+    { passive: true }
+  );
 }
 
 function installPerformanceProfile() {
-  if (typeof document === 'undefined') return;
+  if (typeof document === 'undefined') {
+    return;
+  }
   const memory = Number(navigator.deviceMemory) || 8;
   const cores = Number(navigator.hardwareConcurrency) || 8;
   const saveData = Boolean(navigator.connection?.saveData);
@@ -368,22 +453,30 @@ function installPerformanceProfile() {
 }
 
 function installDomObserver() {
-  if (typeof MutationObserver === 'undefined' || domObserver) return;
+  if (typeof MutationObserver === 'undefined' || domObserver) {
+    return;
+  }
   domObserver = new MutationObserver(mutations => {
     const needsRefresh = mutations.some(mutation =>
-      [...mutation.addedNodes].some(node =>
-        node.nodeType === Node.ELEMENT_NODE &&
-        (node.matches?.('.hud-container, .hud-role-line') || node.querySelector?.('.hud-role-line'))
+      [...mutation.addedNodes].some(
+        node =>
+          node.nodeType === Node.ELEMENT_NODE &&
+          (node.matches?.('.hud-container, .hud-role-line') ||
+            node.querySelector?.('.hud-role-line'))
       )
     );
-    if (needsRefresh) injectSaveStatus();
+    if (needsRefresh) {
+      injectSaveStatus();
+    }
   });
   domObserver.observe(document.documentElement, { subtree: true, childList: true });
   injectSaveStatus();
 }
 
 export function installReleasePolishRuntime() {
-  if (globalThis[RUNTIME_FLAG]) return;
+  if (globalThis[RUNTIME_FLAG]) {
+    return;
+  }
   globalThis[RUNTIME_FLAG] = true;
   installStorageProtection();
   installJourneyHooks();

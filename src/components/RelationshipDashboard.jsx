@@ -135,13 +135,30 @@ export function RelationshipDashboard({
     return { alive, deceased, avgStat, conflicts, promises, sorted };
   }, [person]);
 
-  if (!person) return null;
+  if (!person) {
+    return null;
+  }
 
   const tabs = [
     { id: 'all', label: copy.all, icon: '👥', count: stats.alive.length },
-    { id: 'family', label: copy.family, icon: '👪', count: stats.alive.filter(rel => FAMILY_TYPES.has(rel.type)).length },
-    { id: 'love', label: copy.love, icon: '💕', count: stats.alive.filter(rel => LOVE_TYPES.has(rel.type)).length },
-    { id: 'friends', label: copy.friends, icon: '🤝', count: stats.alive.filter(rel => FRIEND_TYPES.has(rel.type)).length },
+    {
+      id: 'family',
+      label: copy.family,
+      icon: '👪',
+      count: stats.alive.filter(rel => FAMILY_TYPES.has(rel.type)).length,
+    },
+    {
+      id: 'love',
+      label: copy.love,
+      icon: '💕',
+      count: stats.alive.filter(rel => LOVE_TYPES.has(rel.type)).length,
+    },
+    {
+      id: 'friends',
+      label: copy.friends,
+      icon: '🤝',
+      count: stats.alive.filter(rel => FRIEND_TYPES.has(rel.type)).length,
+    },
     { id: 'departed', label: copy.departed, icon: '🕊️', count: stats.deceased.length },
   ];
 
@@ -154,7 +171,11 @@ export function RelationshipDashboard({
       (activeTab === 'love' && LOVE_TYPES.has(rel.type)) ||
       (activeTab === 'friends' && FRIEND_TYPES.has(rel.type));
     const needle = query.trim().toLocaleLowerCase(locale === 'ar' ? 'ar' : 'en');
-    const matchesQuery = !needle || String(rel.name || '').toLocaleLowerCase().includes(needle);
+    const matchesQuery =
+      !needle ||
+      String(rel.name || '')
+        .toLocaleLowerCase()
+        .includes(needle);
     return matchesTab && matchesQuery;
   });
 
@@ -170,13 +191,37 @@ export function RelationshipDashboard({
       className="relationships-destination"
     >
       <div className="phase-two-metrics">
-        <PhaseTwoMetric icon="👥" label={copy.alive} value={formatNumber(stats.alive.length, language)} tone="growth" />
-        <PhaseTwoMetric icon="❤️" label={copy.average} value={`${formatNumber(stats.avgStat, language)}%`} />
-        <PhaseTwoMetric icon="⚡" label={copy.conflicts} value={formatNumber(stats.conflicts.length, language)} tone={stats.conflicts.length ? 'danger' : 'neutral'} />
-        <PhaseTwoMetric icon="📜" label={copy.promises} value={formatNumber(stats.promises.length, language)} tone="gold" />
+        <PhaseTwoMetric
+          icon="👥"
+          label={copy.alive}
+          value={formatNumber(stats.alive.length, language)}
+          tone="growth"
+        />
+        <PhaseTwoMetric
+          icon="❤️"
+          label={copy.average}
+          value={`${formatNumber(stats.avgStat, language)}%`}
+        />
+        <PhaseTwoMetric
+          icon="⚡"
+          label={copy.conflicts}
+          value={formatNumber(stats.conflicts.length, language)}
+          tone={stats.conflicts.length ? 'danger' : 'neutral'}
+        />
+        <PhaseTwoMetric
+          icon="📜"
+          label={copy.promises}
+          value={formatNumber(stats.promises.length, language)}
+          tone="gold"
+        />
       </div>
 
-      <PhaseTwoTabs tabs={tabs} activeId={activeTab} onChange={setActiveTab} ariaLabel={copy.title} />
+      <PhaseTwoTabs
+        tabs={tabs}
+        activeId={activeTab}
+        onChange={setActiveTab}
+        ariaLabel={copy.title}
+      />
 
       <PhaseTwoSection
         title={copy.peopleTitle}
@@ -209,14 +254,20 @@ export function RelationshipDashboard({
                 memoryCount ? `🧠 ${formatNumber(memoryCount, language)} ${copy.memories}` : null,
               ].filter(Boolean);
               return (
-                <div key={rel.id} className={`phase-two-card relationship-person-card ${isDeceased ? 'is-deceased' : ''}`}>
+                <div
+                  key={rel.id}
+                  className={`phase-two-card relationship-person-card ${isDeceased ? 'is-deceased' : ''}`}
+                >
                   <div className="relationship-person-heading">
                     <span className="relationship-person-avatar" aria-hidden="true">
                       {isDeceased ? '🕊️' : REL_EMOJI[rel.type] || '👤'}
                     </span>
                     <div>
                       <h2 dir="auto">{rel.name}</h2>
-                      <p>{typeLabel(rel.type, language)}{isDeceased ? ` · ${copy.deceased}` : ''}</p>
+                      <p>
+                        {typeLabel(rel.type, language)}
+                        {isDeceased ? ` · ${copy.deceased}` : ''}
+                      </p>
                     </div>
                     {!isDeceased && <strong>{formatNumber(value, language)}%</strong>}
                   </div>
@@ -230,7 +281,9 @@ export function RelationshipDashboard({
                   {badges.length > 0 && (
                     <div className="phase-two-pill-row relationship-badges">
                       {badges.map(label => (
-                        <span key={label} className="phase-two-pill">{label}</span>
+                        <span key={label} className="phase-two-pill">
+                          {label}
+                        </span>
                       ))}
                     </div>
                   )}
@@ -252,7 +305,11 @@ export function RelationshipDashboard({
         )}
       </PhaseTwoSection>
 
-      <button type="button" className="phase-two-button relationship-manager-wide" onClick={onOpenFullManager}>
+      <button
+        type="button"
+        className="phase-two-button relationship-manager-wide"
+        onClick={onOpenFullManager}
+      >
         🤝 {copy.openManager}
       </button>
     </PhaseTwoScreen>

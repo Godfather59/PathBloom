@@ -71,7 +71,12 @@ function formatNumber(value, language, options = {}) {
     : numeric.toLocaleString('en-US', options);
 }
 
-export function WorldOverview({ person, onClose, language = getStoredLanguage(), t = (key, fallback) => fallback || key }) {
+export function WorldOverview({
+  person,
+  onClose,
+  language = getStoredLanguage(),
+  t = (key, fallback) => fallback || key,
+}) {
   const locale = language === 'ar' ? 'ar' : 'en';
   const copy = COPY[locale];
   const [selectedCountryId, setSelectedCountryId] = useState(null);
@@ -83,23 +88,39 @@ export function WorldOverview({ person, onClose, language = getStoredLanguage(),
   const stats = state
     ? getGlobalStats(state)
     : { avgHappiness: 0, avgStability: 0, totalPopulation: 0, wars: 0, democracies: 0 };
-  const continents = [...new Set(countries.map(country => country.continent).filter(Boolean))].sort();
+  const continents = [
+    ...new Set(countries.map(country => country.continent).filter(Boolean)),
+  ].sort();
 
   const visibleCountries = useMemo(() => {
     const needle = query.trim().toLocaleLowerCase(locale === 'ar' ? 'ar' : 'en');
     return [...countries]
       .filter(country => filterContinent === 'all' || country.continent === filterContinent)
       .filter(country => {
-        if (!needle) return true;
+        if (!needle) {
+          return true;
+        }
         const name = translateGameText(language, country.name).toLocaleLowerCase();
         return name.includes(needle);
       })
       .sort((a, b) => {
-        if (sortKey === 'name') return translateGameText(language, a.name).localeCompare(translateGameText(language, b.name));
-        if (sortKey === 'gdp') return Number(b.gdp) - Number(a.gdp);
-        if (sortKey === 'military') return Number(b.militaryPower) - Number(a.militaryPower);
-        if (sortKey === 'happiness') return Number(b.happiness) - Number(a.happiness);
-        if (sortKey === 'stability') return Number(b.stability) - Number(a.stability);
+        if (sortKey === 'name') {
+          return translateGameText(language, a.name).localeCompare(
+            translateGameText(language, b.name)
+          );
+        }
+        if (sortKey === 'gdp') {
+          return Number(b.gdp) - Number(a.gdp);
+        }
+        if (sortKey === 'military') {
+          return Number(b.militaryPower) - Number(a.militaryPower);
+        }
+        if (sortKey === 'happiness') {
+          return Number(b.happiness) - Number(a.happiness);
+        }
+        if (sortKey === 'stability') {
+          return Number(b.stability) - Number(a.stability);
+        }
         return 0;
       });
   }, [countries, filterContinent, language, locale, query, sortKey]);
@@ -136,10 +157,29 @@ export function WorldOverview({ person, onClose, language = getStoredLanguage(),
       className="world-overview-destination"
     >
       <div className="phase-two-metrics">
-        <PhaseTwoMetric icon="😊" label={copy.happiness} value={`${formatNumber(stats.avgHappiness, language)}%`} tone="growth" />
-        <PhaseTwoMetric icon="🛡️" label={copy.stability} value={`${formatNumber(stats.avgStability, language)}%`} tone="world" />
-        <PhaseTwoMetric icon="👥" label={copy.population} value={`${formatNumber(stats.totalPopulation, language, { maximumFractionDigits: 1 })}M`} />
-        <PhaseTwoMetric icon="⚔️" label={copy.wars} value={formatNumber(stats.wars, language)} tone={Number(stats.wars) > 0 ? 'danger' : 'neutral'} />
+        <PhaseTwoMetric
+          icon="😊"
+          label={copy.happiness}
+          value={`${formatNumber(stats.avgHappiness, language)}%`}
+          tone="growth"
+        />
+        <PhaseTwoMetric
+          icon="🛡️"
+          label={copy.stability}
+          value={`${formatNumber(stats.avgStability, language)}%`}
+          tone="world"
+        />
+        <PhaseTwoMetric
+          icon="👥"
+          label={copy.population}
+          value={`${formatNumber(stats.totalPopulation, language, { maximumFractionDigits: 1 })}M`}
+        />
+        <PhaseTwoMetric
+          icon="⚔️"
+          label={copy.wars}
+          value={formatNumber(stats.wars, language)}
+          tone={Number(stats.wars) > 0 ? 'danger' : 'neutral'}
+        />
       </div>
 
       <PhaseTwoSection title={copy.countries} subtitle={copy.countriesHint}>
@@ -158,14 +198,26 @@ export function WorldOverview({ person, onClose, language = getStoredLanguage(),
               />
               <label className="world-sort-control">
                 <span>{copy.sort}</span>
-                <select className="phase-two-select" value={sortKey} onChange={event => setSortKey(event.target.value)}>
-                  {sortOptions.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                <select
+                  className="phase-two-select"
+                  value={sortKey}
+                  onChange={event => setSortKey(event.target.value)}
+                >
+                  {sortOptions.map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
                 </select>
               </label>
             </div>
 
             <div className="phase-two-filter-row" aria-label={copy.countries}>
-              <button type="button" className={filterContinent === 'all' ? 'is-active' : ''} onClick={() => setFilterContinent('all')}>
+              <button
+                type="button"
+                className={filterContinent === 'all' ? 'is-active' : ''}
+                onClick={() => setFilterContinent('all')}
+              >
                 {copy.all}
               </button>
               {continents.map(continent => (
@@ -184,7 +236,8 @@ export function WorldOverview({ person, onClose, language = getStoredLanguage(),
               {visibleCountries.map(country => {
                 const gov = GOVERNMENT_TYPES[country.govType] || GOVERNMENT_TYPES.democracy;
                 const stability = Math.max(0, Math.min(100, Number(country.stability) || 0));
-                const status = stability >= 60 ? copy.stable : stability >= 35 ? copy.watch : copy.fragile;
+                const status =
+                  stability >= 60 ? copy.stable : stability >= 35 ? copy.watch : copy.fragile;
                 const tone = stability >= 60 ? 'good' : stability >= 35 ? 'warning' : 'danger';
                 return (
                   <button
@@ -195,18 +248,33 @@ export function WorldOverview({ person, onClose, language = getStoredLanguage(),
                   >
                     <div className="world-country-heading">
                       <div>
-                        <span className="phase-two-eyebrow">{translateGameText(language, country.continent)}</span>
+                        <span className="phase-two-eyebrow">
+                          {translateGameText(language, country.continent)}
+                        </span>
                         <h2>{translateGameText(language, country.name)}</h2>
                         <p>{translateGameText(language, gov?.label || country.govType)}</p>
                       </div>
                       <span className={`phase-two-pill ${tone}`}>{status}</span>
                     </div>
                     <div className="world-country-stats">
-                      <span>💵 ${formatNumber(country.gdp, language, { maximumFractionDigits: 0 })}B</span>
+                      <span>
+                        💵 ${formatNumber(country.gdp, language, { maximumFractionDigits: 0 })}B
+                      </span>
                       <span>🪖 {formatNumber(country.militaryPower, language)}</span>
-                      <span>{Number(country.happiness) >= 60 ? '😊' : Number(country.happiness) >= 35 ? '😐' : '😞'} {formatNumber(country.happiness, language)}%</span>
+                      <span>
+                        {Number(country.happiness) >= 60
+                          ? '😊'
+                          : Number(country.happiness) >= 35
+                            ? '😐'
+                            : '😞'}{' '}
+                        {formatNumber(country.happiness, language)}%
+                      </span>
                     </div>
-                    <PhaseTwoProgress label={copy.stability} value={stability} tone={stability >= 60 ? 'growth' : stability >= 35 ? 'warning' : 'danger'} />
+                    <PhaseTwoProgress
+                      label={copy.stability}
+                      value={stability}
+                      tone={stability >= 60 ? 'growth' : stability >= 35 ? 'warning' : 'danger'}
+                    />
                   </button>
                 );
               })}

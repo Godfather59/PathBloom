@@ -1,3 +1,13 @@
+export const FAMILY_TREE_STORAGE_KEY = 'bitlife_family_tree';
+
+function cloneSerializable(value, fallback) {
+  try {
+    return JSON.parse(JSON.stringify(value));
+  } catch {
+    return fallback;
+  }
+}
+
 export class FamilyTree {
   constructor() {
     this.generations = [];
@@ -12,36 +22,26 @@ export class FamilyTree {
   }
 
   load() {
+    if (typeof localStorage === 'undefined') {
+      return false;
+    }
+
     try {
-      const saved = localStorage.getItem('bitlife_family_tree');
+      const saved = localStorage.getItem(FAMILY_TREE_STORAGE_KEY);
       if (saved) {
-        const data = JSON.parse(saved);
-        this.generations = Array.isArray(data.generations) ? data.generations : [];
-        this.heirlooms = Array.isArray(data.heirlooms) ? data.heirlooms : [];
-        this.familyWealth = Number.isFinite(Number(data.familyWealth))
-          ? Number(data.familyWealth)
-          : 0;
-        this.familyName = typeof data.familyName === 'string' ? data.familyName : '';
-        this.foundedYear = Number.isFinite(Number(data.foundedYear)) ? Number(data.foundedYear) : 0;
-        this.familyReputation = Number.isFinite(Number(data.familyReputation))
-          ? Number(data.familyReputation)
-          : 0;
-        this.generationCount = Number.isFinite(Number(data.generationCount))
-          ? Number(data.generationCount)
-          : this.generations.length;
-        this.totalAchievements = Number.isFinite(Number(data.totalAchievements))
-          ? Number(data.totalAchievements)
-          : 0;
+        this.restoreState(JSON.parse(saved));
+        return true;
       }
     } catch (error) {
       console.warn('Unable to load the family tree.', error);
     }
+    return false;
   }
 
-  save() {
-    const data = {
-      generations: this.generations,
-      heirlooms: this.heirlooms,
+  getState() {
+    return {
+      generations: cloneSerializable(this.generations, []),
+      heirlooms: cloneSerializable(this.heirlooms, []),
       familyWealth: this.familyWealth,
       familyName: this.familyName,
       foundedYear: this.foundedYear,
@@ -49,10 +49,43 @@ export class FamilyTree {
       generationCount: this.generationCount || this.generations.length,
       totalAchievements: this.totalAchievements,
     };
+  }
+
+  restoreState(data = {}) {
+    const state = data && typeof data === 'object' ? data : {};
+    this.generations = cloneSerializable(
+      Array.isArray(state.generations) ? state.generations : [],
+      []
+    );
+    this.heirlooms = cloneSerializable(Array.isArray(state.heirlooms) ? state.heirlooms : [], []);
+    this.familyWealth = Number.isFinite(Number(state.familyWealth))
+      ? Number(state.familyWealth)
+      : 0;
+    this.familyName = typeof state.familyName === 'string' ? state.familyName : '';
+    this.foundedYear = Number.isFinite(Number(state.foundedYear)) ? Number(state.foundedYear) : 0;
+    this.familyReputation = Number.isFinite(Number(state.familyReputation))
+      ? Number(state.familyReputation)
+      : 0;
+    this.generationCount = Number.isFinite(Number(state.generationCount))
+      ? Number(state.generationCount)
+      : this.generations.length;
+    this.totalAchievements = Number.isFinite(Number(state.totalAchievements))
+      ? Number(state.totalAchievements)
+      : 0;
+    return this.getState();
+  }
+
+  save() {
+    if (typeof localStorage === 'undefined') {
+      return false;
+    }
+
     try {
-      localStorage.setItem('bitlife_family_tree', JSON.stringify(data));
+      localStorage.setItem(FAMILY_TREE_STORAGE_KEY, JSON.stringify(this.getState()));
+      return true;
     } catch (error) {
       console.warn('Unable to save the family tree.', error);
+      return false;
     }
   }
 
@@ -299,19 +332,14 @@ export class FamilyTree {
     return [...this.generations].sort((a, b) => a.birthYear - b.birthYear);
   }
 
-  reset() {
-    this.generations = [];
-    this.heirlooms = [];
-    this.familyWealth = 0;
-    this.familyName = '';
-    this.foundedYear = 0;
-    this.familyReputation = 0;
-    this.generationCount = 0;
-    this.totalAchievements = 0;
-    try {
-      localStorage.removeItem('bitlife_family_tree');
-    } catch {
-      /* storage may be unavailable */
+  reset({ persist = true } = {}) {
+    this.restoreState();
+    if (persist && typeof localStorage !== 'undefined') {
+      try {
+        localStorage.removeItem(FAMILY_TREE_STORAGE_KEY);
+      } catch {
+        /* storage may be unavailable */
+      }
     }
   }
 }

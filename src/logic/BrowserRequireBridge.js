@@ -13,7 +13,7 @@ const LEGACY_MODULES = Object.freeze({
 
 /**
  * Temporary browser compatibility for legacy handlers in App.jsx that still
- * call CommonJS require(). The bridge is installed before App.jsx is imported,
+ * perform CommonJS-style module lookups. The bridge is installed before App.jsx is imported,
  * so Android WebView can resolve the known modules without exposing a general
  * dynamic module loader.
  */
@@ -26,8 +26,12 @@ export function browserRequire(moduleId) {
 }
 
 export function installBrowserRequire(target = globalThis) {
-  if (!target || typeof target !== 'object' && typeof target !== 'function') return false;
-  if (typeof target.require === 'function') return true;
+  if (!target || (typeof target !== 'object' && typeof target !== 'function')) {
+    return false;
+  }
+  if (typeof target.require === 'function') {
+    return true;
+  }
 
   try {
     Object.defineProperty(target, 'require', {

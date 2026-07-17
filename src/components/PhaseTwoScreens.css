@@ -219,10 +219,22 @@
   line-height: 1.35;
 }
 
-.phase-two-metric.tone-growth { background: rgba(57, 217, 138, 0.075); border-color: rgba(57, 217, 138, 0.18); }
-.phase-two-metric.tone-gold { background: rgba(243, 201, 105, 0.075); border-color: rgba(243, 201, 105, 0.2); }
-.phase-two-metric.tone-danger { background: rgba(255, 107, 122, 0.07); border-color: rgba(255, 107, 122, 0.18); }
-.phase-two-metric.tone-world { background: rgba(103, 169, 255, 0.075); border-color: rgba(103, 169, 255, 0.2); }
+.phase-two-metric.tone-growth {
+  background: rgba(57, 217, 138, 0.075);
+  border-color: rgba(57, 217, 138, 0.18);
+}
+.phase-two-metric.tone-gold {
+  background: rgba(243, 201, 105, 0.075);
+  border-color: rgba(243, 201, 105, 0.2);
+}
+.phase-two-metric.tone-danger {
+  background: rgba(255, 107, 122, 0.07);
+  border-color: rgba(255, 107, 122, 0.18);
+}
+.phase-two-metric.tone-world {
+  background: rgba(103, 169, 255, 0.075);
+  border-color: rgba(103, 169, 255, 0.2);
+}
 
 .phase-two-section {
   margin-bottom: 16px;
@@ -314,10 +326,18 @@
   transition: width 300ms ease;
 }
 
-.phase-two-progress.tone-warning .phase-two-progress-track > div { background: var(--pb-warning); }
-.phase-two-progress.tone-danger .phase-two-progress-track > div { background: var(--pb-danger); }
-.phase-two-progress.tone-world .phase-two-progress-track > div { background: var(--pb-blue); }
-.phase-two-progress.tone-purple .phase-two-progress-track > div { background: var(--pb-purple); }
+.phase-two-progress.tone-warning .phase-two-progress-track > div {
+  background: var(--pb-warning);
+}
+.phase-two-progress.tone-danger .phase-two-progress-track > div {
+  background: var(--pb-danger);
+}
+.phase-two-progress.tone-world .phase-two-progress-track > div {
+  background: var(--pb-blue);
+}
+.phase-two-progress.tone-purple .phase-two-progress-track > div {
+  background: var(--pb-purple);
+}
 
 .phase-two-progress small {
   display: block;
@@ -370,10 +390,18 @@
   font-size: 1.18rem;
 }
 
-.phase-two-action-row.tone-danger .phase-two-action-icon { background: rgba(255, 107, 122, 0.11); }
-.phase-two-action-row.tone-gold .phase-two-action-icon { background: rgba(243, 201, 105, 0.12); }
-.phase-two-action-row.tone-world .phase-two-action-icon { background: rgba(103, 169, 255, 0.12); }
-.phase-two-action-row.tone-purple .phase-two-action-icon { background: rgba(170, 140, 255, 0.12); }
+.phase-two-action-row.tone-danger .phase-two-action-icon {
+  background: rgba(255, 107, 122, 0.11);
+}
+.phase-two-action-row.tone-gold .phase-two-action-icon {
+  background: rgba(243, 201, 105, 0.12);
+}
+.phase-two-action-row.tone-world .phase-two-action-icon {
+  background: rgba(103, 169, 255, 0.12);
+}
+.phase-two-action-row.tone-purple .phase-two-action-icon {
+  background: rgba(170, 140, 255, 0.12);
+}
 
 .phase-two-action-copy {
   min-width: 0;
@@ -438,10 +466,22 @@
   font-weight: 700;
 }
 
-.phase-two-pill.good { color: var(--pb-growth); border-color: rgba(57, 217, 138, 0.2); }
-.phase-two-pill.warning { color: var(--pb-warning); border-color: rgba(255, 180, 94, 0.2); }
-.phase-two-pill.danger { color: var(--pb-danger); border-color: rgba(255, 107, 122, 0.2); }
-.phase-two-pill.world { color: var(--pb-blue); border-color: rgba(103, 169, 255, 0.2); }
+.phase-two-pill.good {
+  color: var(--pb-growth);
+  border-color: rgba(57, 217, 138, 0.2);
+}
+.phase-two-pill.warning {
+  color: var(--pb-warning);
+  border-color: rgba(255, 180, 94, 0.2);
+}
+.phase-two-pill.danger {
+  color: var(--pb-danger);
+  border-color: rgba(255, 107, 122, 0.2);
+}
+.phase-two-pill.world {
+  color: var(--pb-blue);
+  border-color: rgba(103, 169, 255, 0.2);
+}
 
 .phase-two-button-row {
   display: grid;
@@ -548,7 +588,9 @@
   scrollbar-width: none;
 }
 
-.phase-two-filter-row::-webkit-scrollbar { display: none; }
+.phase-two-filter-row::-webkit-scrollbar {
+  display: none;
+}
 
 .phase-two-filter-row button {
   min-width: max-content;

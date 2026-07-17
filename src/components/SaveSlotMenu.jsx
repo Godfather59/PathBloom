@@ -59,7 +59,10 @@ export function SaveSlotMenu({
       try {
         deleteSaveTransaction(slotId);
         const newSlots = slots.filter(slot => slot.id !== slotId);
-        localStorage.setItem('bitlife_save_meta', JSON.stringify(newSlots.map(({ saveHealth, ...slot }) => slot)));
+        localStorage.setItem(
+          'bitlife_save_meta',
+          JSON.stringify(newSlots.map(({ saveHealth, ...slot }) => slot))
+        );
         setSlots(newSlots);
         onSlotsChanged?.(newSlots);
       } catch (error) {
@@ -82,8 +85,14 @@ export function SaveSlotMenu({
     <div className="modal-overlay">
       <div className="modal-content save-slot-release" dir={isArabic ? 'rtl' : 'ltr'}>
         <div className="modal-header">
-          <h2 className="modal-title">{t('saveload.title', isArabic ? 'تحميل لعبة' : 'Load Game')}</h2>
-          <button className="close-btn" onClick={onClose} aria-label={t('common.close', isArabic ? 'إغلاق' : 'Close')}>
+          <h2 className="modal-title">
+            {t('saveload.title', isArabic ? 'تحميل لعبة' : 'Load Game')}
+          </h2>
+          <button
+            className="close-btn"
+            onClick={onClose}
+            aria-label={t('common.close', isArabic ? 'إغلاق' : 'Close')}
+          >
             &times;
           </button>
         </div>
@@ -91,8 +100,17 @@ export function SaveSlotMenu({
           {slots.length === 0 ? (
             <div className="save-slot-empty">
               <span aria-hidden="true">🌱</span>
-              <strong>{t('saveload.noSaves', isArabic ? 'لا توجد ألعاب محفوظة.' : 'No saved games found.')}</strong>
-              <small>{isArabic ? 'ابدأ حياة جديدة وسيحمي الحفظ التلقائي تقدمك.' : 'Start a new life and autosave will protect your progress.'}</small>
+              <strong>
+                {t(
+                  'saveload.noSaves',
+                  isArabic ? 'لا توجد ألعاب محفوظة.' : 'No saved games found.'
+                )}
+              </strong>
+              <small>
+                {isArabic
+                  ? 'ابدأ حياة جديدة وسيحمي الحفظ التلقائي تقدمك.'
+                  : 'Start a new life and autosave will protect your progress.'}
+              </small>
             </div>
           ) : (
             <div className="save-slot-list">
@@ -111,13 +129,17 @@ export function SaveSlotMenu({
                   }}
                 >
                   <div className="save-slot-card-main">
-                    <span className="save-slot-avatar" aria-hidden="true">🌿</span>
+                    <span className="save-slot-avatar" aria-hidden="true">
+                      🌿
+                    </span>
                     <span className="save-slot-copy">
                       <strong dir="auto">{slot.name}</strong>
                       <small dir="auto">
                         {isArabic ? 'العمر' : 'Age'} {slot.age} · {slot.job}
                       </small>
-                      <span className={`save-slot-health ${slot.saveHealth.recoveryAvailable ? 'is-recovery' : 'is-healthy'}`}>
+                      <span
+                        className={`save-slot-health ${slot.saveHealth.recoveryAvailable ? 'is-recovery' : 'is-healthy'}`}
+                      >
                         {statusCopy(slot.saveHealth)}
                       </span>
                     </span>
@@ -126,7 +148,11 @@ export function SaveSlotMenu({
                     </span>
                   </div>
                   <div className="save-slot-actions">
-                    <button type="button" className="save-slot-load" onClick={() => onSelectSlot(slot.id)}>
+                    <button
+                      type="button"
+                      className="save-slot-load"
+                      onClick={() => onSelectSlot(slot.id)}
+                    >
                       {isArabic ? 'تابع' : 'Continue'}
                     </button>
                     <button

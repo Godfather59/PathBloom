@@ -114,7 +114,11 @@
 .decision-choice-card:active {
   transform: scale(0.985);
   background:
-    linear-gradient(105deg, color-mix(in srgb, var(--risk-color) 13%, transparent), transparent 48%),
+    linear-gradient(
+      105deg,
+      color-mix(in srgb, var(--risk-color) 13%, transparent),
+      transparent 48%
+    ),
     rgba(22, 39, 61, 0.94);
 }
 

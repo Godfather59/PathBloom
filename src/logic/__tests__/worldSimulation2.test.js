@@ -51,16 +51,26 @@ describe('World Simulation 2.0', () => {
     world.countries.Morocco.shortages.food = 70;
     simulateWorldMonth(person);
     expect(person.contentState.flags.world2ShortageCrisis).toBe(true);
-    expect(person.contentState.scheduled.some(item => item.eventId === 'inflation_shortage_crisis')).toBe(true);
+    expect(
+      person.contentState.scheduled.some(item => item.eventId === 'inflation_shortage_crisis')
+    ).toBe(true);
   });
 
   it('progresses an active war and keeps both countries synchronized', () => {
     const person = makePerson('Morocco');
     const world = ensureWorldSimulation2(person);
     const war = {
-      id: 'test-war', attacker: 'Morocco', defender: 'France', startMonth: 0, months: 0,
-      status: 'active', front: 0, casualties: { attacker: 0, defender: 0, civilian: 0 },
-      exhaustion: { attacker: 0, defender: 0 }, occupation: { attacker: 0, defender: 0 }, peaceOffers: 0,
+      id: 'test-war',
+      attacker: 'Morocco',
+      defender: 'France',
+      startMonth: 0,
+      months: 0,
+      status: 'active',
+      front: 0,
+      casualties: { attacker: 0, defender: 0, civilian: 0 },
+      exhaustion: { attacker: 0, defender: 0 },
+      occupation: { attacker: 0, defender: 0 },
+      peaceOffers: 0,
     };
     world.wars.push(war);
     world.countries.Morocco.atWar = ['France'];
@@ -76,7 +86,14 @@ describe('World Simulation 2.0', () => {
   it('allows influential players to change diplomacy and records it in the timeline', () => {
     const person = makePerson('Morocco');
     person.money = 50000;
-    person.reputation = { professional: 50, criminal: 0, political: 75, family: 50, public: 40, trust: 50 };
+    person.reputation = {
+      professional: 50,
+      criminal: 0,
+      political: 75,
+      family: 50,
+      public: 40,
+      trust: 50,
+    };
     const world = ensureWorldSimulation2(person);
     const before = world.timeline.length;
     const result = performWorldSimulationAction(person, 'diplomacy', 'France');

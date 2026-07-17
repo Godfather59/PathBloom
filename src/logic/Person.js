@@ -19,6 +19,7 @@ import { writeTimeCapsule, readTimeCapsule } from './TimeCapsule';
 import { getDefaultCityForCountry, CITIES } from './City';
 import { familyTree } from './DynastyMode';
 import { resolveActivity, getActivityWithDefaults } from './ActivityEngine';
+import { generateBandMembers } from './Band';
 
 const MAX_RELATIONSHIP_MEMORIES = 8;
 const IMPORTANT_RELATIONSHIP_TYPES = new Set([
@@ -1181,9 +1182,7 @@ export class Person {
       this.pendingEvent = {
         type: 'chain_followup',
         text: result.followUp.text,
-        choices: [
-          { text: 'Continue', effect: 'acknowledge', effects: {} },
-        ],
+        choices: [{ text: 'Continue', effect: 'acknowledge', effects: {} }],
       };
     } else if (result.followUp) {
       this.updateStats(result.followUp.effects || {});
@@ -1350,7 +1349,12 @@ export class Person {
         this.updateStats({ karma: -10 });
       } else if (choice.effect === 'war_journalist') {
         if (!this.job || this.job.title !== 'Journalist') {
-          this.job = { title: 'War Journalist', salary: 45000, yearsOfWork: 0, isWarJournalist: true };
+          this.job = {
+            title: 'War Journalist',
+            salary: 45000,
+            yearsOfWork: 0,
+            isWarJournalist: true,
+          };
         }
         this.logEvent('You embedded with troops to report from the front lines.', 'neutral');
         this.updateStats({ fame: 10, stress: 10 });
@@ -2378,10 +2382,14 @@ export class Person {
     p.unResolutions = (this.unResolutions || []).map(r => ({ ...r }));
     p.diplomaticHistory = (this.diplomaticHistory || []).map(d => ({ ...d }));
     p.cabinet = this.cabinet
-      ? Object.fromEntries(Object.entries(this.cabinet).map(([pos, member]) => [pos, { ...member }]))
+      ? Object.fromEntries(
+          Object.entries(this.cabinet).map(([pos, member]) => [pos, { ...member }])
+        )
       : null;
     p.policies = this.policies ? { ...this.policies } : null;
-    p.pendingGeopoliticalEvent = this.pendingGeopoliticalEvent ? { ...this.pendingGeopoliticalEvent } : null;
+    p.pendingGeopoliticalEvent = this.pendingGeopoliticalEvent
+      ? { ...this.pendingGeopoliticalEvent }
+      : null;
 
     return p;
   }
@@ -2432,7 +2440,6 @@ export class Person {
       this.logEvent('You are already in a band.', 'neutral');
       return null;
     }
-    const { generateBandMembers } = require('./Band');
     const memberCount = 2 + Math.floor(Math.random() * 2) + (this.fame > 30 ? 1 : 0);
     this.band = {
       name,
@@ -2452,7 +2459,7 @@ export class Person {
       this.logEvent("You're not in a band.", 'neutral');
       return;
     }
-    const name = this.band.name;
+    const { name } = this.band;
     const earnings = this.band.totalEarnings || 0;
     this.band = null;
     this.logEvent(

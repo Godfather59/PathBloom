@@ -133,8 +133,7 @@ const EXACT_AR = Object.freeze({
   'They were just planning your surprise party. Oops.':
     'كانوا يخططون لحفلة مفاجئة لك فقط. يا للإحراج.',
   'It eats at you all year.': 'ظل الشك يؤلمك طوال العام.',
-  'You decided to run a marathon. You trained for months.':
-    'قررت خوض سباق ماراثون وتدربت لأشهر.',
+  'You decided to run a marathon. You trained for months.': 'قررت خوض سباق ماراثون وتدربت لأشهر.',
   'You are having a midlife crisis. You bought a red convertible.':
     'تمر بأزمة منتصف العمر واشتريت سيارة حمراء مكشوفة.',
   'A friend wants you to invest in their startup. It is a phone case that doubles as a wallet.':
@@ -169,8 +168,7 @@ const EXACT_AR = Object.freeze({
     'ذهبت عائلتك إلى مدينة الملاهي وركبت أكبر أفعوانية.',
   'Your parents signed you up for soccer! You hate it.':
     'سجّلك والداك في كرة القدم رغم أنك لا تحبها.',
-  'Your child had a baby! You are a grandparent now!':
-    'رُزق طفلك بمولود وأصبحت جدا الآن!',
+  'Your child had a baby! You are a grandparent now!': 'رُزق طفلك بمولود وأصبحت جدا الآن!',
   'You had a health scare. The doctors say you need to take it easy.':
     'مررت بوعكة مقلقة ونصحك الأطباء بالراحة.',
   'You find an old photo album and spend the afternoon reminiscing.':
@@ -218,12 +216,10 @@ const EXACT_AR = Object.freeze({
   'Your high school reunion is coming up. Do you go?':
     'اقترب لقاء خريجي مدرستك الثانوية. هل ستذهب؟',
   'Go and show off': 'اذهب وأظهر نجاحك',
-  'Skip it': 'لا تذهب',
   'The water heater broke and the basement is flooding.':
     'تعطل سخان المياه وبدأ القبو يمتلئ بالماء.',
 
   // Deep simulation and geopolitical UI
-  'Simulation Overview': 'نظرة عامة على المحاكاة',
   'Country rules': 'قواعد الدولة',
   'Personal finance': 'الوضع المالي',
   'Reputation & identity': 'السمعة والهوية',
@@ -374,48 +370,93 @@ const PATTERN_AR = Object.freeze([
   [/^\$([\d,.-]+)$/, match => formatArabicMoney(Number(match[1].replace(/,/g, '')))],
   [/^(\d+(?:\.\d+)?)%$/, match => formatArabicPercent(Number(match[1]))],
   [/^You were born in (.+)\.$/, match => `وُلدت في ${translateArabicEntity(match[1])}.`],
-  [/^You were born a (Male|Female) in a hospital\.$/, match =>
-    match[1] === 'Male' ? 'وُلدت ذكرا في المستشفى.' : 'وُلدت أنثى في المستشفى.'],
-  [/^You started studying (.+) at (.+)\.$/, match =>
-    `بدأت دراسة ${translateArabicEntity(match[1])} في ${translateArabicEntity(match[2])}.`],
+  [
+    /^You were born a (Male|Female) in a hospital\.$/,
+    match => (match[1] === 'Male' ? 'وُلدت ذكرا في المستشفى.' : 'وُلدت أنثى في المستشفى.'),
+  ],
+  [
+    /^You started studying (.+) at (.+)\.$/,
+    match => `بدأت دراسة ${translateArabicEntity(match[1])} في ${translateArabicEntity(match[2])}.`,
+  ],
   [/^You graduated from (.+)!$/, match => `تخرجت من ${translateArabicEntity(match[1])}!`],
   [/^You were promoted to (.+)!$/, match => `تمت ترقيتك إلى ${translateArabicEntity(match[1])}!`],
   [/^You were fired from (.+)\.$/, match => `تم طردك من ${translateArabicEntity(match[1])}.`],
-  [/^You found a new job as a (.+)\.$/, match => `وجدت وظيفة جديدة كـ${translateArabicEntity(match[1])}.`],
+  [
+    /^You found a new job as a (.+)\.$/,
+    match => `وجدت وظيفة جديدة كـ${translateArabicEntity(match[1])}.`,
+  ],
   [/^You started dating (.+)\.$/, match => `بدأت مواعدة ${match[1]}.`],
   [/^You broke up with (.+)\.$/, match => `انفصلت عن ${match[1]}.`],
-  [/^You helped (.+) with \$([\d,]+)\.$/, match =>
-    `ساعدت ${match[1]} بمبلغ ${formatArabicMoney(Number(match[2].replace(/,/g, '')))}.`],
-  [/^(.+) asks you for \$([\d,]+)\.$/, match =>
-    `يطلب منك ${match[1]} مبلغ ${formatArabicMoney(Number(match[2].replace(/,/g, '')))}.`],
-  [/^You received \$([\d,]+) in unemployment support from (.+)\.$/, match =>
-    `تلقيت ${formatArabicMoney(Number(match[1].replace(/,/g, '')))} كدعم للبطالة من ${translateArabicEntity(match[2])}.`],
-  [/^(.+)'s tax rules adjusted your annual income tax to \$([\d,]+)\.$/, match =>
-    `عدلت قوانين الضرائب في ${translateArabicEntity(match[1])} ضريبة دخلك السنوية إلى ${formatArabicMoney(Number(match[2].replace(/,/g, '')))}.`],
-  [/^The standard retirement age in (.+) is (\d+)\.$/, match =>
-    `سن التقاعد المعتاد في ${translateArabicEntity(match[1])} هو ${formatArabicNumber(Number(match[2]))}.`],
-  [/^Campaign month (\d+): polling is at (\d+)%\./, match =>
-    `الشهر ${formatArabicNumber(Number(match[1]))} من الحملة: تبلغ نسبة التأييد ${formatArabicPercent(Number(match[2]))}.`],
+  [
+    /^You helped (.+) with \$([\d,]+)\.$/,
+    match => `ساعدت ${match[1]} بمبلغ ${formatArabicMoney(Number(match[2].replace(/,/g, '')))}.`,
+  ],
+  [
+    /^(.+) asks you for \$([\d,]+)\.$/,
+    match => `يطلب منك ${match[1]} مبلغ ${formatArabicMoney(Number(match[2].replace(/,/g, '')))}.`,
+  ],
+  [
+    /^You received \$([\d,]+) in unemployment support from (.+)\.$/,
+    match =>
+      `تلقيت ${formatArabicMoney(Number(match[1].replace(/,/g, '')))} كدعم للبطالة من ${translateArabicEntity(match[2])}.`,
+  ],
+  [
+    /^(.+)'s tax rules adjusted your annual income tax to \$([\d,]+)\.$/,
+    match =>
+      `عدلت قوانين الضرائب في ${translateArabicEntity(match[1])} ضريبة دخلك السنوية إلى ${formatArabicMoney(Number(match[2].replace(/,/g, '')))}.`,
+  ],
+  [
+    /^The standard retirement age in (.+) is (\d+)\.$/,
+    match =>
+      `سن التقاعد المعتاد في ${translateArabicEntity(match[1])} هو ${formatArabicNumber(Number(match[2]))}.`,
+  ],
+  [
+    /^Campaign month (\d+): polling is at (\d+)%\./,
+    match =>
+      `الشهر ${formatArabicNumber(Number(match[1]))} من الحملة: تبلغ نسبة التأييد ${formatArabicPercent(Number(match[2]))}.`,
+  ],
   [/^Pregnancy month (\d+):/, match => `الشهر ${formatArabicNumber(Number(match[1]))} من الحمل:`],
-  [/^The court case has lasted (\d+) months\./, match =>
-    `استمرت القضية ${formatArabicDuration(Number(match[1]), 'month')}.`],
-  [/^War shortages increased your monthly costs by \$([\d,]+)\.$/, match =>
-    `زادت أزمات الحرب نفقاتك الشهرية بمقدار ${formatArabicMoney(Number(match[1].replace(/,/g, '')))}.`],
-  [/^(.+) declared war on (.+)\.$/, match =>
-    `أعلنت ${translateArabicEntity(match[1])} الحرب على ${translateArabicEntity(match[2])}.`],
-  [/^(.+) and (.+) signed a defensive alliance\.$/, match =>
-    `وقعت ${translateArabicEntity(match[1])} و${translateArabicEntity(match[2])} تحالفا دفاعيا.`],
-  [/^(.+) imposed sanctions on (.+)\.$/, match =>
-    `فرضت ${translateArabicEntity(match[1])} عقوبات على ${translateArabicEntity(match[2])}.`],
-  [/^(.+) won the election in (.+)\.$/, match =>
-    `فاز ${match[1]} بالانتخابات في ${translateArabicEntity(match[2])}.`],
-  [/^A coup removed (.+) from power in (.+)\.$/, match =>
-    `أطاح انقلاب بـ${match[1]} من السلطة في ${translateArabicEntity(match[2])}.`],
-  [/^A revolution began in (.+)\.$/, match =>
-    `بدأت ثورة في ${translateArabicEntity(match[1])}.`],
-  [/^(.+) moved to (.+) to start a new chapter\.$/, match =>
-    `انتقل ${match[1]} إلى ${translateArabicEntity(match[2])} لبدء فصل جديد.`],
-  [/^You chose: (.+)\.$/, match => `اخترت: ${translateArabicText(match[1], { recordLeak: false })}.`],
+  [
+    /^The court case has lasted (\d+) months\./,
+    match => `استمرت القضية ${formatArabicDuration(Number(match[1]), 'month')}.`,
+  ],
+  [
+    /^War shortages increased your monthly costs by \$([\d,]+)\.$/,
+    match =>
+      `زادت أزمات الحرب نفقاتك الشهرية بمقدار ${formatArabicMoney(Number(match[1].replace(/,/g, '')))}.`,
+  ],
+  [
+    /^(.+) declared war on (.+)\.$/,
+    match =>
+      `أعلنت ${translateArabicEntity(match[1])} الحرب على ${translateArabicEntity(match[2])}.`,
+  ],
+  [
+    /^(.+) and (.+) signed a defensive alliance\.$/,
+    match =>
+      `وقعت ${translateArabicEntity(match[1])} و${translateArabicEntity(match[2])} تحالفا دفاعيا.`,
+  ],
+  [
+    /^(.+) imposed sanctions on (.+)\.$/,
+    match =>
+      `فرضت ${translateArabicEntity(match[1])} عقوبات على ${translateArabicEntity(match[2])}.`,
+  ],
+  [
+    /^(.+) won the election in (.+)\.$/,
+    match => `فاز ${match[1]} بالانتخابات في ${translateArabicEntity(match[2])}.`,
+  ],
+  [
+    /^A coup removed (.+) from power in (.+)\.$/,
+    match => `أطاح انقلاب بـ${match[1]} من السلطة في ${translateArabicEntity(match[2])}.`,
+  ],
+  [/^A revolution began in (.+)\.$/, match => `بدأت ثورة في ${translateArabicEntity(match[1])}.`],
+  [
+    /^(.+) moved to (.+) to start a new chapter\.$/,
+    match => `انتقل ${match[1]} إلى ${translateArabicEntity(match[2])} لبدء فصل جديد.`,
+  ],
+  [
+    /^You chose: (.+)\.$/,
+    match => `اخترت: ${translateArabicText(match[1], { recordLeak: false })}.`,
+  ],
 ]);
 
 function safeStorage() {
@@ -428,7 +469,9 @@ function safeStorage() {
 
 function readStoredLeaks() {
   const storage = safeStorage();
-  if (!storage) return [];
+  if (!storage) {
+    return [];
+  }
   try {
     const parsed = JSON.parse(storage.getItem(LEAK_STORAGE_KEY) || '[]');
     return Array.isArray(parsed) ? parsed : [];
@@ -439,7 +482,9 @@ function readStoredLeaks() {
 
 function writeStoredLeaks(leaks) {
   const storage = safeStorage();
-  if (!storage) return;
+  if (!storage) {
+    return;
+  }
   try {
     storage.setItem(LEAK_STORAGE_KEY, JSON.stringify(leaks.slice(0, MAX_LEAKS)));
   } catch {
@@ -479,8 +524,12 @@ export function isArabicPlaceholder(value, source = '') {
 
 export function isCompleteArabicTranslation(value, source = '') {
   const normalized = normalize(value);
-  if (!normalized || isArabicPlaceholder(value, source)) return false;
-  if (!hasArabicText(normalized)) return false;
+  if (!normalized || isArabicPlaceholder(value, source)) {
+    return false;
+  }
+  if (!hasArabicText(normalized)) {
+    return false;
+  }
   // Names and abbreviations are allowed, but a sentence that remains mostly English is not.
   return latinWordCount(normalized) <= Math.max(2, Math.ceil(normalized.split(/\s+/).length * 0.3));
 }
@@ -492,7 +541,9 @@ export function translateArabicEntity(value) {
 
 export function recordArabicLeak(value, context = 'runtime') {
   const text = normalize(value);
-  if (!text || !hasLatinText(text) || /^https?:\/\//i.test(text)) return null;
+  if (!text || !hasLatinText(text) || /^https?:\/\//i.test(text)) {
+    return null;
+  }
   const leaks = readStoredLeaks();
   const existing = leaks.find(entry => entry.text === text && entry.context === context);
   if (existing) {
@@ -530,14 +581,18 @@ export function getArabicDigitStyle() {
 
 export function setArabicDigitStyle(style) {
   const storage = safeStorage();
-  if (!storage) return;
+  if (!storage) {
+    return;
+  }
   storage.setItem(DIGIT_STYLE_KEY, style === 'arab' ? 'arab' : 'latn');
 }
 
 export function formatArabicNumber(value, options = {}) {
   const numeric = Number(value);
-  if (!Number.isFinite(numeric)) return String(value ?? '');
-  return new Intl.NumberFormat('ar-MA-u-nu-' + getArabicDigitStyle(), {
+  if (!Number.isFinite(numeric)) {
+    return String(value ?? '');
+  }
+  return new Intl.NumberFormat(`ar-MA-u-nu-${getArabicDigitStyle()}`, {
     maximumFractionDigits: options.maximumFractionDigits ?? 2,
     minimumFractionDigits: options.minimumFractionDigits ?? 0,
     ...options,
@@ -546,8 +601,10 @@ export function formatArabicNumber(value, options = {}) {
 
 export function formatArabicMoney(value, currency = 'USD') {
   const numeric = Number(value);
-  if (!Number.isFinite(numeric)) return String(value ?? '');
-  return new Intl.NumberFormat('ar-MA-u-nu-' + getArabicDigitStyle(), {
+  if (!Number.isFinite(numeric)) {
+    return String(value ?? '');
+  }
+  return new Intl.NumberFormat(`ar-MA-u-nu-${getArabicDigitStyle()}`, {
     style: 'currency',
     currency,
     maximumFractionDigits: 0,
@@ -556,8 +613,10 @@ export function formatArabicMoney(value, currency = 'USD') {
 
 export function formatArabicPercent(value) {
   const numeric = Number(value);
-  if (!Number.isFinite(numeric)) return String(value ?? '');
-  return new Intl.NumberFormat('ar-MA-u-nu-' + getArabicDigitStyle(), {
+  if (!Number.isFinite(numeric)) {
+    return String(value ?? '');
+  }
+  return new Intl.NumberFormat(`ar-MA-u-nu-${getArabicDigitStyle()}`, {
     style: 'percent',
     maximumFractionDigits: 1,
   }).format(numeric / 100);
@@ -567,39 +626,69 @@ export function formatArabicDuration(value, unit = 'year') {
   const count = Math.max(0, Math.floor(Number(value) || 0));
   const number = formatArabicNumber(count, { maximumFractionDigits: 0 });
   if (unit === 'month') {
-    if (count === 0) return '0 شهر';
-    if (count === 1) return 'شهر واحد';
-    if (count === 2) return 'شهران';
-    if (count >= 3 && count <= 10) return `${number} أشهر`;
+    if (count === 0) {
+      return '0 شهر';
+    }
+    if (count === 1) {
+      return 'شهر واحد';
+    }
+    if (count === 2) {
+      return 'شهران';
+    }
+    if (count >= 3 && count <= 10) {
+      return `${number} أشهر`;
+    }
     return `${number} شهرا`;
   }
-  if (count === 0) return '0 سنة';
-  if (count === 1) return 'سنة واحدة';
-  if (count === 2) return 'سنتان';
-  if (count >= 3 && count <= 10) return `${number} سنوات`;
+  if (count === 0) {
+    return '0 سنة';
+  }
+  if (count === 1) {
+    return 'سنة واحدة';
+  }
+  if (count === 2) {
+    return 'سنتان';
+  }
+  if (count >= 3 && count <= 10) {
+    return `${number} سنوات`;
+  }
   return `${number} سنة`;
 }
 
 export function translateArabicText(value, options = {}) {
   const text = normalize(value);
-  if (!text || hasArabicText(text) && !isArabicPlaceholder(text)) return text;
-  if (EXACT_AR[text]) return EXACT_AR[text];
-  if (ENTITY_AR[text]) return ENTITY_AR[text];
+  if (!text || (hasArabicText(text) && !isArabicPlaceholder(text))) {
+    return text;
+  }
+  if (EXACT_AR[text]) {
+    return EXACT_AR[text];
+  }
+  if (ENTITY_AR[text]) {
+    return ENTITY_AR[text];
+  }
 
   for (const [pattern, replacer] of PATTERN_AR) {
     const match = text.match(pattern);
-    if (match) return replacer(match);
+    if (match) {
+      return replacer(match);
+    }
   }
 
   // Translate simple slash- or bullet-separated labels without damaging names.
   const separator = text.includes(' • ') ? ' • ' : text.includes(' / ') ? ' / ' : null;
   if (separator) {
     const parts = text.split(separator);
-    const translated = parts.map(part => translateArabicText(part, { ...options, recordLeak: false }));
-    if (translated.some((part, index) => part !== parts[index])) return translated.join(separator);
+    const translated = parts.map(part =>
+      translateArabicText(part, { ...options, recordLeak: false })
+    );
+    if (translated.some((part, index) => part !== parts[index])) {
+      return translated.join(separator);
+    }
   }
 
-  if (options.recordLeak !== false) recordArabicLeak(text, options.context || 'runtime');
+  if (options.recordLeak !== false) {
+    recordArabicLeak(text, options.context || 'runtime');
+  }
   return options.unknownFallback || text;
 }
 
@@ -607,13 +696,19 @@ export function localizeArabicCandidate(localizedValue, fallbackValue = '', cont
   const localized = normalize(localizedValue);
   const fallback = normalize(fallbackValue);
 
-  if (isCompleteArabicTranslation(localized, fallback)) return localized;
+  if (isCompleteArabicTranslation(localized, fallback)) {
+    return localized;
+  }
 
   const fromFallback = translateArabicText(fallback, { context, recordLeak: false });
-  if (fromFallback && fromFallback !== fallback) return fromFallback;
+  if (fromFallback && fromFallback !== fallback) {
+    return fromFallback;
+  }
 
   const fromLocalized = translateArabicText(localized, { context, recordLeak: false });
-  if (fromLocalized && fromLocalized !== localized) return fromLocalized;
+  if (fromLocalized && fromLocalized !== localized) {
+    return fromLocalized;
+  }
 
   recordArabicLeak(fallback || localized, context);
   return localized || fallback;
@@ -626,7 +721,10 @@ export function getArabicLocalizationDiagnostics() {
     entityTranslations: Object.keys(ENTITY_AR).length,
     dynamicPatterns: PATTERN_AR.length,
     runtimeLeaks: leaks.length,
-    totalLeakOccurrences: leaks.reduce((sum, entry) => sum + Math.max(1, Number(entry.count) || 1), 0),
+    totalLeakOccurrences: leaks.reduce(
+      (sum, entry) => sum + Math.max(1, Number(entry.count) || 1),
+      0
+    ),
     digitStyle: getArabicDigitStyle(),
     leaks,
   };

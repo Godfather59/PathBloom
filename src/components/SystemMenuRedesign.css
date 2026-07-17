@@ -135,8 +135,7 @@
 
 .system-save-card {
   background:
-    linear-gradient(135deg, rgba(103, 169, 255, 0.11), transparent 55%),
-    rgba(16, 31, 51, 0.82);
+    linear-gradient(135deg, rgba(103, 169, 255, 0.11), transparent 55%), rgba(16, 31, 51, 0.82);
 }
 
 .system-resume-card > span,
@@ -176,8 +175,7 @@
   border-radius: 18px;
   color: var(--pb-text);
   background:
-    linear-gradient(105deg, rgba(243, 201, 105, 0.12), transparent 45%),
-    rgba(16, 31, 51, 0.8);
+    linear-gradient(105deg, rgba(243, 201, 105, 0.12), transparent 45%), rgba(16, 31, 51, 0.8);
   text-align: start;
 }
 

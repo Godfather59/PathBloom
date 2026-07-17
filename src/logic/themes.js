@@ -62,7 +62,9 @@ const LEGACY_THEME_MAP = Object.freeze({
 
 export function normalizeTheme(themeName) {
   const requested = String(themeName || '').toLowerCase();
-  if (Object.hasOwn(THEMES, requested)) return requested;
+  if (Object.hasOwn(THEMES, requested)) {
+    return requested;
+  }
   return LEGACY_THEME_MAP[requested] || 'dark';
 }
 

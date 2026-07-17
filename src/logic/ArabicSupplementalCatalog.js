@@ -111,8 +111,9 @@ export function translateSupplementalArabicEntity(value) {
 
 export function replaceKnownEnglishEntitiesInArabic(value) {
   let result = String(value ?? '');
-  const entries = Object.entries(ARABIC_ENTITY_SUPPLEMENTS)
-    .sort(([left], [right]) => right.length - left.length);
+  const entries = Object.entries(ARABIC_ENTITY_SUPPLEMENTS).sort(
+    ([left], [right]) => right.length - left.length
+  );
 
   entries.forEach(([english, arabic]) => {
     const pattern = new RegExp(`(^|[^A-Za-z])${escapeRegExp(english)}(?=$|[^A-Za-z])`, 'g');
@@ -123,40 +124,57 @@ export function replaceKnownEnglishEntitiesInArabic(value) {
 }
 
 const ARABIC_RUNTIME_PATTERNS = Object.freeze([
-  [/^(.+) moved to (.+) to start a new chapter\.$/, match =>
-    `انتقل ${translateSupplementalArabicEntity(match[1])} إلى ${translateSupplementalArabicEntity(match[2])} لبدء فصل جديد.`],
-  [/^(.+) surged!$/, match =>
-    `ارتفع سعر ${translateSupplementalArabicEntity(match[1])} بقوة!`],
-  [/^(.+) crashed!$/, match =>
-    `انهار سعر ${translateSupplementalArabicEntity(match[1])}!`],
-  [/^(.+) rose sharply!$/, match =>
-    `ارتفع سعر ${translateSupplementalArabicEntity(match[1])} بشكل حاد!`],
-  [/^(.+) fell sharply!$/, match =>
-    `انخفض سعر ${translateSupplementalArabicEntity(match[1])} بشكل حاد!`],
-  [/^(.+) got married\.$/, match =>
-    `تزوج ${translateSupplementalArabicEntity(match[1])}.`],
-  [/^(.+) had a baby\.$/, match =>
-    `رُزق ${translateSupplementalArabicEntity(match[1])} بمولود.`],
-  [/^(.+) started a new job as (.+)\.$/, match =>
-    `بدأ ${translateSupplementalArabicEntity(match[1])} عملا جديدا بوصفه ${translateSupplementalArabicEntity(match[2])}.`],
-  [/^(.+) was promoted to (.+)\.$/, match =>
-    `تمت ترقية ${translateSupplementalArabicEntity(match[1])} إلى ${translateSupplementalArabicEntity(match[2])}.`],
-  [/^(.+) died at age (\d+)\.$/, match =>
-    `توفي ${translateSupplementalArabicEntity(match[1])} عن عمر ${match[2]} سنة.`],
+  [
+    /^(.+) moved to (.+) to start a new chapter\.$/,
+    match =>
+      `انتقل ${translateSupplementalArabicEntity(match[1])} إلى ${translateSupplementalArabicEntity(match[2])} لبدء فصل جديد.`,
+  ],
+  [/^(.+) surged!$/, match => `ارتفع سعر ${translateSupplementalArabicEntity(match[1])} بقوة!`],
+  [/^(.+) crashed!$/, match => `انهار سعر ${translateSupplementalArabicEntity(match[1])}!`],
+  [
+    /^(.+) rose sharply!$/,
+    match => `ارتفع سعر ${translateSupplementalArabicEntity(match[1])} بشكل حاد!`,
+  ],
+  [
+    /^(.+) fell sharply!$/,
+    match => `انخفض سعر ${translateSupplementalArabicEntity(match[1])} بشكل حاد!`,
+  ],
+  [/^(.+) got married\.$/, match => `تزوج ${translateSupplementalArabicEntity(match[1])}.`],
+  [/^(.+) had a baby\.$/, match => `رُزق ${translateSupplementalArabicEntity(match[1])} بمولود.`],
+  [
+    /^(.+) started a new job as (.+)\.$/,
+    match =>
+      `بدأ ${translateSupplementalArabicEntity(match[1])} عملا جديدا بوصفه ${translateSupplementalArabicEntity(match[2])}.`,
+  ],
+  [
+    /^(.+) was promoted to (.+)\.$/,
+    match =>
+      `تمت ترقية ${translateSupplementalArabicEntity(match[1])} إلى ${translateSupplementalArabicEntity(match[2])}.`,
+  ],
+  [
+    /^(.+) died at age (\d+)\.$/,
+    match => `توفي ${translateSupplementalArabicEntity(match[1])} عن عمر ${match[2]} سنة.`,
+  ],
   [/^The stock market surged!$/, () => 'ارتفعت سوق الأسهم بقوة!'],
   [/^The stock market crashed!$/, () => 'انهارت سوق الأسهم!'],
 ]);
 
 export function translateSupplementalArabicText(value) {
   const source = String(value ?? '').trim();
-  if (!source) return value;
+  if (!source) {
+    return value;
+  }
 
   const exact = ARABIC_TEXT_SUPPLEMENTS[source];
-  if (exact) return exact;
+  if (exact) {
+    return exact;
+  }
 
   for (const [pattern, translate] of ARABIC_RUNTIME_PATTERNS) {
     const match = source.match(pattern);
-    if (match) return translate(match);
+    if (match) {
+      return translate(match);
+    }
   }
 
   const entityReplaced = replaceKnownEnglishEntitiesInArabic(source);

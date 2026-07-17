@@ -1,7 +1,9 @@
 const STORAGE_VERSION = 1;
 
 function storage() {
-  if (typeof localStorage === 'undefined') return null;
+  if (typeof localStorage === 'undefined') {
+    return null;
+  }
   return localStorage;
 }
 
@@ -67,12 +69,11 @@ export function parseStoredSave(raw) {
 
 function setHealth(slotId, health) {
   const store = storage();
-  if (!store) return;
+  if (!store) {
+    return;
+  }
   try {
-    store.setItem(
-      keySet(slotId).health,
-      JSON.stringify({ ...health, checkedAt: Date.now() })
-    );
+    store.setItem(keySet(slotId).health, JSON.stringify({ ...health, checkedAt: Date.now() }));
   } catch {
     // Health metadata is optional and should never block gameplay.
   }
@@ -135,7 +136,9 @@ export function writeSaveTransaction(slotId, payload) {
 
 export function readSaveWithRecovery(slotId) {
   const store = storage();
-  if (!store || !slotId) return { ok: false, reason: 'unavailable' };
+  if (!store || !slotId) {
+    return { ok: false, reason: 'unavailable' };
+  }
   const keys = keySet(slotId);
   const candidates = [
     ['primary', keys.primary],
@@ -146,13 +149,17 @@ export function readSaveWithRecovery(slotId) {
 
   for (const [source, key] of candidates) {
     const raw = store.getItem(key);
-    if (!raw) continue;
+    if (!raw) {
+      continue;
+    }
     const parsed = parseStoredSave(raw);
     if (parsed.ok) {
       if (source !== 'primary') {
         try {
           store.setItem(keys.primary, raw);
-          if (source === 'temp') store.removeItem(keys.temp);
+          if (source === 'temp') {
+            store.removeItem(keys.temp);
+          }
         } catch {
           // Returning the recovered payload is still better than failing the load.
         }
@@ -185,7 +192,9 @@ export function readSaveWithRecovery(slotId) {
 
 export function inspectSaveSlot(slotId) {
   const store = storage();
-  if (!store || !slotId) return { status: 'missing', loadable: false };
+  if (!store || !slotId) {
+    return { status: 'missing', loadable: false };
+  }
   const keys = keySet(slotId);
   const primary = parseStoredSave(store.getItem(keys.primary));
   const temp = parseStoredSave(store.getItem(keys.temp));
@@ -203,7 +212,9 @@ export function inspectSaveSlot(slotId) {
 
 export function deleteSaveTransaction(slotId) {
   const store = storage();
-  if (!store || !slotId) return false;
+  if (!store || !slotId) {
+    return false;
+  }
   const keys = keySet(slotId);
   try {
     store.removeItem(keys.primary);
@@ -218,7 +229,9 @@ export function deleteSaveTransaction(slotId) {
 
 export function readSaveHealth(slotId) {
   const store = storage();
-  if (!store || !slotId) return null;
+  if (!store || !slotId) {
+    return null;
+  }
   try {
     const raw = store.getItem(keySet(slotId).health);
     return raw ? JSON.parse(raw) : null;

@@ -27,12 +27,19 @@ export function runSimulationBatch(count = 100, maxAge = 80) {
           break;
         }
         for (const stat of ['happiness', 'health', 'smarts', 'looks', 'stress', 'karma']) {
-          if (typeof person[stat] !== 'number' || isNaN(person[stat]) || person[stat] < -1000 || person[stat] > 1000) {
+          if (
+            typeof person[stat] !== 'number' ||
+            isNaN(person[stat]) ||
+            person[stat] < -1000 ||
+            person[stat] > 1000
+          ) {
             results.nanStats++;
             break;
           }
         }
-        if (!person.isAlive) break;
+        if (!person.isAlive) {
+          break;
+        }
       }
       results.total++;
       if (!person.isAlive) {
@@ -45,8 +52,12 @@ export function runSimulationBatch(count = 100, maxAge = 80) {
         results.jobsAtDeath[person.job.title] = (results.jobsAtDeath[person.job.title] || 0) + 1;
       }
       results.finalMoney.push(person.money || 0);
-      if (person.wars) results.warsFought += Object.keys(person.wars).length;
-      if (person.age > maxAge + 5 || person.age < 0) results.ageBugs++;
+      if (person.wars) {
+        results.warsFought += Object.keys(person.wars).length;
+      }
+      if (person.age > maxAge + 5 || person.age < 0) {
+        results.ageBugs++;
+      }
     } catch (e) {
       results.errors.push(e.message);
     }
@@ -59,7 +70,7 @@ export function printSimulationReport(results) {
   const lines = [
     '=== SIMULATION BENCH REPORT ===',
     `Total lives simulated: ${results.total}`,
-    `Deaths: ${results.deaths} (${results.total > 0 ? Math.round(results.deaths / results.total * 100) : 0}%)`,
+    `Deaths: ${results.deaths} (${results.total > 0 ? Math.round((results.deaths / results.total) * 100) : 0}%)`,
     `Errors: ${results.errors.length}`,
     `NaN money bugs: ${results.nanMoney}`,
     `NaN stat bugs: ${results.nanStats}`,

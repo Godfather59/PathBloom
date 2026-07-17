@@ -12,7 +12,7 @@ import {
 } from '../BrowserRequireBridge';
 import { localizeToastMessage } from '../ToastLocalization';
 import { applyTheme, getStoredTheme, normalizeTheme, THEMES } from '../themes';
-import { orderHistoryNewestFirst } from '../../components/EventLog';
+import { orderHistoryNewestFirst } from '../HistoryOrdering';
 import { MainMenu } from '../../components/MainMenu';
 import { Toast } from '../../components/Toast';
 
@@ -54,9 +54,9 @@ describe('Arabic runtime alerts', () => {
   beforeEach(() => localStorage.clear());
 
   it('localizes natural-disaster alerts and country names', () => {
-    expect(
-      localizeToastMessage('A devastating natural disaster has struck Egypt.', 'ar')
-    ).toBe('ضربت كارثة طبيعية مدمرة مصر.');
+    expect(localizeToastMessage('A devastating natural disaster has struck Egypt.', 'ar')).toBe(
+      'ضربت كارثة طبيعية مدمرة مصر.'
+    );
   });
 
   it('renders a localized RTL toast without exposing the English alert', () => {
@@ -151,7 +151,7 @@ describe('Arabic new-life setup', () => {
 
   it('starts directly without importing or rendering AvatarCreator', () => {
     const source = readComponentSource('MainMenu.jsx');
-    expect(source).not.toContain("import AvatarCreator");
+    expect(source).not.toContain('import AvatarCreator');
     expect(source).not.toContain('showAvatarCreator');
     expect(source).not.toContain('<AvatarCreator');
     expect(source).not.toContain('avatarData');

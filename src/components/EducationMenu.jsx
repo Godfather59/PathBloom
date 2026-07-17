@@ -78,7 +78,9 @@ const COPY = {
 
 function formatMoney(value, language) {
   const amount = Math.round(Number(value) || 0);
-  return language === 'ar' ? formatArabicMoney(amount, 'USD') : `$${amount.toLocaleString('en-US')}`;
+  return language === 'ar'
+    ? formatArabicMoney(amount, 'USD')
+    : `$${amount.toLocaleString('en-US')}`;
 }
 
 export function EducationMenu({
@@ -95,14 +97,20 @@ export function EducationMenu({
   const [activeTab, setActiveTab] = useState(person.age < 18 ? 'public' : 'uni');
 
   useEffect(() => {
-    if (person.age < 18) setActiveTab('public');
+    if (person.age < 18) {
+      setActiveTab('public');
+    }
   }, [person.age]);
 
   const lists = useMemo(
     () => ({
       public: PUBLIC_SCHOOLS.filter(school => {
-        if (school.type === 'elementary') return person.age >= 6 && person.age < 14;
-        if (school.type === 'high_school') return person.age >= 14 && person.age < 18;
+        if (school.type === 'elementary') {
+          return person.age >= 6 && person.age < 14;
+        }
+        if (school.type === 'high_school') {
+          return person.age >= 14 && person.age < 18;
+        }
         return false;
       }),
       uni: UNIVERSITY_MAJORS,
@@ -113,7 +121,9 @@ export function EducationMenu({
 
   const currentList = lists[activeTab] || [];
   const history = [
-    ...(person.educationHistory || []).map(value => (typeof value === 'string' ? value : value?.name)),
+    ...(person.educationHistory || []).map(value =>
+      typeof value === 'string' ? value : value?.name
+    ),
     ...(person.degrees || []).map(degree => degree?.type || degree?.name),
   ].filter(Boolean);
   const uniqueHistory = [...new Set(history)];
@@ -124,7 +134,9 @@ export function EducationMenu({
   const graduationProgress = Math.max(0, Math.min(100, (currentYear / totalYears) * 100));
 
   const tabs = [
-    ...(person.age < 18 ? [{ id: 'public', label: copy.school, icon: '🏫', count: lists.public.length }] : []),
+    ...(person.age < 18
+      ? [{ id: 'public', label: copy.school, icon: '🏫', count: lists.public.length }]
+      : []),
     { id: 'uni', label: copy.university, icon: '🎓', count: lists.uni.length },
     { id: 'grad', label: copy.graduate, icon: '📜', count: lists.grad.length },
   ];
@@ -159,8 +171,17 @@ export function EducationMenu({
           value={school ? translateGameText(language, school.name) : '—'}
           tone={school ? 'growth' : 'neutral'}
         />
-        <PhaseTwoMetric icon="📊" label={copy.grade} value={school ? `${Math.round(performance)}%` : '—'} />
-        <PhaseTwoMetric icon="📅" label={copy.year} value={school ? `${currentYear}/${totalYears}` : '—'} tone="world" />
+        <PhaseTwoMetric
+          icon="📊"
+          label={copy.grade}
+          value={school ? `${Math.round(performance)}%` : '—'}
+        />
+        <PhaseTwoMetric
+          icon="📅"
+          label={copy.year}
+          value={school ? `${currentYear}/${totalYears}` : '—'}
+          tone="world"
+        />
         <PhaseTwoMetric icon="📜" label={copy.degrees} value={uniqueHistory.length} tone="gold" />
       </div>
 
@@ -168,11 +189,15 @@ export function EducationMenu({
         <PhaseTwoSection title={copy.enrolledTitle} subtitle={copy.enrolledSubtitle}>
           <div className="phase-two-card phase-two-card-highlight education-current-card">
             <div className="education-current-heading">
-              <span className="education-current-icon" aria-hidden="true">🎓</span>
+              <span className="education-current-icon" aria-hidden="true">
+                🎓
+              </span>
               <div>
                 <span className="phase-two-eyebrow">{copy.current}</span>
                 <h2 dir="auto">{translateGameText(language, school.name)}</h2>
-                <p>{copy.year} {currentYear} / {totalYears}</p>
+                <p>
+                  {copy.year} {currentYear} / {totalYears}
+                </p>
               </div>
             </div>
             <PhaseTwoProgress
@@ -180,11 +205,7 @@ export function EducationMenu({
               value={performance}
               tone={performance >= 70 ? 'growth' : performance >= 40 ? 'warning' : 'danger'}
             />
-            <PhaseTwoProgress
-              label={copy.schoolProgress}
-              value={graduationProgress}
-              tone="world"
-            />
+            <PhaseTwoProgress label={copy.schoolProgress} value={graduationProgress} tone="world" />
             <div className="phase-two-button-row">
               <button type="button" className="phase-two-button" onClick={onStudy}>
                 📚 {copy.study}
@@ -197,7 +218,12 @@ export function EducationMenu({
         </PhaseTwoSection>
       ) : (
         <>
-          <PhaseTwoTabs tabs={tabs} activeId={activeTab} onChange={setActiveTab} ariaLabel={copy.title} />
+          <PhaseTwoTabs
+            tabs={tabs}
+            activeId={activeTab}
+            onChange={setActiveTab}
+            ariaLabel={copy.title}
+          />
           <PhaseTwoSection title={copy.opportunities} subtitle={copy.opportunitiesSubtitle}>
             <div className="phase-two-action-list education-program-list">
               {currentList.map(program => {
@@ -214,14 +240,24 @@ export function EducationMenu({
                 return (
                   <PhaseTwoActionRow
                     key={program.id}
-                    icon={alreadyHave ? '✅' : activeTab === 'grad' ? '📜' : activeTab === 'uni' ? '🎓' : '🏫'}
+                    icon={
+                      alreadyHave
+                        ? '✅'
+                        : activeTab === 'grad'
+                          ? '📜'
+                          : activeTab === 'uni'
+                            ? '🎓'
+                            : '🏫'
+                    }
                     title={title}
                     subtitle={requirement}
                     disabled={!available}
                     tone={alreadyHave ? 'gold' : hasReq ? 'neutral' : 'danger'}
                     onClick={() => onEnroll(program)}
                     trailing={
-                      <span className={`phase-two-pill ${available ? 'good' : alreadyHave ? 'warning' : 'danger'}`}>
+                      <span
+                        className={`phase-two-pill ${available ? 'good' : alreadyHave ? 'warning' : 'danger'}`}
+                      >
                         {available ? copy.apply : alreadyHave ? copy.completed : copy.unavailable}
                       </span>
                     }
@@ -240,7 +276,9 @@ export function EducationMenu({
         {uniqueHistory.length > 0 ? (
           <div className="phase-two-pill-row">
             {uniqueHistory.map(item => (
-              <span key={item} className="phase-two-pill good" dir="auto">✅ {translateGameText(language, item)}</span>
+              <span key={item} className="phase-two-pill good" dir="auto">
+                ✅ {translateGameText(language, item)}
+              </span>
             ))}
           </div>
         ) : (

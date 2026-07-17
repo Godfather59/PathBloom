@@ -36,19 +36,19 @@ describe('Arabic screenshot regressions', () => {
   });
 
   it('translates the exact mixed Arabic relationship event from the phone screenshot', () => {
-    expect(
-      translateSupplementalArabicText('انتقل Dad إلى Germany لبدء فصل جديد.')
-    ).toBe('انتقل والدك إلى ألمانيا لبدء فصل جديد.');
+    expect(translateSupplementalArabicText('انتقل Dad إلى Germany لبدء فصل جديد.')).toBe(
+      'انتقل والدك إلى ألمانيا لبدء فصل جديد.'
+    );
   });
 
   it('translates the English source event while preserving real person names', () => {
-    expect(
-      translateSupplementalArabicText('Dad moved to Germany to start a new chapter.')
-    ).toBe('انتقل والدك إلى ألمانيا لبدء فصل جديد.');
+    expect(translateSupplementalArabicText('Dad moved to Germany to start a new chapter.')).toBe(
+      'انتقل والدك إلى ألمانيا لبدء فصل جديد.'
+    );
 
-    expect(
-      replaceKnownEnglishEntitiesInArabic('انتقل Thomas إلى Germany لبدء فصل جديد.')
-    ).toBe('انتقل Thomas إلى ألمانيا لبدء فصل جديد.');
+    expect(replaceKnownEnglishEntitiesInArabic('انتقل Thomas إلى Germany لبدء فصل جديد.')).toBe(
+      'انتقل Thomas إلى ألمانيا لبدء فصل جديد.'
+    );
   });
 
   it('translates common dynamic market headlines', () => {

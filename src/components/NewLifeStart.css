@@ -1,13 +1,14 @@
 .new-life-start {
   align-items: center;
   min-height: 100%;
-  padding:
-    max(18px, env(safe-area-inset-top))
-    12px
-    max(24px, env(safe-area-inset-bottom));
+  padding: max(18px, env(safe-area-inset-top)) 12px max(24px, env(safe-area-inset-bottom));
   color: var(--pb-text, var(--text-primary));
   background:
-    radial-gradient(circle at 15% -5%, color-mix(in srgb, var(--pb-growth, #39d98a) 14%, transparent), transparent 34%),
+    radial-gradient(
+      circle at 15% -5%,
+      color-mix(in srgb, var(--pb-growth, #39d98a) 14%, transparent),
+      transparent 34%
+    ),
     linear-gradient(180deg, var(--pb-bg-soft, #0c1a2c), var(--pb-bg, #07111f));
 }
 
@@ -37,8 +38,11 @@
   max-width: 520px;
   padding: 16px;
   color: var(--pb-text, var(--text-primary));
-  background:
-    linear-gradient(145deg, color-mix(in srgb, var(--pb-surface, #102139) 98%, transparent), color-mix(in srgb, var(--pb-surface-raised, #081421) 96%, transparent));
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--pb-surface, #102139) 98%, transparent),
+    color-mix(in srgb, var(--pb-surface-raised, #081421) 96%, transparent)
+  );
   border: 1px solid var(--pb-border, var(--glass-border));
   border-radius: 22px;
   box-shadow: var(--pb-shadow-card, var(--shadow-lg));
@@ -251,7 +255,11 @@
   margin-top: 3px;
   border-radius: 15px;
   color: #06170f;
-  background: linear-gradient(135deg, var(--pb-growth, #39d98a), color-mix(in srgb, var(--pb-growth, #39d98a) 70%, white));
+  background: linear-gradient(
+    135deg,
+    var(--pb-growth, #39d98a),
+    color-mix(in srgb, var(--pb-growth, #39d98a) 70%, white)
+  );
   box-shadow: 0 10px 24px color-mix(in srgb, var(--pb-growth, #39d98a) 24%, transparent);
 }
 

@@ -14,10 +14,14 @@ GameEngine.ageUp = function ageUpWithSmartMonthlyFastForward(person, amount = 1)
   const startingMonth = Number(person.timeProgress?.month) || 0;
 
   for (let index = 0; index < 12; index += 1) {
-    if (!person.isAlive || person.pendingEvent || !getActiveMonthlySituation(person)) break;
+    if (!person.isAlive || person.pendingEvent || !getActiveMonthlySituation(person)) {
+      break;
+    }
     originalAgeUp(person, 'month');
     completedMonths += 1;
-    if (!person.isAlive || person.pendingEvent || !getActiveMonthlySituation(person)) break;
+    if (!person.isAlive || person.pendingEvent || !getActiveMonthlySituation(person)) {
+      break;
+    }
   }
 
   person.fastForwardResult = {

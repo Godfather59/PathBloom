@@ -30,7 +30,9 @@
   pointer-events: auto;
   cursor: pointer;
   animation: toast-in 0.24s cubic-bezier(0.2, 0.86, 0.3, 1.12);
-  transition: opacity 0.24s ease, transform 0.24s ease;
+  transition:
+    opacity 0.24s ease,
+    transform 0.24s ease;
 }
 
 .toast-copy {
@@ -60,14 +62,22 @@
 .toast-type-bad {
   border-color: color-mix(in srgb, var(--pb-danger, #ff6b7a) 70%, transparent);
   background:
-    linear-gradient(110deg, color-mix(in srgb, var(--pb-danger, #ff6b7a) 12%, transparent), transparent 58%),
+    linear-gradient(
+      110deg,
+      color-mix(in srgb, var(--pb-danger, #ff6b7a) 12%, transparent),
+      transparent 58%
+    ),
     color-mix(in srgb, var(--pb-surface, #1e1e2e) 96%, transparent);
 }
 
 .toast-type-good {
   border-color: color-mix(in srgb, var(--pb-growth, #39d98a) 65%, transparent);
   background:
-    linear-gradient(110deg, color-mix(in srgb, var(--pb-growth, #39d98a) 12%, transparent), transparent 58%),
+    linear-gradient(
+      110deg,
+      color-mix(in srgb, var(--pb-growth, #39d98a) 12%, transparent),
+      transparent 58%
+    ),
     color-mix(in srgb, var(--pb-surface, #1e1e2e) 96%, transparent);
 }
 

@@ -3,6 +3,7 @@ import { translateGameMessage, translateGameText } from '../logic/i18n';
 import { cleanLocalizedText } from '../logic/localizationSanitizer';
 import { translateDeepSimulationText } from '../logic/DeepLocalization';
 import { getCurrentTimePerson } from '../logic/TimeProgression';
+import { orderHistoryNewestFirst } from '../logic/HistoryOrdering';
 import {
   formatArabicMoney,
   formatArabicNumber,
@@ -70,66 +71,99 @@ const localizeEvent = (event, language) => {
 
 function detectCategory(event) {
   const explicit = String(event.category || event.situationType || '').toLowerCase();
-  if (CATEGORY_DEFINITIONS[explicit]) return explicit;
+  if (CATEGORY_DEFINITIONS[explicit]) {
+    return explicit;
+  }
 
   const pack = String(event.contentPackId || '').toLowerCase();
-  if (pack.includes('family')) return 'family';
-  if (pack.includes('career')) return 'career';
-  if (pack.includes('crime')) return 'crime';
-  if (pack.includes('politic')) return 'politics';
-  if (pack.includes('war') || pack.includes('geopolit')) return 'world';
-  if (pack.includes('school')) return 'education';
+  if (pack.includes('family')) {
+    return 'family';
+  }
+  if (pack.includes('career')) {
+    return 'career';
+  }
+  if (pack.includes('crime')) {
+    return 'crime';
+  }
+  if (pack.includes('politic')) {
+    return 'politics';
+  }
+  if (pack.includes('war') || pack.includes('geopolit')) {
+    return 'world';
+  }
+  if (pack.includes('school')) {
+    return 'education';
+  }
 
   const text = String(event.text || event.localizedText?.en || '').toLowerCase();
-  if (/war|military|deployment|battle|missile|casualt|invasion/.test(text)) return 'war';
-  if (/president|election|campaign|minister|government|politic|parliament|coup|sanction/.test(text)) return 'politics';
-  if (/job|career|salary|promotion|fired|business|company|work/.test(text)) return 'career';
-  if (/school|college|university|class|degree|graduat|exam/.test(text)) return 'education';
-  if (/doctor|health|ill|disease|injur|treatment|hospital|pregnan/.test(text)) return 'health';
-  if (/married|divorc|partner|friend|relationship|child|parent|family|baby/.test(text)) return 'relationship';
-  if (/crime|prison|arrest|police|rob|stole|gang|court|lawsuit/.test(text)) return 'crime';
-  if (/money|paid|earned|cost|debt|tax|rent|bought|sold|profit|loss/.test(text)) return 'money';
-  if (/achievement|milestone|completed|won|graduated/.test(text)) return 'achievement';
-  if (/world|country|refugee|migration|alliance|treaty/.test(text)) return 'world';
-  return 'life';
-}
-
-export function orderHistoryNewestFirst(history = []) {
-  const ordered = Array.isArray(history) ? [...history] : [];
-  if (ordered.length < 2) return ordered;
-
-  const firstAge = Number(ordered[0]?.age);
-  const lastAge = Number(ordered[ordered.length - 1]?.age);
-  if (Number.isFinite(firstAge) && Number.isFinite(lastAge) && firstAge < lastAge) {
-    ordered.reverse();
+  if (/war|military|deployment|battle|missile|casualt|invasion/.test(text)) {
+    return 'war';
   }
-  return ordered;
+  if (
+    /president|election|campaign|minister|government|politic|parliament|coup|sanction/.test(text)
+  ) {
+    return 'politics';
+  }
+  if (/job|career|salary|promotion|fired|business|company|work/.test(text)) {
+    return 'career';
+  }
+  if (/school|college|university|class|degree|graduat|exam/.test(text)) {
+    return 'education';
+  }
+  if (/doctor|health|ill|disease|injur|treatment|hospital|pregnan/.test(text)) {
+    return 'health';
+  }
+  if (/married|divorc|partner|friend|relationship|child|parent|family|baby/.test(text)) {
+    return 'relationship';
+  }
+  if (/crime|prison|arrest|police|rob|stole|gang|court|lawsuit/.test(text)) {
+    return 'crime';
+  }
+  if (/money|paid|earned|cost|debt|tax|rent|bought|sold|profit|loss/.test(text)) {
+    return 'money';
+  }
+  if (/achievement|milestone|completed|won|graduated/.test(text)) {
+    return 'achievement';
+  }
+  if (/world|country|refugee|migration|alliance|treaty/.test(text)) {
+    return 'world';
+  }
+  return 'life';
 }
 
 function collectEffectChips(event, language) {
   const source = event.effects || event.statChanges || event.changes || {};
   const values = { ...source };
-  if (Number.isFinite(Number(event.moneyChange))) values.money = Number(event.moneyChange);
-  if (Number.isFinite(Number(event.reputationChange))) values.reputation = Number(event.reputationChange);
+  if (Number.isFinite(Number(event.moneyChange))) {
+    values.money = Number(event.moneyChange);
+  }
+  if (Number.isFinite(Number(event.reputationChange))) {
+    values.reputation = Number(event.reputationChange);
+  }
 
   return Object.entries(values)
-    .filter(([key, value]) => EFFECT_LABELS[key] && Number.isFinite(Number(value)) && Number(value) !== 0)
+    .filter(
+      ([key, value]) => EFFECT_LABELS[key] && Number.isFinite(Number(value)) && Number(value) !== 0
+    )
     .slice(0, 4)
     .map(([key, value]) => {
       const numeric = Number(value);
       const sign = numeric > 0 ? '+' : '';
-      const formatted = key === 'money'
-        ? language === 'ar'
-          ? formatArabicMoney(numeric)
-          : new Intl.NumberFormat('en-US', {
-              style: 'currency',
-              currency: 'USD',
-              maximumFractionDigits: 0,
-              signDisplay: 'always',
-            }).format(numeric)
-        : `${sign}${language === 'ar'
-            ? formatArabicNumber(numeric, { maximumFractionDigits: 0 })
-            : Math.round(numeric)}`;
+      const formatted =
+        key === 'money'
+          ? language === 'ar'
+            ? formatArabicMoney(numeric)
+            : new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                maximumFractionDigits: 0,
+                signDisplay: 'always',
+              }).format(numeric)
+          : `${sign}${
+              language === 'ar'
+                ? formatArabicNumber(numeric, { maximumFractionDigits: 0 })
+                : Math.round(numeric)
+            }`;
       return {
         key,
         positive: numeric > 0,
@@ -138,13 +172,12 @@ function collectEffectChips(event, language) {
     });
 }
 
-const TimelineEvent = memo(function TimelineEvent({ event, language, t, showAgeMarker }) {
+const TimelineEvent = memo(({ event, language, t, showAgeMarker }) => {
   const categoryId = detectCategory(event);
   const category = CATEGORY_DEFINITIONS[categoryId] || CATEGORY_DEFINITIONS.life;
   const effects = collectEffectChips(event, language);
-  const age = language === 'ar'
-    ? formatArabicNumber(event.age, { maximumFractionDigits: 0 })
-    : event.age;
+  const age =
+    language === 'ar' ? formatArabicNumber(event.age, { maximumFractionDigits: 0 }) : event.age;
 
   return (
     <article className={`timeline-event category-${categoryId} tone-${event.type || 'neutral'}`}>
@@ -156,18 +189,21 @@ const TimelineEvent = memo(function TimelineEvent({ event, language, t, showAgeM
 
       <div className="timeline-card">
         <div className="timeline-meta-row">
-          <span className="timeline-category">
-            {category[language === 'ar' ? 'ar' : 'en']}
-          </span>
+          <span className="timeline-category">{category[language === 'ar' ? 'ar' : 'en']}</span>
           <span className={`timeline-age ${showAgeMarker ? 'is-new-age' : ''}`}>
             {t('common.age', 'Age')} {age}
           </span>
         </div>
 
-        <p className="event-text" dir="auto">{localizeEvent(event, language)}</p>
+        <p className="event-text" dir="auto">
+          {localizeEvent(event, language)}
+        </p>
 
         {effects.length > 0 && (
-          <div className="timeline-effects" aria-label={language === 'ar' ? 'نتائج الحدث' : 'Event consequences'}>
+          <div
+            className="timeline-effects"
+            aria-label={language === 'ar' ? 'نتائج الحدث' : 'Event consequences'}
+          >
             {effects.map(effect => (
               <span
                 key={`${event.id || event.text}-${effect.key}`}
@@ -184,95 +220,115 @@ const TimelineEvent = memo(function TimelineEvent({ event, language, t, showAgeM
   );
 });
 
-export const EventLog = memo(function EventLog({
-  history = [],
-  language = 'en',
-  t = (key, fallback) => fallback || key,
-  headerContent = null,
-}) {
-  const containerRef = useRef(null);
-  const [notification, setNotification] = useState(null);
-  const currentPerson = getCurrentTimePerson();
+export const EventLog = memo(
+  ({
+    history = [],
+    language = 'en',
+    t = (key, fallback) => fallback || key,
+    headerContent = null,
+  }) => {
+    const containerRef = useRef(null);
+    const [notification, setNotification] = useState(null);
+    const currentPerson = getCurrentTimePerson();
 
-  useEffect(() => {
-    const element = containerRef.current;
-    if (!element) return undefined;
+    useEffect(() => {
+      const element = containerRef.current;
+      if (!element) {
+        return undefined;
+      }
 
-    const updatePadding = () => {
+      const updatePadding = () => {
+        const hud = document.querySelector('.hud-container');
+        const actionMenu = document.querySelector('.action-menu');
+        if (hud) {
+          element.style.paddingTop = `${hud.offsetHeight + 18}px`;
+        }
+        if (actionMenu) {
+          element.style.paddingBottom = `${actionMenu.offsetHeight + 22}px`;
+        }
+      };
+
+      const observer = new ResizeObserver(updatePadding);
       const hud = document.querySelector('.hud-container');
       const actionMenu = document.querySelector('.action-menu');
-      if (hud) element.style.paddingTop = `${hud.offsetHeight + 18}px`;
-      if (actionMenu) element.style.paddingBottom = `${actionMenu.offsetHeight + 22}px`;
-    };
+      if (hud) {
+        observer.observe(hud);
+      }
+      if (actionMenu) {
+        observer.observe(actionMenu);
+      }
+      updatePadding();
+      return () => observer.disconnect();
+    }, []);
 
-    const observer = new ResizeObserver(updatePadding);
-    const hud = document.querySelector('.hud-container');
-    const actionMenu = document.querySelector('.action-menu');
-    if (hud) observer.observe(hud);
-    if (actionMenu) observer.observe(actionMenu);
-    updatePadding();
-    return () => observer.disconnect();
-  }, []);
+    useEffect(() => {
+      const handleNotification = event => setNotification(event.detail || null);
+      window.addEventListener('pathbloom-journey-notification', handleNotification);
+      return () => window.removeEventListener('pathbloom-journey-notification', handleNotification);
+    }, []);
 
-  useEffect(() => {
-    const handleNotification = event => setNotification(event.detail || null);
-    window.addEventListener('pathbloom-journey-notification', handleNotification);
-    return () => window.removeEventListener('pathbloom-journey-notification', handleNotification);
-  }, []);
+    useEffect(() => {
+      const element = containerRef.current;
+      if (!element) {
+        return undefined;
+      }
+      const frame = requestAnimationFrame(() => {
+        if (typeof element.scrollTo === 'function') {
+          element.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+        } else {
+          element.scrollTop = 0;
+        }
+      });
+      return () => cancelAnimationFrame(frame);
+    }, [history.length]);
 
-  useEffect(() => {
-    const element = containerRef.current;
-    if (!element) return undefined;
-    const frame = requestAnimationFrame(() => {
-      element.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [history.length]);
+    const displayHistory = useMemo(() => {
+      const newestFirst = orderHistoryNewestFirst(history);
+      return newestFirst.length > MAX_VISIBLE_EVENTS
+        ? newestFirst.slice(0, MAX_VISIBLE_EVENTS)
+        : newestFirst;
+    }, [history]);
 
-  const displayHistory = useMemo(() => {
-    const newestFirst = orderHistoryNewestFirst(history);
-    return newestFirst.length > MAX_VISIBLE_EVENTS
-      ? newestFirst.slice(0, MAX_VISIBLE_EVENTS)
-      : newestFirst;
-  }, [history]);
+    const resolvedHeader =
+      headerContent ||
+      (currentPerson ? <JourneyCard person={currentPerson} language={language} /> : null);
 
-  const resolvedHeader = headerContent || (currentPerson ? (
-    <JourneyCard person={currentPerson} language={language} />
-  ) : null);
-
-  return (
-    <main className="event-log" ref={containerRef} dir={language === 'ar' ? 'rtl' : 'ltr'}>
-      <div className="timeline-heading">
-        <span>{language === 'ar' ? 'قصتك' : 'Your story'}</span>
-        <strong>{language === 'ar' ? 'أحدث الأحداث أولا' : 'Newest first'}</strong>
-      </div>
-
-      {resolvedHeader}
-
-      {displayHistory.length === 0 && (
-        <div className="timeline-empty">
-          <span className="timeline-empty-icon"><AppIcon name="life" size={26} /></span>
-          <strong>{t('eventlog.empty', 'No events yet. Start living!')}</strong>
+    return (
+      <main className="event-log" ref={containerRef} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="timeline-heading">
+          <span>{language === 'ar' ? 'قصتك' : 'Your story'}</span>
+          <strong>{language === 'ar' ? 'أحدث الأحداث أولا' : 'Newest first'}</strong>
         </div>
-      )}
 
-      <div className="timeline-list">
-        {displayHistory.map((event, index) => (
-          <TimelineEvent
-            key={event.id || `${event.age}-${index}-${event.text}`}
-            event={event}
-            language={language}
-            t={t}
-            showAgeMarker={index === 0 || displayHistory[index - 1]?.age !== event.age}
-          />
-        ))}
-      </div>
+        {resolvedHeader}
 
-      <MilestoneCelebration
-        notification={notification}
-        language={language}
-        onClose={() => setNotification(null)}
-      />
-    </main>
-  );
-});
+        {displayHistory.length === 0 && (
+          <div className="timeline-empty">
+            <span className="timeline-empty-icon">
+              <AppIcon name="life" size={26} />
+            </span>
+            <strong>{t('eventlog.empty', 'No events yet. Start living!')}</strong>
+          </div>
+        )}
+
+        <div className="timeline-list">
+          {displayHistory.map((event, index) => (
+            <TimelineEvent
+              key={event.id || `${event.age}-${index}-${event.text}`}
+              event={event}
+              language={language}
+              t={t}
+              showAgeMarker={index === 0 || displayHistory[index - 1]?.age !== event.age}
+            />
+          ))}
+        </div>
+
+        <MilestoneCelebration
+          notification={notification}
+          language={language}
+          onClose={() => setNotification(null)}
+        />
+      </main>
+    );
+  }
+);

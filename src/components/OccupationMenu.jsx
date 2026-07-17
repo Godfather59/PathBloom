@@ -136,18 +136,24 @@ export function OccupationMenu({
         person.skills?.instrument || 0,
         ...Object.values(person.skills?.instruments || {}).map(Number)
       );
-      if (musicSkill < 80) add('Voice or Instrument Skill (80+)', 'مهارة الغناء أو العزف (80+)');
+      if (musicSkill < 80) {
+        add('Voice or Instrument Skill (80+)', 'مهارة الغناء أو العزف (80+)');
+      }
     }
     if (job.customReq === 'actor' && (person.fame || 0) < 20) {
       add('Fame (20+)', 'الشهرة (20+)');
     }
     if (
       job.customReq === 'personal_trainer_unlock' &&
-      !person.unlockedFeatures?.includes('personal_training')
+      (!Array.isArray(person.unlockedFeatures) ||
+        !person.unlockedFeatures.includes('personal_training'))
     ) {
       add('Complete a personal training session', 'أكمل حصة تدريب شخصي');
     }
-    if (job.customReq === 'study_group_unlock' && !person.unlockedFeatures?.includes('study_group')) {
+    if (
+      job.customReq === 'study_group_unlock' &&
+      (!Array.isArray(person.unlockedFeatures) || !person.unlockedFeatures.includes('study_group'))
+    ) {
       add('Discover a study group at the library', 'اكتشف مجموعة دراسة في المكتبة');
     }
 
@@ -169,7 +175,10 @@ export function OccupationMenu({
         req.degree_req.includes(degree?.type)
       );
       if (!hasRequiredMajor) {
-        add(`Degree: ${req.degree_req.join(' or ')}`, `شهادة: ${req.degree_req.map(value => translateGameText(language, value)).join(' أو ')}`);
+        add(
+          `Degree: ${req.degree_req.join(' or ')}`,
+          `شهادة: ${req.degree_req.map(value => translateGameText(language, value)).join(' أو ')}`
+        );
       }
     }
     return issues;
@@ -182,13 +191,15 @@ export function OccupationMenu({
         issues: checkRequirements(job),
         localizedTitle: translateGameText(language, job.title),
       })),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     [jobs, person, language]
   );
 
   const visibleJobs = useMemo(() => {
     const needle = query.trim().toLocaleLowerCase(locale === 'ar' ? 'ar' : 'en');
-    if (!needle) return evaluatedJobs;
+    if (!needle) {
+      return evaluatedJobs;
+    }
     return evaluatedJobs.filter(item => item.localizedTitle.toLocaleLowerCase().includes(needle));
   }, [evaluatedJobs, query, locale]);
 
@@ -215,7 +226,12 @@ export function OccupationMenu({
       dir={locale === 'ar' ? 'rtl' : 'ltr'}
       className="career-destination"
     >
-      <PhaseTwoTabs tabs={tabs} activeId={activeTab} onChange={setActiveTab} ariaLabel={copy.title} />
+      <PhaseTwoTabs
+        tabs={tabs}
+        activeId={activeTab}
+        onChange={setActiveTab}
+        ariaLabel={copy.title}
+      />
 
       <div className="phase-two-metrics">
         <PhaseTwoMetric
@@ -224,11 +240,7 @@ export function OccupationMenu({
           value={person.job ? formatMoney(person.job.salary, language) : '—'}
           tone={person.job ? 'growth' : 'neutral'}
         />
-        <PhaseTwoMetric
-          icon="📅"
-          label={copy.years}
-          value={person.job?.yearsEmployed ?? 0}
-        />
+        <PhaseTwoMetric icon="📅" label={copy.years} value={person.job?.yearsEmployed ?? 0} />
         <PhaseTwoMetric icon="📋" label={copy.openings} value={jobs.length} tone="world" />
         <PhaseTwoMetric icon="✅" label={copy.qualified} value={qualifiedCount} tone="growth" />
       </div>
@@ -244,7 +256,8 @@ export function OccupationMenu({
                   </span>
                   <h2 dir="auto">{translateGameText(language, person.job.title)}</h2>
                   <p>
-                    {formatMoney(person.job.salary, language)} · {person.job.yearsEmployed || 0} {copy.years.toLocaleLowerCase()}
+                    {formatMoney(person.job.salary, language)} · {person.job.yearsEmployed || 0}{' '}
+                    {copy.years.toLocaleLowerCase()}
                   </p>
                 </div>
                 <span className="career-current-icon" aria-hidden="true">
@@ -257,11 +270,19 @@ export function OccupationMenu({
                 tone={jobPerformance >= 65 ? 'growth' : jobPerformance >= 35 ? 'warning' : 'danger'}
               />
               <div className="phase-two-button-row">
-                <button type="button" className="phase-two-button-secondary" onClick={() => onClose('skills')}>
+                <button
+                  type="button"
+                  className="phase-two-button-secondary"
+                  onClick={() => onClose('skills')}
+                >
                   🧭 {copy.skills}
                 </button>
                 {person.job.isMilitary ? (
-                  <button type="button" className="phase-two-button" onClick={() => onClose('deploy')}>
+                  <button
+                    type="button"
+                    className="phase-two-button"
+                    onClick={() => onClose('deploy')}
+                  >
                     🪖 {copy.deploy}
                   </button>
                 ) : (
@@ -271,7 +292,11 @@ export function OccupationMenu({
                 )}
               </div>
               {person.job.isMilitary && (
-                <button type="button" className="phase-two-button-danger career-resign-wide" onClick={onQuit}>
+                <button
+                  type="button"
+                  className="phase-two-button-danger career-resign-wide"
+                  onClick={onQuit}
+                >
                   🚪 {copy.resign}
                 </button>
               )}
@@ -282,7 +307,11 @@ export function OccupationMenu({
               title={copy.unemployed}
               description={copy.unemployedHint}
               action={
-                <button type="button" className="phase-two-button" onClick={() => setActiveTab('market')}>
+                <button
+                  type="button"
+                  className="phase-two-button"
+                  onClick={() => setActiveTab('market')}
+                >
                   {copy.market}
                 </button>
               }
@@ -314,7 +343,11 @@ export function OccupationMenu({
                   disabled={!qualified}
                   tone={qualified ? 'neutral' : 'danger'}
                   onClick={() => onApply(job)}
-                  trailing={<span className={`phase-two-pill ${qualified ? 'good' : 'danger'}`}>{qualified ? copy.apply : copy.locked}</span>}
+                  trailing={
+                    <span className={`phase-two-pill ${qualified ? 'good' : 'danger'}`}>
+                      {qualified ? copy.apply : copy.locked}
+                    </span>
+                  }
                 />
               );
             })}
@@ -330,20 +363,34 @@ export function OccupationMenu({
           <div className="phase-two-grid military-branch-grid">
             {MILITARY_BRANCHES.map(branch => (
               <div key={branch.key} className="phase-two-card military-branch-card">
-                <span className="military-branch-icon" aria-hidden="true">{branch.icon}</span>
+                <span className="military-branch-icon" aria-hidden="true">
+                  {branch.icon}
+                </span>
                 <h2>{locale === 'ar' ? branch.ar : branch.name}</h2>
                 <div className="phase-two-button-row">
                   <button
                     type="button"
                     className="phase-two-button-secondary"
-                    onClick={() => onApply({ isMilitary: true, branch: { name: branch.name, id: branch.key }, isOfficer: false })}
+                    onClick={() =>
+                      onApply({
+                        isMilitary: true,
+                        branch: { name: branch.name, id: branch.key },
+                        isOfficer: false,
+                      })
+                    }
                   >
                     {copy.enlist}
                   </button>
                   <button
                     type="button"
                     className="phase-two-button"
-                    onClick={() => onApply({ isMilitary: true, branch: { name: branch.name, id: branch.key }, isOfficer: true })}
+                    onClick={() =>
+                      onApply({
+                        isMilitary: true,
+                        branch: { name: branch.name, id: branch.key },
+                        isOfficer: true,
+                      })
+                    }
                     title={copy.officerHint}
                   >
                     {copy.officer}

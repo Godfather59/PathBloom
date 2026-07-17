@@ -107,7 +107,9 @@ const START_COPY = {
 };
 
 function localizedCountry(language, country) {
-  if (language === 'ar') return COUNTRY_AR[country] || translateCountryName(language, country);
+  if (language === 'ar') {
+    return COUNTRY_AR[country] || translateCountryName(language, country);
+  }
   return translateCountryName(language, country);
 }
 
@@ -173,7 +175,11 @@ export function MainMenu({
   };
 
   return (
-    <main className="main-menu animate-fade-in new-life-start" dir={isRtl ? 'rtl' : 'ltr'} lang={locale}>
+    <main
+      className="main-menu animate-fade-in new-life-start"
+      dir={isRtl ? 'rtl' : 'ltr'}
+      lang={locale}
+    >
       <header className="new-life-brand">
         <h1 className="main-menu-title">🌱 {t('app.title', 'PathBloom')}</h1>
         <p>{t('app.subtitle', copy.subtitle)}</p>
@@ -200,7 +206,9 @@ export function MainMenu({
         {hasSave && saveSummary && (
           <div className="save-summary new-life-save-summary">
             <div className="save-summary-info">
-              <div className="save-summary-name" dir="auto">{saveSummary.name}</div>
+              <div className="save-summary-name" dir="auto">
+                {saveSummary.name}
+              </div>
               <div className="save-summary-detail" dir="auto">
                 🎂 {t('common.age', copy.age)} {saveSummary.age} · {saveSummary.job}
               </div>
@@ -221,13 +229,19 @@ export function MainMenu({
           <span aria-hidden="true">🌅</span>
           <div>
             <h2>{t('main.startNewLife', copy.title)}</h2>
-            <p>{isRtl ? 'اختر هويتك الأساسية وابدأ القصة مباشرة.' : 'Choose the basics and begin the story immediately.'}</p>
+            <p>
+              {isRtl
+                ? 'اختر هويتك الأساسية وابدأ القصة مباشرة.'
+                : 'Choose the basics and begin the story immediately.'}
+            </p>
           </div>
         </div>
 
         <div className="new-life-name-grid">
           <label className="main-menu-section new-life-field">
-            <span className="main-menu-section-label">👤 {t('main.firstName', copy.firstName)}</span>
+            <span className="main-menu-section-label">
+              👤 {t('main.firstName', copy.firstName)}
+            </span>
             <input
               type="text"
               value={firstName}
@@ -294,7 +308,9 @@ export function MainMenu({
             className="main-menu-select"
           >
             {COUNTRIES.map(option => (
-              <option key={option} value={option}>{localizedCountry(locale, option)}</option>
+              <option key={option} value={option}>
+                {localizedCountry(locale, option)}
+              </option>
             ))}
           </select>
         </label>
@@ -309,7 +325,8 @@ export function MainMenu({
             <option value="">🌿 {t('main.normalLife', copy.normalLife)}</option>
             {CHALLENGES.filter(challenge => challenge.available !== false).map(challenge => (
               <option key={challenge.id} value={challenge.id}>
-                {challenge.icon} {locale === 'ar' ? challenge.nameAr || challenge.name : challenge.name}
+                {challenge.icon}{' '}
+                {locale === 'ar' ? challenge.nameAr || challenge.name : challenge.name}
                 {challenge.difficulty ? ` · ${challenge.difficulty}` : ''}
               </option>
             ))}
@@ -317,7 +334,9 @@ export function MainMenu({
         </label>
 
         <fieldset className="main-menu-section new-life-fieldset">
-          <legend className="main-menu-section-label">📅 {t('main.dailyLife', copy.dailyLife)}</legend>
+          <legend className="main-menu-section-label">
+            📅 {t('main.dailyLife', copy.dailyLife)}
+          </legend>
           <div className="menu-btn-row">
             <button
               type="button"
@@ -334,10 +353,13 @@ export function MainMenu({
               className={`menu-btn${mode === 'daily' && !dailyPlayed ? ' active-mode-daily' : ''}${dailyPlayed ? ' daily-disabled' : ''}`}
               aria-pressed={mode === 'daily'}
             >
-              🔥 {t('main.dailyLife', copy.dailyShort)} {streak.streak > 0 ? `(${streak.streak})` : ''}
+              🔥 {t('main.dailyLife', copy.dailyShort)}{' '}
+              {streak.streak > 0 ? `(${streak.streak})` : ''}
             </button>
           </div>
-          {dailyPlayed && <p className="daily-done-text">{t('main.dailyAlreadyPlayed', copy.dailyDone)}</p>}
+          {dailyPlayed && (
+            <p className="daily-done-text">{t('main.dailyAlreadyPlayed', copy.dailyDone)}</p>
+          )}
           {mode === 'daily' && !dailyPlayed && (
             <p className="hint-text">{t('main.dailyLifeDesc', copy.dailyDescription)}</p>
           )}

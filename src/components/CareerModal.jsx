@@ -61,13 +61,7 @@ const COPY = {
   },
 };
 
-export function CareerModal({
-  person,
-  onAction,
-  onClose,
-  onBand,
-  language = getStoredLanguage(),
-}) {
+export function CareerModal({ person, onAction, onClose, onBand, language = getStoredLanguage() }) {
   const locale = language === 'ar' ? 'ar' : 'en';
   const copy = COPY[locale];
   const [view, setView] = useState('overview');
@@ -102,9 +96,24 @@ export function CareerModal({
       className="music-career-destination"
     >
       <div className="phase-two-metrics">
-        <PhaseTwoMetric icon="🎼" label={copy.talent} value={`${Math.round(Number(person.musicalTalent) || 0)}%`} tone="gold" />
-        <PhaseTwoMetric icon="🎤" label={copy.voice} value={`${Math.round(Number(person.skills?.voice) || 0)}%`} tone="growth" />
-        <PhaseTwoMetric icon="🎸" label={copy.instrumentsKnown} value={practicedCount} tone="world" />
+        <PhaseTwoMetric
+          icon="🎼"
+          label={copy.talent}
+          value={`${Math.round(Number(person.musicalTalent) || 0)}%`}
+          tone="gold"
+        />
+        <PhaseTwoMetric
+          icon="🎤"
+          label={copy.voice}
+          value={`${Math.round(Number(person.skills?.voice) || 0)}%`}
+          tone="growth"
+        />
+        <PhaseTwoMetric
+          icon="🎸"
+          label={copy.instrumentsKnown}
+          value={practicedCount}
+          tone="world"
+        />
         <PhaseTwoMetric icon="👥" label={copy.band} value={person.band?.name || copy.noBand} />
       </div>
 
@@ -125,7 +134,11 @@ export function CareerModal({
               icon="🎸"
               title={copy.practiceInstrument}
               subtitle={copy.instrumentHint}
-              meta={strongestInstrument?.skill > 0 ? `${translateGameText(language, strongestInstrument.instrument.name)} · ${strongestInstrument.skill}%` : undefined}
+              meta={
+                strongestInstrument?.skill > 0
+                  ? `${translateGameText(language, strongestInstrument.instrument.name)} · ${strongestInstrument.skill}%`
+                  : undefined
+              }
               onClick={() => setView('instruments')}
               tone="world"
             />
@@ -133,7 +146,11 @@ export function CareerModal({
               <PhaseTwoActionRow
                 icon="🥁"
                 title={copy.manageBand}
-                subtitle={person.band ? `${person.band.name} · ${person.band.members?.length || 0}` : copy.formBand}
+                subtitle={
+                  person.band
+                    ? `${person.band.name} · ${person.band.members?.length || 0}`
+                    : copy.formBand
+                }
                 onClick={onBand}
                 tone="gold"
               />
@@ -146,19 +163,32 @@ export function CareerModal({
         <PhaseTwoSection title={copy.instruments} subtitle={copy.instrumentHint}>
           <div className="phase-two-action-list music-instrument-list">
             {INSTRUMENTS.map(instrument => {
-              const skill = Math.max(0, Math.min(100, Number(instrumentSkills[instrument.id]) || 0));
+              const skill = Math.max(
+                0,
+                Math.min(100, Number(instrumentSkills[instrument.id]) || 0)
+              );
               return (
                 <div key={instrument.id} className="phase-two-card music-instrument-card">
                   <div className="music-instrument-heading">
                     <div>
                       <h2>{translateGameText(language, instrument.name)}</h2>
-                      <p>{copy.type}: {translateGameText(language, instrument.type)}</p>
+                      <p>
+                        {copy.type}: {translateGameText(language, instrument.type)}
+                      </p>
                     </div>
-                    <button type="button" className="phase-two-button" onClick={() => onAction('practice', instrument.id)}>
+                    <button
+                      type="button"
+                      className="phase-two-button"
+                      onClick={() => onAction('practice', instrument.id)}
+                    >
                       {copy.practice}
                     </button>
                   </div>
-                  <PhaseTwoProgress label={copy.skill} value={skill} tone={skill >= 70 ? 'growth' : skill >= 35 ? 'warning' : 'world'} />
+                  <PhaseTwoProgress
+                    label={copy.skill}
+                    value={skill}
+                    tone={skill >= 70 ? 'growth' : skill >= 35 ? 'warning' : 'world'}
+                  />
                 </div>
               );
             })}

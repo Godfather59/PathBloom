@@ -30,9 +30,19 @@ export function Toast({ message, type, onClose, duration = 3000 }) {
         role="status"
         aria-live="polite"
       >
-        {type === 'bad' && <span className="toast-badge" aria-hidden="true">!</span>}
-        {type === 'good' && <span className="toast-badge" aria-hidden="true">✓</span>}
-        <span className="toast-copy" dir="auto">{localizedMessage}</span>
+        {type === 'bad' && (
+          <span className="toast-badge" aria-hidden="true">
+            !
+          </span>
+        )}
+        {type === 'good' && (
+          <span className="toast-badge" aria-hidden="true">
+            ✓
+          </span>
+        )}
+        <span className="toast-copy" dir="auto">
+          {localizedMessage}
+        </span>
       </div>
     </div>
   );

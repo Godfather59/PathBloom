@@ -5,7 +5,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0,0,0,0.97);
+  background-color: rgba(0, 0, 0, 0.97);
   color: white;
   display: flex;
   flex-direction: column;
@@ -39,8 +39,8 @@
   width: 100%;
   max-width: 500px;
   margin-bottom: 25px;
-  border: 1px solid rgba(255,255,255,0.08);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .game-over-legacy-row {
@@ -49,7 +49,7 @@
   align-items: center;
   margin-bottom: 18px;
   padding-bottom: 14px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .game-over-legacy-icon {
@@ -81,7 +81,7 @@
 }
 
 .game-over-stat {
-  background: rgba(255,255,255,0.03);
+  background: rgba(255, 255, 255, 0.03);
   padding: 12px;
   border-radius: 10px;
   text-align: left;
@@ -118,7 +118,7 @@
 }
 
 .game-over-section {
-  border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-top: 16px;
   margin-bottom: 18px;
 }
@@ -168,9 +168,9 @@
 }
 
 .goal-pill-pending {
-  background: rgba(255,255,255,0.08);
+  background: rgba(255, 255, 255, 0.08);
   color: #aaa;
-  border: 1px solid rgba(255,255,255,0.15);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .achievement-row {
@@ -198,7 +198,7 @@
 }
 
 .game-over-sub-stat {
-  background: rgba(255,255,255,0.03);
+  background: rgba(255, 255, 255, 0.03);
   padding: 10px;
   border-radius: 8px;
   text-align: left;
@@ -238,7 +238,9 @@
   text-align: center;
   gap: 6px;
   min-height: 48px;
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
 }
 
 .game-over-btn:active {
@@ -257,7 +259,7 @@
 .child-section {
   margin-top: 20px;
   padding-top: 20px;
-  border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .child-section-title {
@@ -283,7 +285,9 @@
   min-width: 140px;
   flex: 1;
   box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -311,10 +315,10 @@
 }
 
 /* Game Over RTL overrides */
-[dir="rtl"] .game-over-stat {
+[dir='rtl'] .game-over-stat {
   text-align: right;
 }
 
-[dir="rtl"] .game-over-sub-stat {
+[dir='rtl'] .game-over-sub-stat {
   text-align: right;
 }

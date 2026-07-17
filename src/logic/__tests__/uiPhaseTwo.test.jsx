@@ -171,10 +171,7 @@ describe('phase two destination redesign', () => {
       money: 20000,
       loans: 3000,
       personalDebt: 2000,
-      assets: [
-        { value: 100000, mortgage: { balance: 60000 } },
-        { price: 15000 },
-      ],
+      assets: [{ value: 100000, mortgage: { balance: 60000 } }, { price: 15000 }],
       portfolio: [{ currentValue: 12000 }, { value: 3000 }],
     });
     expect(summary.cash).toBe(20000);
@@ -188,13 +185,7 @@ describe('phase two destination redesign', () => {
 
   it('renders country overview, economy, society, and security tabs', () => {
     const html = render(
-      <CountryProfile
-        person={worldPerson}
-        countryId="morocco"
-        onClose={noop}
-        language="en"
-        t={t}
-      />
+      <CountryProfile person={worldPerson} countryId="morocco" onClose={noop} language="en" t={t} />
     );
     expect(html).toContain('Morocco');
     expect(html).toContain('Overview');
@@ -205,9 +196,7 @@ describe('phase two destination redesign', () => {
   });
 
   it('renders the searchable world overview and country stability card', () => {
-    const html = render(
-      <WorldOverview person={worldPerson} onClose={noop} language="en" t={t} />
-    );
+    const html = render(<WorldOverview person={worldPerson} onClose={noop} language="en" t={t} />);
     expect(html).toContain('World overview');
     expect(html).toContain('Search countries');
     expect(html).toContain('Morocco');
@@ -215,9 +204,7 @@ describe('phase two destination redesign', () => {
   });
 
   it('renders Arabic news categories and localized story hierarchy', () => {
-    const html = render(
-      <WorldNewsFeed person={worldPerson} onClose={noop} language="ar" t={t} />
-    );
+    const html = render(<WorldNewsFeed person={worldPerson} onClose={noop} language="ar" t={t} />);
     expect(html).toContain('الأخبار والتاريخ');
     expect(html).toContain('قصص العالم');
     expect(html).toContain('قصص الأشخاص');

@@ -1,8 +1,8 @@
 name: Diagnose compact HUD tests
 
 on:
-  push:
-    branches: [fix/compact-hud-physical-layout]
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: read

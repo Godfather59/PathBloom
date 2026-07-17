@@ -14,14 +14,26 @@ const LABELS = {
     activities: 'Activities',
     world: 'World',
     menu: 'Menu',
-    fast: 'Fast forward',
+    fast: 'Automatic progression',
+    oneStep: 'One step',
+    oneMonth: 'One month',
+    oneYear: '+1 Year',
+    autoYears: 'Auto: 5 Years',
+    autoMonths: 'Auto: Up to 12 Months',
+    stops: 'Stops for decisions',
   },
   ar: {
     life: 'الحياة',
     activities: 'الأنشطة',
     world: 'العالم',
     menu: 'القائمة',
-    fast: 'تقدم سريع',
+    fast: 'التقدم التلقائي',
+    oneStep: 'خطوة واحدة',
+    oneMonth: 'شهر واحد',
+    oneYear: 'سنة واحدة',
+    autoYears: 'تلقائي: 5 سنوات',
+    autoMonths: 'تلقائي: حتى 12 شهرا',
+    stops: 'يتوقف عند ظهور قرار',
   },
 };
 
@@ -38,9 +50,13 @@ export const BottomNavigation = memo(
     disabled = false,
     language = 'en',
   }) => {
-    const labels = LABELS[language === 'ar' ? 'ar' : 'en'];
+    const locale = language === 'ar' ? 'ar' : 'en';
+    const labels = LABELS[locale];
     const firstHalf = DESTINATIONS.slice(0, 2);
     const secondHalf = DESTINATIONS.slice(2);
+    const resolvedPrimaryLabel = isMonthly ? primaryLabel : labels.oneYear;
+    const primaryCaption = isMonthly ? labels.oneMonth : labels.oneStep;
+    const resolvedSmartLabel = isMonthly ? labels.autoMonths : labels.autoYears;
 
     const renderDestination = destination => (
       <button
@@ -50,6 +66,7 @@ export const BottomNavigation = memo(
         onClick={() => onNavigate?.(destination.id)}
         aria-current={activeDestination === destination.id ? 'page' : undefined}
         aria-label={labels[destination.id]}
+        title={labels[destination.id]}
       >
         <span className="bottom-nav-icon">
           <AppIcon name={destination.icon} size={21} />
@@ -61,7 +78,7 @@ export const BottomNavigation = memo(
     return (
       <nav
         className="bottom-navigation"
-        aria-label={language === 'ar' ? 'التنقل الرئيسي' : 'Main navigation'}
+        aria-label={locale === 'ar' ? 'التنقل الرئيسي' : 'Main navigation'}
       >
         <div className="bottom-nav-side bottom-nav-start">{firstHalf.map(renderDestination)}</div>
 
@@ -72,12 +89,13 @@ export const BottomNavigation = memo(
             onClick={onPrimaryAction}
             disabled={disabled}
             title={primaryHint}
-            aria-label={primaryHint || primaryLabel}
+            aria-label={`${resolvedPrimaryLabel}. ${primaryCaption}`}
           >
             <span className="time-primary-icon">
               <AppIcon name="clock" size={24} strokeWidth={2} />
             </span>
-            <span className="time-primary-label">{primaryLabel}</span>
+            <span className="time-primary-label">{resolvedPrimaryLabel}</span>
+            <span className="time-primary-caption">{primaryCaption}</span>
           </button>
 
           <button
@@ -85,11 +103,14 @@ export const BottomNavigation = memo(
             className="time-smart-action"
             onClick={onSmartAdvance}
             disabled={disabled}
-            title={labels.fast}
-            aria-label={`${labels.fast}: ${smartLabel}`}
+            title={`${resolvedSmartLabel} — ${labels.stops}`}
+            aria-label={`${labels.fast}: ${resolvedSmartLabel}. ${labels.stops}`}
           >
-            <AppIcon name="fast" size={14} />
-            <span>{smartLabel}</span>
+            <AppIcon name="fast" size={15} />
+            <span className="time-smart-copy">
+              <strong>{resolvedSmartLabel}</strong>
+              <small>{labels.stops}</small>
+            </span>
           </button>
         </div>
 

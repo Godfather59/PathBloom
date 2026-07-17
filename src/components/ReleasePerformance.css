@@ -1,0 +1,66 @@
+.event-log > .journey-card {
+  margin: 0 0 14px;
+}
+
+.performance-lite *,
+.performance-lite *::before,
+.performance-lite *::after {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.performance-lite .timeline-event,
+.performance-lite .milestone-celebration,
+.performance-lite .modal-overlay,
+.performance-lite .phase-two-screen,
+.performance-lite .journey-card,
+.performance-lite .active-situation-card,
+.performance-lite .situation-detail-sheet {
+  animation: none !important;
+}
+
+.performance-lite .timeline-card,
+.performance-lite .phase-two-card,
+.performance-lite .journey-card,
+.performance-lite .milestone-celebration-card,
+.performance-lite .modal-content,
+.performance-lite .bottom-navigation,
+.performance-lite .hud-container {
+  box-shadow: none !important;
+}
+
+.performance-lite .phase-two-screen,
+.performance-lite .release-onboarding .onboarding-card,
+.performance-lite .app-container {
+  background-image: none !important;
+  background-color: #07111f !important;
+}
+
+.performance-lite .timeline-card,
+.performance-lite .phase-two-card,
+.performance-lite .journey-card {
+  background-image: none !important;
+  background-color: rgba(14, 29, 48, 0.98) !important;
+}
+
+.performance-lite .timeline-event:nth-child(n + 85) {
+  content-visibility: auto;
+  contain-intrinsic-size: 96px;
+}
+
+.performance-lite .release-onboarding-visual,
+.performance-lite .milestone-burst {
+  background-image: none !important;
+}
+
+@media (max-width: 360px) {
+  .hud-save-status {
+    max-width: 74px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .event-log > .journey-card {
+    margin-bottom: 10px;
+  }
+}

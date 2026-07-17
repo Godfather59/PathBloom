@@ -1,0 +1,199 @@
+/* Fixes captured during physical Android screenshot review. */
+
+/* CSS Grid line numbers follow the element's writing direction. Keep the
+   structural grid LTR so the explicit RTL column placement does not reverse
+   twice, while the card content itself remains naturally RTL. */
+.event-log[dir='rtl'] .timeline-event {
+  direction: ltr;
+}
+
+.event-log[dir='rtl'] .timeline-card {
+  direction: rtl;
+}
+
+/* Keep mixed Arabic labels and currency values isolated from each other. */
+.hud-container[dir='rtl'] .hud-finance-block,
+.hud-container[dir='rtl'] .hud-money,
+.hud-container[dir='rtl'] .hud-debt {
+  unicode-bidi: isolate;
+}
+
+.hud-container[dir='rtl'] .hud-money {
+  direction: ltr;
+}
+
+.hud-container[dir='rtl'] .hud-debt {
+  direction: rtl;
+}
+
+/* The center dock contains two different actions. Make the one-step action
+   and the automatic action visually independent instead of one combined pill. */
+.time-control-dock {
+  isolation: isolate;
+}
+
+/* The automatic control floats above the central one-step button. Reserve a
+   dedicated lane above the navigation so it never covers Career,
+   Relationships, Education, or Assets. */
+.bottom-navigation {
+  margin-top: 54px;
+}
+
+.time-primary-action {
+  width: 92px;
+  min-height: 74px;
+  bottom: 7px;
+}
+
+.time-primary-label {
+  max-width: 82px;
+  font-size: 0.72rem;
+  line-height: 1.1;
+}
+
+.time-primary-caption {
+  display: block;
+  max-width: 78px;
+  color: rgba(3, 19, 12, 0.72);
+  font-size: 0.54rem;
+  font-weight: 800;
+  line-height: 1.05;
+}
+
+.time-primary-action.is-monthly .time-primary-caption {
+  color: rgba(25, 16, 6, 0.72);
+}
+
+.time-smart-action {
+  top: -50px;
+  min-width: 142px;
+  min-height: 42px;
+  padding: 6px 10px;
+  border-radius: 14px;
+  color: var(--pb-text);
+  background: rgba(18, 38, 62, 0.99);
+  border-color: rgba(103, 169, 255, 0.34);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+}
+
+.time-smart-action > .app-icon {
+  color: var(--pb-blue);
+}
+
+.time-smart-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  text-align: start;
+}
+
+[dir='rtl'] .time-smart-copy {
+  align-items: flex-end;
+  text-align: end;
+}
+
+.time-smart-copy strong,
+.time-smart-copy small {
+  display: block;
+  white-space: nowrap;
+}
+
+.time-smart-copy strong {
+  color: var(--pb-text);
+  font-size: 0.64rem;
+  font-weight: 900;
+}
+
+.time-smart-copy small {
+  color: var(--pb-text-muted);
+  font-size: 0.52rem;
+  font-weight: 700;
+}
+
+/* Inactive destinations must still look tappable. The selected Life button
+   remains stronger, while Activities beside it no longer appears disabled. */
+.bottom-nav-item:not(.is-active) {
+  color: var(--pb-text-secondary);
+  background: rgba(204, 226, 255, 0.025);
+}
+
+.bottom-nav-item:not(.is-active) .bottom-nav-icon {
+  color: var(--pb-text-secondary);
+}
+
+.bottom-nav-item.is-active {
+  border: 1px solid rgba(57, 217, 138, 0.12);
+}
+
+/* The yellow numbered control is PathBloom's World News button. Hud.css used
+   a three-column mobile grid for four HUD sections, which forced this fourth
+   section into a new row at the top-left in RTL. Preserve four columns so the
+   control stays inside the identity row and below the safe area. */
+@media (max-width: 420px) {
+  .hud-identity-row {
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    gap: 6px;
+  }
+
+  .hud-top-btns {
+    grid-row: 1;
+    min-width: 34px;
+    align-self: center;
+    justify-self: end;
+  }
+
+  .news-btn {
+    width: 34px;
+    height: 34px;
+    min-height: 34px;
+  }
+
+  .news-btn-count {
+    inset-inline-end: -3px;
+    top: -4px;
+  }
+}
+
+@media (max-width: 360px) {
+  .event-log[dir='rtl'] {
+    padding-inline-start: 12px;
+    padding-inline-end: 11px;
+  }
+
+  .bottom-navigation {
+    margin-top: 50px;
+  }
+
+  .time-primary-action {
+    width: 82px;
+  }
+
+  .time-smart-action {
+    top: -46px;
+    min-width: 128px;
+    min-height: 39px;
+    padding-inline: 8px;
+  }
+
+  .time-smart-copy strong {
+    font-size: 0.59rem;
+  }
+
+  .time-smart-copy small {
+    font-size: 0.48rem;
+  }
+}
+
+@media (max-width: 340px) {
+  .hud-finance-block {
+    min-width: 58px;
+  }
+
+  .news-btn {
+    width: 32px;
+    height: 32px;
+    min-height: 32px;
+  }
+}

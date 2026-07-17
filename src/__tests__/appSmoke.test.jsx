@@ -57,9 +57,9 @@ describe('App save and continue smoke test', () => {
     });
 
     await act(async () => container.querySelector('.start-btn').click());
-    const confirmButton = findButton('Start Life');
-    expect(confirmButton).toBeDefined();
-    await act(async () => confirmButton.click());
+    const skipOnboardingButton = findButton('Skip');
+    expect(skipOnboardingButton).toBeDefined();
+    await act(async () => skipOnboardingButton.click());
 
     expect(container.querySelector('.hud-container')).not.toBeNull();
     await act(async () => container.querySelector('.hud-menu-fallback').click());

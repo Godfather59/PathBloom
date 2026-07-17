@@ -1,0 +1,178 @@
+.save-slot-release {
+  width: min(100%, 560px);
+  max-height: min(88dvh, 760px);
+  overflow: hidden;
+  color: var(--pb-text);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(57, 217, 138, 0.08), transparent 32%),
+    linear-gradient(180deg, #102139, #081421);
+}
+
+.save-slot-list {
+  display: grid;
+  gap: 10px;
+}
+
+.save-slot-card {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 18px;
+  background: rgba(204, 226, 255, 0.045);
+  border: 1px solid var(--pb-border);
+  cursor: pointer;
+}
+
+.save-slot-card:focus-visible,
+.save-slot-card:hover {
+  border-color: rgba(57, 217, 138, 0.35);
+  background: rgba(57, 217, 138, 0.065);
+}
+
+.save-slot-card-main {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 11px;
+}
+
+.save-slot-avatar {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  background: var(--pb-growth-soft);
+  font-size: 1.35rem;
+}
+
+.save-slot-copy {
+  min-width: 0;
+}
+
+.save-slot-copy > strong,
+.save-slot-copy > small,
+.save-slot-copy > span {
+  display: block;
+}
+
+.save-slot-copy > strong {
+  overflow: hidden;
+  color: var(--pb-text);
+  font-size: 0.92rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.save-slot-copy > small {
+  margin-top: 3px;
+  overflow: hidden;
+  color: var(--pb-text-secondary);
+  font-size: 0.69rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.save-slot-health {
+  width: fit-content;
+  margin-top: 6px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  font-size: 0.61rem;
+  font-weight: 800;
+}
+
+.save-slot-health.is-healthy {
+  color: var(--pb-growth);
+  background: rgba(57, 217, 138, 0.09);
+  border: 1px solid rgba(57, 217, 138, 0.16);
+}
+
+.save-slot-health.is-recovery {
+  color: var(--pb-warning);
+  background: rgba(255, 180, 94, 0.09);
+  border: 1px solid rgba(255, 180, 94, 0.18);
+}
+
+.save-slot-date {
+  color: var(--pb-text-muted);
+  font-size: 0.63rem;
+  white-space: nowrap;
+}
+
+.save-slot-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.save-slot-actions button {
+  min-height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 850;
+}
+
+.save-slot-load {
+  color: #06170f;
+  background: var(--pb-growth);
+}
+
+.save-slot-delete {
+  min-width: 76px;
+  color: var(--pb-danger);
+  background: rgba(255, 107, 122, 0.07);
+  border: 1px solid rgba(255, 107, 122, 0.17);
+}
+
+.save-slot-new {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--pb-border);
+}
+
+.save-slot-new button {
+  width: 100%;
+}
+
+.save-slot-empty {
+  min-height: 210px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  padding: 28px;
+  color: var(--pb-text-secondary);
+  text-align: center;
+}
+
+.save-slot-empty > span {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border-radius: 20px;
+  background: var(--pb-growth-soft);
+  font-size: 1.7rem;
+}
+
+.save-slot-empty > strong {
+  color: var(--pb-text);
+}
+
+.save-slot-empty > small {
+  max-width: 330px;
+  line-height: 1.5;
+}
+
+@media (max-width: 380px) {
+  .save-slot-date {
+    display: none;
+  }
+
+  .save-slot-card-main {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+}

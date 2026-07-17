@@ -1,7 +1,9 @@
-// Theme definitions with CSS variable mappings
-export const THEMES = {
+// PathBloom intentionally keeps a focused two-theme system. Older theme IDs
+// are migrated so existing players never boot into an unsupported appearance.
+export const THEMES = Object.freeze({
   dark: {
     name: 'Dark Mode',
+    nameAr: 'الوضع الداكن',
     icon: '🌙',
     colors: {
       '--bg-deep': '#0a0a12',
@@ -10,174 +12,96 @@ export const THEMES = {
       '--panel-bg': 'rgba(30, 30, 46, 0.96)',
       '--glass-bg': 'rgba(255, 255, 255, 0.06)',
       '--glass-border': 'rgba(255, 255, 255, 0.08)',
-      '--accent-primary': '#7000ff',
-      '--accent-secondary': '#ae00ff',
-      '--accent-gradient': 'linear-gradient(135deg, #7000ff, #ae00ff)',
-      '--success-color': '#00e676',
-      '--success-gradient': 'linear-gradient(135deg, #00e676, #00b09b)',
-      '--danger-color': '#ff1744',
-      '--danger-gradient': 'linear-gradient(135deg, #ff1744, #ff5252)',
+      '--accent-primary': '#39d98a',
+      '--accent-secondary': '#67a9ff',
+      '--accent-gradient': 'linear-gradient(135deg, #39d98a, #67a9ff)',
+      '--success-color': '#39d98a',
+      '--success-gradient': 'linear-gradient(135deg, #39d98a, #00b09b)',
+      '--danger-color': '#ff6b7a',
+      '--danger-gradient': 'linear-gradient(135deg, #ff6b7a, #ff5252)',
       '--text-primary': '#ffffff',
-      '--text-secondary': '#a0a0b0',
-      '--text-muted': '#666677',
+      '--text-secondary': '#b9c8dc',
+      '--text-muted': '#708197',
       '--shadow-sm': '0 2px 8px rgba(0, 0, 0, 0.2)',
       '--shadow-lg': '0 10px 30px rgba(0, 0, 0, 0.4)',
     },
   },
   light: {
-    name: 'Light Mode',
+    name: 'Clear Mode',
+    nameAr: 'الوضع الفاتح',
     icon: '☀️',
     colors: {
-      '--bg-deep': '#f0f2f5',
+      '--bg-deep': '#eef2f5',
       '--bg-surface': '#ffffff',
-      '--bg-gradient': 'linear-gradient(135deg, #e0e0e0, #f5f5f5, #ffffff)',
-      '--panel-bg': 'rgba(255, 255, 255, 0.97)',
-      '--glass-bg': 'rgba(0, 0, 0, 0.05)',
-      '--glass-border': 'rgba(0, 0, 0, 0.1)',
-      '--accent-primary': '#1e88e5',
-      '--accent-secondary': '#42a5f5',
-      '--accent-gradient': 'linear-gradient(135deg, #1e88e5, #42a5f5)',
-      '--success-color': '#2e7d32',
-      '--success-gradient': 'linear-gradient(135deg, #2e7d32, #43a047)',
-      '--danger-color': '#d32f2f',
-      '--danger-gradient': 'linear-gradient(135deg, #d32f2f, #e53935)',
-      '--text-primary': '#1a1a1a',
-      '--text-secondary': '#4a4a4a',
-      '--text-muted': '#7a7a7a',
-      '--shadow-sm': '0 2px 8px rgba(0, 0, 0, 0.1)',
-      '--shadow-lg': '0 10px 30px rgba(0, 0, 0, 0.15)',
+      '--bg-gradient': 'linear-gradient(135deg, #eef2f5, #f8fafc, #ffffff)',
+      '--panel-bg': 'rgba(255, 255, 255, 0.98)',
+      '--glass-bg': 'rgba(20, 32, 51, 0.05)',
+      '--glass-border': 'rgba(24, 43, 64, 0.13)',
+      '--accent-primary': '#128454',
+      '--accent-secondary': '#276db8',
+      '--accent-gradient': 'linear-gradient(135deg, #128454, #276db8)',
+      '--success-color': '#128454',
+      '--success-gradient': 'linear-gradient(135deg, #128454, #2e9f69)',
+      '--danger-color': '#c52f47',
+      '--danger-gradient': 'linear-gradient(135deg, #c52f47, #dc4a5f)',
+      '--text-primary': '#142033',
+      '--text-secondary': '#45566c',
+      '--text-muted': '#718096',
+      '--shadow-sm': '0 2px 8px rgba(22, 38, 56, 0.08)',
+      '--shadow-lg': '0 10px 30px rgba(22, 38, 56, 0.14)',
     },
   },
-  sepia: {
-    name: 'Sepia',
-    icon: '🟫',
-    colors: {
-      '--bg-deep': '#f4ebd9',
-      '--bg-surface': '#faf3e0',
-      '--bg-gradient': 'linear-gradient(135deg, #e8dcc8, #f4ebd9, #faf3e0)',
-      '--panel-bg': 'rgba(250, 243, 224, 0.97)',
-      '--glass-bg': 'rgba(0, 0, 0, 0.04)',
-      '--glass-border': 'rgba(0, 0, 0, 0.08)',
-      '--accent-primary': '#8b5e3c',
-      '--accent-secondary': '#a67c52',
-      '--accent-gradient': 'linear-gradient(135deg, #8b5e3c, #a67c52)',
-      '--success-color': '#5b8c3a',
-      '--success-gradient': 'linear-gradient(135deg, #5b8c3a, #7cb342)',
-      '--danger-color': '#b71c1c',
-      '--danger-gradient': 'linear-gradient(135deg, #b71c1c, #d32f2f)',
-      '--text-primary': '#2c1810',
-      '--text-secondary': '#5c4033',
-      '--text-muted': '#8d6e63',
-      '--shadow-sm': '0 2px 8px rgba(0, 0, 0, 0.08)',
-      '--shadow-lg': '0 10px 30px rgba(0, 0, 0, 0.12)',
-    },
-  },
-  forest: {
-    name: 'Forest',
-    icon: '🌲',
-    colors: {
-      '--bg-deep': '#0d1f12',
-      '--bg-surface': '#1a3324',
-      '--bg-gradient': 'linear-gradient(135deg, #0d1f12, #1a3324, #2d4a36)',
-      '--panel-bg': 'rgba(26, 51, 36, 0.97)',
-      '--glass-bg': 'rgba(255, 255, 255, 0.05)',
-      '--glass-border': 'rgba(255, 255, 255, 0.07)',
-      '--accent-primary': '#4caf50',
-      '--accent-secondary': '#66bb6a',
-      '--accent-gradient': 'linear-gradient(135deg, #4caf50, #66bb6a)',
-      '--success-color': '#00e676',
-      '--success-gradient': 'linear-gradient(135deg, #00e676, #00b09b)',
-      '--danger-color': '#ef5350',
-      '--danger-gradient': 'linear-gradient(135deg, #ef5350, #e53935)',
-      '--text-primary': '#e8f5e9',
-      '--text-secondary': '#a5d6a7',
-      '--text-muted': '#6a8f6a',
-      '--shadow-sm': '0 2px 8px rgba(0, 0, 0, 0.3)',
-      '--shadow-lg': '0 10px 30px rgba(0, 0, 0, 0.5)',
-    },
-  },
-  ocean: {
-    name: 'Ocean',
-    icon: '🌊',
-    colors: {
-      '--bg-deep': '#0a1628',
-      '--bg-surface': '#0f2040',
-      '--bg-gradient': 'linear-gradient(135deg, #0a1628, #0f2040, #162d50)',
-      '--panel-bg': 'rgba(15, 32, 64, 0.97)',
-      '--glass-bg': 'rgba(255, 255, 255, 0.05)',
-      '--glass-border': 'rgba(255, 255, 255, 0.07)',
-      '--accent-primary': '#2196f3',
-      '--accent-secondary': '#42a5f5',
-      '--accent-gradient': 'linear-gradient(135deg, #2196f3, #42a5f5)',
-      '--success-color': '#00e676',
-      '--success-gradient': 'linear-gradient(135deg, #00e676, #00b09b)',
-      '--danger-color': '#ff1744',
-      '--danger-gradient': 'linear-gradient(135deg, #ff1744, #ff5252)',
-      '--text-primary': '#e3f2fd',
-      '--text-secondary': '#90caf9',
-      '--text-muted': '#5c7999',
-      '--shadow-sm': '0 2px 8px rgba(0, 0, 0, 0.3)',
-      '--shadow-lg': '0 10px 30px rgba(0, 0, 0, 0.5)',
-    },
-  },
-  midnight: {
-    name: 'Midnight',
-    icon: '🌃',
-    colors: {
-      '--bg-deep': '#050510',
-      '--bg-surface': '#0d0d1a',
-      '--bg-gradient': 'linear-gradient(135deg, #050510, #0d0d1a, #1a1a2e)',
-      '--panel-bg': 'rgba(13, 13, 26, 0.97)',
-      '--glass-bg': 'rgba(255, 255, 255, 0.04)',
-      '--glass-border': 'rgba(255, 255, 255, 0.06)',
-      '--accent-primary': '#e040fb',
-      '--accent-secondary': '#7c4dff',
-      '--accent-gradient': 'linear-gradient(135deg, #e040fb, #7c4dff)',
-      '--success-color': '#00e676',
-      '--success-gradient': 'linear-gradient(135deg, #00e676, #00b09b)',
-      '--danger-color': '#ff1744',
-      '--danger-gradient': 'linear-gradient(135deg, #ff1744, #ff5252)',
-      '--text-primary': '#ffffff',
-      '--text-secondary': '#b388ff',
-      '--text-muted': '#555577',
-      '--shadow-sm': '0 2px 8px rgba(0, 0, 0, 0.4)',
-      '--shadow-lg': '0 10px 30px rgba(0, 0, 0, 0.6)',
-    },
-  },
-};
+});
+
+const LEGACY_THEME_MAP = Object.freeze({
+  sepia: 'light',
+  forest: 'dark',
+  ocean: 'dark',
+  midnight: 'dark',
+});
+
+export function normalizeTheme(themeName) {
+  const requested = String(themeName || '').toLowerCase();
+  if (Object.hasOwn(THEMES, requested)) {
+    return requested;
+  }
+  return LEGACY_THEME_MAP[requested] || 'dark';
+}
 
 export function applyTheme(themeName) {
-  const theme = THEMES[themeName] || THEMES.dark;
+  const resolvedName = normalizeTheme(themeName);
+  const theme = THEMES[resolvedName];
   const root = document.documentElement;
-  const resolvedName = THEMES[themeName] ? themeName : 'dark';
 
   root.dataset.theme = resolvedName;
-  root.style.colorScheme = resolvedName === 'light' || resolvedName === 'sepia' ? 'light' : 'dark';
+  root.style.colorScheme = resolvedName === 'light' ? 'light' : 'dark';
 
   Object.entries(theme.colors).forEach(([property, value]) => {
     root.style.setProperty(property, value);
   });
 
-  // Save preference
   try {
     localStorage.setItem('bitlife_theme', resolvedName);
   } catch {
     /* storage is optional */
   }
+
+  return resolvedName;
 }
 
 export function getStoredTheme() {
   try {
     const stored = localStorage.getItem('bitlife_theme');
-    return stored && THEMES[stored] ? stored : 'dark';
+    const resolved = normalizeTheme(stored);
+    if (stored && stored !== resolved) {
+      localStorage.setItem('bitlife_theme', resolved);
+    }
+    return resolved;
   } catch {
     return 'dark';
   }
 }
 
 export function getThemesList() {
-  return Object.keys(THEMES).map(key => ({
-    id: key,
-    ...THEMES[key],
-  }));
+  return Object.entries(THEMES).map(([id, theme]) => ({ id, ...theme }));
 }

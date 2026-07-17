@@ -14,7 +14,7 @@ import {
 const render = component => renderToStaticMarkup(component);
 
 describe('Arabic screenshot regressions', () => {
-  it('clearly separates one-year progression from automatic five-year progression', () => {
+  it('keeps one-year progression primary and hides automatic progression behind more controls', () => {
     const html = render(
       <BottomNavigation
         language="ar"
@@ -28,11 +28,12 @@ describe('Arabic screenshot regressions', () => {
     );
 
     expect(html).toContain('سنة واحدة');
-    expect(html).toContain('خطوة واحدة');
-    expect(html).toContain('تلقائي: 5 سنوات');
-    expect(html).toContain('يتوقف عند ظهور قرار');
+    expect(html).toContain('المزيد من أدوات الوقت');
+    expect(html).toContain('ذكي +5');
+    expect(html).not.toContain('تلقائي: 5 سنوات');
+    expect(html).not.toContain('يتوقف عند ظهور قرار');
     expect(html).toContain('الأنشطة');
-    expect(html).not.toContain('ذكي +5');
+    expect((html.match(/time-primary-action/g) || []).length).toBe(1);
   });
 
   it('translates the exact mixed Arabic relationship event from the phone screenshot', () => {
@@ -58,12 +59,12 @@ describe('Arabic screenshot regressions', () => {
 
   it('keeps Activities visibly tappable beside the selected Life destination', () => {
     const css = fs.readFileSync(
-      path.join(process.cwd(), 'src', 'components', 'ScreenshotRegressionFixes.css'),
+      path.join(process.cwd(), 'src', 'components', 'ShellRefresh.css'),
       'utf8'
     );
 
-    expect(css).toContain('.bottom-nav-item:not(.is-active)');
-    expect(css).toContain('.time-primary-caption');
-    expect(css).toContain('.time-smart-copy');
+    expect(css).toContain('.bottom-nav-item');
+    expect(css).toContain('.time-primary-action');
+    expect(css).toContain('.time-more-action');
   });
 });

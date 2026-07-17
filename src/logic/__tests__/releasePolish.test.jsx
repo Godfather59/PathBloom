@@ -3,6 +3,7 @@
 import React from 'react';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
+import { Person } from '../Person';
 import {
   checksumText,
   deleteSaveTransaction,
@@ -136,6 +137,25 @@ describe('guided starter journey', () => {
     const view = getJourneyView(person, 'ar');
     expect(view.title).toBe('اتخذ خطوتك الأولى');
     expect(view.cta).toBe('تقدم سنة');
+  });
+
+  it('keeps journey progress independent when a person is cloned', () => {
+    const person = new Person('Clone', 'Journey');
+    ensurePlayerJourney(person, { newLife: true });
+    recordJourneyAction(person, 'open_activities');
+    person.playerJourney.completedGoalIds.push('first_step');
+    person.playerJourney.completedAt.first_step = { age: 1, at: 100 };
+
+    const cloned = person.clone();
+    ensurePlayerJourney(person);
+    ensurePlayerJourney(cloned);
+    recordJourneyAction(cloned, 'open_activities');
+    cloned.playerJourney.completedGoalIds.push('explore_activities');
+    cloned.playerJourney.completedAt.first_step.age = 2;
+
+    expect(person.playerJourney.actions.open_activities).toBe(1);
+    expect(person.playerJourney.completedGoalIds).toEqual(['first_step']);
+    expect(person.playerJourney.completedAt.first_step.age).toBe(1);
   });
 
   it('renders the active journey card only when guidance is enabled', () => {

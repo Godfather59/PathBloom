@@ -133,8 +133,10 @@ export function processPersonalFinanceYear(person) {
     person.personalDebt += collectionInterest;
   }
 
-  const totalShortfall = childSupportResult.shortfall + Math.max(0, collectionInterest);
-  updateCreditScore(person, finance, { shortfall: totalShortfall });
+  // Accrued interest increases the balance, but it is not itself a missed payment.
+  // Only an obligation that actually went unpaid should enter collections and
+  // damage payment history.
+  updateCreditScore(person, finance, { shortfall: childSupportResult.shortfall });
 
   const annualIncome = Math.max(0, Number(person.job?.salary) || 0);
   const discretionary = Math.max(0, annualIncome - livingCost - childSupport - collectionInterest);

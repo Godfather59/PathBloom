@@ -66,6 +66,21 @@ describe('deep simulation systems', () => {
     expect(person.finance.lastBudget.income).toBe(50000);
   });
 
+  it('does not report accrued debt interest as a missed payment', () => {
+    const person = new Person('Finance', 'History', 'Female', 'United States');
+    person.age = 30;
+    person.job = { title: 'Teacher', salary: 50000 };
+    person.personalDebt = 10000;
+    ensurePersonalFinance(person);
+
+    processPersonalFinanceYear(person);
+
+    expect(person.personalDebt).toBeGreaterThan(10000);
+    expect(person.finance.missedPayments).toBe(0);
+    expect(person.finance.collectionsBalance).toBe(0);
+    expect(person.finance.onTimePayments).toBe(1);
+  });
+
   it('records NPC memories and allows autonomous relationship consequences', () => {
     const person = new Person('Memory', 'Tester');
     person.age = 35;
@@ -105,6 +120,27 @@ describe('deep simulation systems', () => {
     resolveMonthlySituationChoice(person, person.pendingEvent, prenatal);
     expect(person.pregnancy.prenatalCare).toBe(1);
     expect(person.money).toBe(4700);
+  });
+
+  it('pays pregnancy work income exactly once', () => {
+    const person = new Person('Pregnancy', 'Worker', 'Female');
+    person.age = 28;
+    person.money = 5000;
+    beginPregnancy(person, {
+      id: 'future-child',
+      name: 'Sam',
+      type: 'Child',
+      age: 0,
+      gender: 'female',
+      traits: [],
+    });
+    person.pregnancy.month = 2;
+    processMonthlySituation(person);
+
+    const work = person.pendingEvent.choices.find(choice => choice.effect === 'pregnancy_work');
+    resolveMonthlySituationChoice(person, person.pendingEvent, work);
+
+    expect(person.money).toBe(5250);
   });
 
   it('builds identity from actions across several reputation domains', () => {

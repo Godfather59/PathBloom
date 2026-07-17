@@ -1364,7 +1364,8 @@ export class Person {
         this.updateStats({ fame: 5, stress: 10 });
       } else if (choice.effect === 'war_refugee') {
         this.logEvent('You fled the war-torn country as a refugee.', 'bad');
-        this.updateStats({ stress: 20, happiness: -15, money: Math.min(0, this.money - 5000) });
+        const evacuationCost = Math.min(5000, Math.max(0, Number(this.money) || 0));
+        this.updateStats({ stress: 20, happiness: -15, money: -evacuationCost });
         this.country = 'Refugee';
       } else if (choice.effect === 'war_help_refugees') {
         this.logEvent('You volunteered to help refugees displaced by the war.', 'good');

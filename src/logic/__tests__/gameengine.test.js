@@ -221,4 +221,21 @@ describe('GameEngine', () => {
     expect(processAssets).not.toHaveBeenCalled();
     expect(person.pendingEvent).toBeNull();
   });
+
+  it('charges the refugee escape cost without creating or adding negative cash', () => {
+    const person = new Person('Kai', 'Refugee', 'Male', 'Canada');
+    person.age = 30;
+    person.money = 10000;
+    person.pendingEvent = {
+      type: 'war_reaction',
+      text: 'War reached your home.',
+      choices: [{ text: 'Flee', effect: 'war_refugee' }],
+    };
+
+    person.resolveEvent(person.pendingEvent.choices[0]);
+
+    expect(person.money).toBe(5000);
+    expect(person.country).toBe('Refugee');
+    expect(person.pendingEvent).toBeNull();
+  });
 });

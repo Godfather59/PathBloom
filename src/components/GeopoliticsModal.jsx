@@ -164,7 +164,7 @@ export function GeopoliticsModal({
       if (!p.policies) {
         p.policies = { taxRate: 30, militarySpending: 30, diplomacyBudget: 30, socialSpending: 30 };
       }
-      p.policies[key] = Math.max(0, Math.min(100, (p.policies[key] || 30) + delta));
+      p.policies[key] = Math.max(0, Math.min(100, (p.policies[key] ?? 30) + delta));
     });
   };
 

@@ -62,7 +62,7 @@ export function calculateUNInfluence(person) {
   if (SECURITY_COUNCIL.includes(myCountry.id)) {
     influence += 20;
   }
-  influence += Math.floor((person.policies?.diplomacyBudget || 30) / 5);
+  influence += Math.floor((person.policies?.diplomacyBudget ?? 30) / 5);
   const stateMember = person.cabinet?.state;
   if (stateMember) {
     influence += Math.floor(stateMember.effectiveness / 5);
@@ -135,7 +135,7 @@ export function proposeResolution(person, targetId, resolutionId) {
     let supportModifier = (influence - 30) / 15;
 
     if (SECURITY_COUNCIL.includes(c.id) && c.name !== person.country) {
-      const councilRel = rel?.relation || 50;
+      const councilRel = rel?.relation ?? 50;
       if (councilRel < 30) {
         vetoed = true;
       }
@@ -186,32 +186,37 @@ export function proposeResolution(person, targetId, resolutionId) {
   }
   person.unResolutions.push(resolutionEntry);
 
-  const rel = person.countryRelations?.[targetId];
-  if (rel && resolution.effect.relationDelta) {
-    rel.relation = Math.max(
-      0,
-      Math.min(100, (rel.relation || 50) + resolution.effect.relationDelta)
-    );
-  }
-  if (rel && resolution.effect.tensionDelta) {
-    rel.tension = Math.max(0, Math.min(100, (rel.tension || 0) + resolution.effect.tensionDelta));
-  }
-  if (rel && resolution.effect.tradeLevel) {
-    rel.tradeLevel = Math.max(0, Math.min(3, (rel.tradeLevel || 0) + resolution.effect.tradeLevel));
-  }
+  if (passed) {
+    const rel = person.countryRelations?.[targetId];
+    if (rel && resolution.effect.relationDelta) {
+      rel.relation = Math.max(
+        0,
+        Math.min(100, (rel.relation ?? 50) + resolution.effect.relationDelta)
+      );
+    }
+    if (rel && resolution.effect.tensionDelta) {
+      rel.tension = Math.max(0, Math.min(100, (rel.tension ?? 0) + resolution.effect.tensionDelta));
+    }
+    if (rel && resolution.effect.tradeLevel) {
+      rel.tradeLevel = Math.max(
+        0,
+        Math.min(3, (rel.tradeLevel ?? 0) + resolution.effect.tradeLevel)
+      );
+    }
 
-  if (resolution.effect.relationToAll) {
-    Object.keys(person.countryRelations || {}).forEach(cId => {
-      if (cId !== targetId) {
-        person.countryRelations[cId].relation = Math.max(
-          0,
-          Math.min(
-            100,
-            (person.countryRelations[cId].relation || 50) + resolution.effect.relationToAll
-          )
-        );
-      }
-    });
+    if (resolution.effect.relationToAll) {
+      Object.keys(person.countryRelations || {}).forEach(cId => {
+        if (cId !== targetId) {
+          person.countryRelations[cId].relation = Math.max(
+            0,
+            Math.min(
+              100,
+              (person.countryRelations[cId].relation ?? 50) + resolution.effect.relationToAll
+            )
+          );
+        }
+      });
+    }
   }
 
   let message;
@@ -222,7 +227,7 @@ export function proposeResolution(person, targetId, resolutionId) {
     message = `✅ UN Resolution to ${resolution.name} against ${target.name} PASSED (${Math.round(pctFor)}% for).`;
     person.logEvent(`[UN] ${message}`, 'good');
     if (person.job) {
-      person.job.approval = Math.min(100, (person.job.approval || 50) + 3);
+      person.job.approval = Math.min(100, (person.job.approval ?? 50) + 3);
     }
   } else {
     message = `❌ UN Resolution to ${resolution.name} against ${target.name} FAILED (${Math.round(pctFor)}% for).`;

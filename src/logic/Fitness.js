@@ -94,17 +94,18 @@ export function processFitness(person) {
     }
   }
 
+  const exerciseSessions = Math.max(
+    0,
+    Math.min(7, Math.floor(Number(person.fitness.exerciseDays) || 0))
+  );
   person.fitness.weight = Math.max(
     80,
-    Math.min(
-      400,
-      person.fitness.weight + diet.weightMod * 0.5 + (person.fitness.exerciseDays > 0 ? -1 : 1)
-    )
+    Math.min(400, person.fitness.weight + diet.weightMod * 0.5 + (exerciseSessions > 0 ? 0 : 1))
   );
 
-  if (person.fitness.exerciseDays > 0) {
-    person.fitness.exerciseDays = Math.max(0, person.fitness.exerciseDays - 1);
-  }
+  // Sessions describe activity during the current simulated year. Carrying them
+  // into later years granted exercise benefits without any new player action.
+  person.fitness.exerciseDays = 0;
 
   if (person.fitness.muscleMass === undefined) {
     person.fitness.muscleMass = 30;
@@ -114,6 +115,10 @@ export function processFitness(person) {
   }
   person.fitness.muscleMass = Math.max(5, Math.min(60, person.fitness.muscleMass - 0.5));
   person.fitness.bodyFat = Math.max(5, Math.min(50, person.fitness.bodyFat + 0.3));
+
+  if (diet.healthMod || diet.looksMod) {
+    person.updateStats({ health: diet.healthMod || 0, looks: diet.looksMod || 0 });
+  }
 
   const bmi = getBMI(person);
   const category = getBMICategory(bmi);

@@ -164,6 +164,19 @@ describe('long-running financial systems', () => {
     expect(person.money).toBe(3800);
   });
 
+  it('applies diet benefits and does not carry exercise sessions into later years', () => {
+    const person = makePerson({
+      money: 5000,
+      fitness: { weight: 150, diet: 'vegan', exerciseDays: 3, muscleMass: 30, bodyFat: 20 },
+    });
+
+    processFitness(person);
+
+    expect(person.fitness.exerciseDays).toBe(0);
+    expect(person.fitness.weight).toBe(148.5);
+    expect(person.updateStats).toHaveBeenCalledWith({ health: 3, looks: 2 });
+  });
+
   it('does not charge for a diet until its annual simulation', () => {
     const person = makePerson({
       money: 1000,

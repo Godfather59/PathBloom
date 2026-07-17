@@ -253,12 +253,22 @@ export function ensurePlayerJourney(person, options = {}) {
     version: JOURNEY_VERSION,
     guidedEnabled: options.newLife ? true : Boolean(existing.guidedEnabled),
     tipsEnabled: existing.tipsEnabled !== false,
-    completedGoalIds: Array.isArray(existing.completedGoalIds) ? existing.completedGoalIds : [],
-    rewardedGoalIds: Array.isArray(existing.rewardedGoalIds) ? existing.rewardedGoalIds : [],
-    seenUnlockIds: Array.isArray(existing.seenUnlockIds) ? existing.seenUnlockIds : [],
-    actions: existing.actions && typeof existing.actions === 'object' ? existing.actions : {},
+    completedGoalIds: Array.isArray(existing.completedGoalIds)
+      ? [...existing.completedGoalIds]
+      : [],
+    rewardedGoalIds: Array.isArray(existing.rewardedGoalIds) ? [...existing.rewardedGoalIds] : [],
+    seenUnlockIds: Array.isArray(existing.seenUnlockIds) ? [...existing.seenUnlockIds] : [],
+    actions:
+      existing.actions && typeof existing.actions === 'object' ? { ...existing.actions } : {},
     completedAt:
-      existing.completedAt && typeof existing.completedAt === 'object' ? existing.completedAt : {},
+      existing.completedAt && typeof existing.completedAt === 'object'
+        ? Object.fromEntries(
+            Object.entries(existing.completedAt).map(([id, value]) => [
+              id,
+              value && typeof value === 'object' ? { ...value } : value,
+            ])
+          )
+        : {},
     lastActiveAt: existing.lastActiveAt || Date.now(),
   };
   return person.playerJourney;

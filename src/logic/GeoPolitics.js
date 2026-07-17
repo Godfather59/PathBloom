@@ -301,6 +301,9 @@ export function executeDiplomaticAction(person, targetCountryId, actionId) {
   if (!target) {
     return { success: false, message: 'Country not found.' };
   }
+  if (target.name === person.country) {
+    return { success: false, message: 'You cannot target your own country.' };
+  }
 
   if (!person.countryRelations || !person.countryRelations[targetCountryId]) {
     return { success: false, message: 'No relations data for this country.' };
@@ -368,24 +371,31 @@ export function executeDiplomaticAction(person, targetCountryId, actionId) {
   }
 
   if (actionId === 'declare_war') {
-    const myCountry = getCountryByName(person.country);
-    if (myCountry) {
-      const myRel = person.countryRelations[targetCountryId];
-      myRel.atWar = true;
-      myRel.tension = 100;
-      myRel.relation = Math.max(0, myRel.relation - 50);
-      person.logEvent(
-        `WAR DECLARED! You have declared war on ${target.name}. The world watches with concern.`,
-        'bad'
-      );
-      if (person.job) {
-        person.job.approval = Math.max(0, (person.job.approval || 50) + 5);
-      }
+    person.wars ??= {};
+    person.wars[targetCountryId] ??= {
+      targetId: targetCountryId,
+      targetName: target.name,
+      years: 0,
+      casualties: 0,
+      territoryGained: 0,
+      phase: 'invasion',
+      battles: [],
+      pendingEvent: null,
+    };
+    person.logEvent(
+      `WAR DECLARED! You have declared war on ${target.name}. The world watches with concern.`,
+      'bad'
+    );
+    if (person.job) {
+      person.job.approval = Math.max(0, (person.job.approval ?? 50) + 5);
     }
   } else if (actionId === 'peace_treaty') {
+    if (person.wars) {
+      delete person.wars[targetCountryId];
+    }
     person.logEvent(`PEACE! A peace treaty with ${target.name} has been signed.`, 'good');
     if (person.job) {
-      person.job.approval = Math.min(100, (person.job.approval || 50) + 10);
+      person.job.approval = Math.min(100, (person.job.approval ?? 50) + 10);
     }
   } else if (actionId === 'form_alliance') {
     person.logEvent(
@@ -581,7 +591,7 @@ export function processGeopoliticsYear(person) {
     }
     rel.relation = Math.max(
       0,
-      Math.min(100, (rel.relation || 50) + Math.floor(Math.random() * 5) - 2)
+      Math.min(100, (rel.relation ?? 50) + Math.floor(Math.random() * 5) - 2)
     );
     rel.tension = Math.max(
       0,
@@ -597,9 +607,9 @@ export function processGeopoliticsYear(person) {
     const member = person.cabinet?.[pos.id];
     if (member) {
       member.yearsServed = (member.yearsServed || 0) + 1;
-      member.loyalty = Math.min(100, (member.loyalty || 50) + Math.floor(Math.random() * 3) - 1);
+      member.loyalty = Math.min(100, (member.loyalty ?? 50) + Math.floor(Math.random() * 3) - 1);
       const effChange = Math.floor(Math.random() * 5) - 2;
-      member.effectiveness = Math.max(10, Math.min(100, (member.effectiveness || 30) + effChange));
+      member.effectiveness = Math.max(10, Math.min(100, (member.effectiveness ?? 30) + effChange));
     }
   });
 
@@ -658,7 +668,7 @@ export function resolveGeopoliticalEvent(person, choiceIndex) {
   if (choice.effects.approval && person.job) {
     person.job.approval = Math.max(
       0,
-      Math.min(100, (person.job.approval || 50) + choice.effects.approval)
+      Math.min(100, (person.job.approval ?? 50) + choice.effects.approval)
     );
   }
   if (choice.effects.fame) {
@@ -695,7 +705,7 @@ export function updatePolicies(person) {
   if (economyImpact > 0) {
     person.logEvent(`Sound economic policies are paying off. The economy is thriving.`, 'good');
     if (person.job) {
-      person.job.approval = Math.min(100, (person.job.approval || 50) + 2);
+      person.job.approval = Math.min(100, (person.job.approval ?? 50) + 2);
     }
   } else if (economyImpact < -5) {
     person.logEvent(
@@ -703,7 +713,7 @@ export function updatePolicies(person) {
       'bad'
     );
     if (person.job) {
-      person.job.approval = Math.max(0, (person.job.approval || 50) - 3);
+      person.job.approval = Math.max(0, (person.job.approval ?? 50) - 3);
     }
   }
 

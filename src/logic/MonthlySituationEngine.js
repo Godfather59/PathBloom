@@ -394,7 +394,6 @@ export function resolveMonthlySituationChoice(person, event, choice) {
   } else if (choice.effect === 'pregnancy_rest' && person.pregnancy) {
     person.pregnancy.health = clamp((person.pregnancy.health || 80) + 3);
   } else if (choice.effect === 'pregnancy_work' && person.pregnancy) {
-    person.money = (Number(person.money) || 0) + 250;
     person.pregnancy.health = clamp((person.pregnancy.health || 80) - 2);
   } else if (choice.effect === 'campaign_positive') {
     person.monthlySituations.campaign.polling = clamp(

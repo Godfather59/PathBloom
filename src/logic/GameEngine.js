@@ -43,7 +43,7 @@ import {
 import { CITIES, getCityByName } from './City';
 import { buildWorldState, simulateWorldYear } from './WorldSimulation';
 import { initializeGeopolitics, getCountryByName } from './GeoPolitics';
-import { startWar, processWarYears } from './WarSystem';
+import { getWarOpponentId, startWar, processWarYears } from './WarSystem';
 import {
   proposeResolution,
   SECURITY_COUNCIL,
@@ -578,8 +578,9 @@ export class GameEngine {
 
           if (item.action === 'declare_war') {
             const myCountryId = getCountryByName(person.country)?.id;
-            if (myCountryId && (item.country === myCountryId || item.targetId === myCountryId)) {
-              const warResult = startWar(person, item.targetId);
+            const opponentId = getWarOpponentId(myCountryId, item);
+            if (opponentId) {
+              const warResult = startWar(person, opponentId);
               if (warResult.success) {
                 person.logEvent(warResult.message, 'bad');
                 person._breakingNews = person._breakingNews || [];
@@ -601,7 +602,7 @@ export class GameEngine {
               person.countryRelations[targetId].alliance = 'ally';
               person.countryRelations[targetId].relation = Math.min(
                 100,
-                (person.countryRelations[targetId].relation || 50) + 30
+                (person.countryRelations[targetId].relation ?? 50) + 30
               );
               person.countryRelations[targetId].tension = Math.max(
                 0,
@@ -665,7 +666,7 @@ export class GameEngine {
 
     // Pick a random country with poor relations to target
     const targets = Object.entries(person.countryRelations)
-      .filter(([id, rel]) => rel && (rel.relation || 50) < 40 && id !== myCountry.id)
+      .filter(([id, rel]) => rel && (rel.relation ?? 50) < 40 && id !== myCountry.id)
       .map(([id]) => id);
 
     if (targets.length === 0) {

@@ -1,14 +1,27 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { afterEach, describe, it, expect, beforeEach, vi } from 'vitest';
 import { Person } from '../Person';
-import { startWar, processWarYears, getMilitaryStrength, getWarExhaustion } from '../WarSystem';
+import {
+  getWarOpponentId,
+  startWar,
+  processWarYears,
+  getMilitaryStrength,
+  getWarExhaustion,
+} from '../WarSystem';
 import {
   calculateUNInfluence,
   canProposeResolution,
   proposeResolution,
   RESOLUTION_TYPES,
 } from '../UnitedNations';
-import { getBaseCountries, getCountryByName, initializeGeopolitics } from '../GeoPolitics';
+import {
+  executeDiplomaticAction,
+  getBaseCountries,
+  getCountryByName,
+  initializeGeopolitics,
+} from '../GeoPolitics';
 import { buildWorldState, simulateWorldYear, getGlobalStats } from '../WorldSimulation';
+
+afterEach(() => vi.restoreAllMocks());
 
 describe('WarSystem', () => {
   let person;
@@ -34,10 +47,26 @@ describe('WarSystem', () => {
     expect(person.wars[target.id].years).toBe(0);
   });
 
-  it('startWar does not block self-war (no self-check in WarSystem)', () => {
+  it('blocks a country from going to war with itself', () => {
     const target = getCountryByName('United States');
     const result = startWar(person, target.id);
-    expect(result.success).toBe(true);
+    expect(result.success).toBe(false);
+    expect(person.wars?.[target.id]).toBeUndefined();
+  });
+
+  it('does not reset an existing war when war initialization repeats', () => {
+    const target = getCountryByName('China');
+    expect(startWar(person, target.id).success).toBe(true);
+    person.wars[target.id].years = 4;
+
+    expect(startWar(person, target.id).success).toBe(false);
+    expect(person.wars[target.id].years).toBe(4);
+  });
+
+  it('selects the other country for both incoming and outgoing world wars', () => {
+    expect(getWarOpponentId('usa', { country: 'usa', targetId: 'china' })).toBe('china');
+    expect(getWarOpponentId('usa', { country: 'china', targetId: 'usa' })).toBe('china');
+    expect(getWarOpponentId('usa', { country: 'usa', targetId: 'usa' })).toBeNull();
   });
 
   it('processWarYears advances war', () => {
@@ -93,6 +122,27 @@ describe('UnitedNations', () => {
     expect(person.unResolutions[0].targetId).toBe(china.id);
   });
 
+  it('does not enforce a vetoed resolution', () => {
+    initializeGeopolitics(person);
+    person.policies.diplomacyBudget = 50;
+    person.cabinet = { state: { title: 'Secretary of State', effectiveness: 60 } };
+    Object.values(person.countryRelations).forEach(relation => {
+      relation.relation = 0;
+    });
+    const china = getCountryByName('China');
+    person.countryRelations[china.id] = { relation: 40, tradeLevel: 2, tension: 10 };
+
+    const result = proposeResolution(person, china.id, 'sanctions');
+
+    expect(result.vetoed).toBe(true);
+    expect(result.passed).toBe(false);
+    expect(person.countryRelations[china.id]).toMatchObject({
+      relation: 40,
+      tradeLevel: 2,
+      tension: 10,
+    });
+  });
+
   it('RESOLUTION_TYPES has expected types', () => {
     const ids = RESOLUTION_TYPES.map(r => r.id);
     expect(ids).toContain('condemn');
@@ -127,6 +177,33 @@ describe('GeoPolitics', () => {
     expect(person.cabinet).toBeDefined();
     expect(person.policies).toBeDefined();
     expect(Object.keys(person.countryRelations).length).toBeGreaterThan(0);
+  });
+
+  it('creates and ends the matching war for manual diplomatic actions', () => {
+    const person = new Person('Leader', 'Tester', 'Female', 'United States');
+    person.age = 45;
+    person.money = 2000000;
+    person.job = { title: 'President', isPolitical: true, approval: 0 };
+    initializeGeopolitics(person);
+    person.job = { title: 'President', isPolitical: true, approval: 0 };
+    const china = getCountryByName('China');
+    person.countryRelations[china.id].relation = 80;
+    person.countryRelations[china.id].tension = 0;
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+
+    const declaration = executeDiplomaticAction(person, china.id, 'declare_war');
+    expect(declaration.success).toBe(true);
+    expect(person.wars[china.id]).toMatchObject({ targetId: china.id, years: 0 });
+    expect(person.countryRelations[china.id].relation).toBe(30);
+    expect(person.job.approval).toBe(5);
+
+    person.money = 200000;
+    person.countryRelations[china.id].relation = 25;
+    const peace = executeDiplomaticAction(person, china.id, 'peace_treaty');
+    expect(peace.success).toBe(true);
+    expect(person.wars[china.id]).toBeUndefined();
+    expect(person.countryRelations[china.id].atWar).toBe(false);
+    expect(person.job.approval).toBe(15);
   });
 });
 

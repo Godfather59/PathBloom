@@ -3,11 +3,7 @@ import { AppIcon } from './AppIcon';
 
 export function Screen({ children, className = '', dir, labelledBy }) {
   return (
-    <section
-      className={`pb-screen ${className}`.trim()}
-      dir={dir}
-      aria-labelledby={labelledBy}
-    >
+    <section className={`pb-screen ${className}`.trim()} dir={dir} aria-labelledby={labelledBy}>
       {children}
     </section>
   );
@@ -122,11 +118,15 @@ export function BottomSheet({
   }
 
   return (
-    <div className="pb-sheet-layer" role="presentation" onMouseDown={event => {
-      if (event.target === event.currentTarget) {
-        onClose?.();
-      }
-    }}>
+    <div
+      className="pb-sheet-layer"
+      role="presentation"
+      onMouseDown={event => {
+        if (event.target === event.currentTarget) {
+          onClose?.();
+        }
+      }}
+    >
       <section
         ref={sheetRef}
         className={`pb-bottom-sheet ${className}`.trim()}
@@ -184,7 +184,12 @@ export function ConfirmSheet({
         </div>
       }
     >
-      {warning && <div className="pb-confirm-warning"><AppIcon name="warning" size={22} />{warning}</div>}
+      {warning && (
+        <div className="pb-confirm-warning">
+          <AppIcon name="warning" size={22} />
+          {warning}
+        </div>
+      )}
     </BottomSheet>
   );
 }

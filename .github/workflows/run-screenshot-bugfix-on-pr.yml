@@ -36,7 +36,9 @@ jobs:
 
       - name: Extract and run patch script
         run: |
-          python - <<'PY'
+          set -o pipefail
+          {
+            python - <<'PY'
           from pathlib import Path
           source = Path('.github/workflows/apply-screenshot-bugfix.yml').read_text(encoding='utf-8')
           start = source.index("          python - <<'PY'\n") + len("          python - <<'PY'\n")
@@ -45,7 +47,20 @@ jobs:
           script = '\n'.join(line[10:] if line.startswith('          ') else line for line in lines)
           Path('/tmp/apply_screenshot_bugfix.py').write_text(script + '\n', encoding='utf-8')
           PY
-          python /tmp/apply_screenshot_bugfix.py
+            python -m py_compile /tmp/apply_screenshot_bugfix.py
+            python /tmp/apply_screenshot_bugfix.py
+          } 2>&1 | tee /tmp/bugfix.log
+
+      - name: Upload patch diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: screenshot-bugfix-diagnostics-${{ github.run_number }}
+          path: |
+            /tmp/bugfix.log
+            /tmp/apply_screenshot_bugfix.py
+          if-no-files-found: warn
+          retention-days: 2
 
       - name: Install dependencies
         run: npm ci

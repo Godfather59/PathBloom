@@ -227,7 +227,13 @@ function StatBar({ definition, value, language, t }) {
         </span>
         <strong>{number}%</strong>
       </div>
-      <div className="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow={safeValue}>
+      <div
+        className="progress-track"
+        role="progressbar"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow={safeValue}
+      >
         <div className={`progress-fill fill-${definition.id}`} style={{ width: `${safeValue}%` }} />
       </div>
     </div>

@@ -50,12 +50,18 @@ export function OccupationMenu({
       issues.push('Fame (20+)');
     }
     if (job.customReq === 'personal_trainer_unlock') {
-      if (!Array.isArray(person.unlockedFeatures) || !person.unlockedFeatures.includes('personal_training')) {
+      if (
+        !Array.isArray(person.unlockedFeatures) ||
+        !person.unlockedFeatures.includes('personal_training')
+      ) {
         issues.push('Requires: personal training session at the gym');
       }
     }
     if (job.customReq === 'study_group_unlock') {
-      if (!Array.isArray(person.unlockedFeatures) || !person.unlockedFeatures.includes('study_group')) {
+      if (
+        !Array.isArray(person.unlockedFeatures) ||
+        !person.unlockedFeatures.includes('study_group')
+      ) {
         issues.push('Requires: discover a study group at the library');
       }
     }

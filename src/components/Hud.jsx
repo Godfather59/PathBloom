@@ -67,10 +67,14 @@ export const Hud = memo(
               {genderLabel} - 🎂 {person.age} {t('hud.yearsOld', 'years old')}
               <div className="hud-money">💵 {formatMoney(person.money)}</div>
               {totalDebt > 0 && (
-                <div className="hud-debt">💳 {t('hud.debt', 'Debt')}: {formatMoney(totalDebt)}</div>
+                <div className="hud-debt">
+                  💳 {t('hud.debt', 'Debt')}: {formatMoney(totalDebt)}
+                </div>
               )}
               <div className="hud-role">{roleLabel}</div>
-              <div className="hud-location">📍 {person.city}, {person.country}</div>
+              <div className="hud-location">
+                📍 {person.city}, {person.country}
+              </div>
             </div>
           </div>
 

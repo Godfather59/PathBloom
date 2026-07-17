@@ -17,15 +17,37 @@ const REL_EMOJI = {
   Queen: '👑',
 };
 
-const REL_ORDER = ['Spouse', 'Fiance', 'Partner', 'Child', 'Sibling', 'Mother', 'Father', 'Parent', 'Best Friend', 'Friend', 'King', 'Queen'];
+const REL_ORDER = [
+  'Spouse',
+  'Fiance',
+  'Partner',
+  'Child',
+  'Sibling',
+  'Mother',
+  'Father',
+  'Parent',
+  'Best Friend',
+  'Friend',
+  'King',
+  'Queen',
+];
 
 function statColor(value) {
-  if (value >= 80) return '#4caf50';
-  if (value >= 50) return '#ff9800';
+  if (value >= 80) {
+    return '#4caf50';
+  }
+  if (value >= 50) {
+    return '#ff9800';
+  }
   return '#f44336';
 }
 
-export function RelationshipDashboard({ person, onClose, onOpenFullManager, t = (key, fallback) => fallback || key }) {
+export function RelationshipDashboard({
+  person,
+  onClose,
+  onOpenFullManager,
+  t = (key, fallback) => fallback || key,
+}) {
   const stats = useMemo(() => {
     const rels = person.relationships || [];
     const alive = rels.filter(r => r.status !== 'Deceased');
@@ -44,14 +66,18 @@ export function RelationshipDashboard({ person, onClose, onOpenFullManager, t = 
     return { alive, deceased, counts, avgStat, strongest, weakest, sorted, inConflict, hasPromise };
   }, [person]);
 
-  if (!person) return null;
+  if (!person) {
+    return null;
+  }
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content dashboard-content" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h2 className="modal-title">📊 {t('dashboard.title', 'Relationship Dashboard')}</h2>
-          <button className="close-btn" onClick={onClose}>&times;</button>
+          <button className="close-btn" onClick={onClose}>
+            &times;
+          </button>
         </div>
 
         <div className="modal-body">
@@ -67,7 +93,9 @@ export function RelationshipDashboard({ person, onClose, onOpenFullManager, t = 
               </div>
             )}
             <div className="summary-card">
-              <div className="summary-value" style={{ color: statColor(stats.avgStat) }}>{stats.avgStat}%</div>
+              <div className="summary-value" style={{ color: statColor(stats.avgStat) }}>
+                {stats.avgStat}%
+              </div>
               <div className="summary-label">{t('dashboard.avgHealth', 'Avg Health')}</div>
             </div>
             <div className="summary-card">
@@ -86,20 +114,23 @@ export function RelationshipDashboard({ person, onClose, onOpenFullManager, t = 
                 <div key={type} className="dashboard-type-row">
                   <span className="dashboard-type-label">
                     <span className="dashboard-type-emoji">{REL_EMOJI[type] || '👤'}</span>
-                    {type}{count > 1 ? ` (${count})` : ''}
+                    {type}
+                    {count > 1 ? ` (${count})` : ''}
                   </span>
                   <div className="dashboard-type-bar-track">
-                    {stats.sorted.filter(r => r.type === type && r.status !== 'Deceased').map(r => (
-                      <div
-                        key={r.id}
-                        className="dashboard-type-bar-fill"
-                        style={{
-                          width: `${r.stat}%`,
-                          backgroundColor: statColor(r.stat),
-                        }}
-                        title={`${r.name}: ${r.stat}%`}
-                      />
-                    ))}
+                    {stats.sorted
+                      .filter(r => r.type === type && r.status !== 'Deceased')
+                      .map(r => (
+                        <div
+                          key={r.id}
+                          className="dashboard-type-bar-fill"
+                          style={{
+                            width: `${r.stat}%`,
+                            backgroundColor: statColor(r.stat),
+                          }}
+                          title={`${r.name}: ${r.stat}%`}
+                        />
+                      ))}
                   </div>
                 </div>
               ))}
@@ -131,9 +162,30 @@ export function RelationshipDashboard({ person, onClose, onOpenFullManager, t = 
                       <div className="dashboard-list-pct">{r.stat}%</div>
                     </div>
                     <div className="dashboard-list-badges">
-                      {r.activeConflict && <span className="badge badge-conflict" title={t('dashboard.conflictTooltip', 'Unresolved conflict')}>⚡</span>}
-                      {r.promise?.status === 'active' && <span className="badge badge-promise" title={t('dashboard.promiseTooltip', 'Promise pending')}>📜</span>}
-                      {r.financialArrangement && <span className="badge badge-finance" title={t('dashboard.financeTooltip', 'Shared finances')}>💰</span>}
+                      {r.activeConflict && (
+                        <span
+                          className="badge badge-conflict"
+                          title={t('dashboard.conflictTooltip', 'Unresolved conflict')}
+                        >
+                          ⚡
+                        </span>
+                      )}
+                      {r.promise?.status === 'active' && (
+                        <span
+                          className="badge badge-promise"
+                          title={t('dashboard.promiseTooltip', 'Promise pending')}
+                        >
+                          📜
+                        </span>
+                      )}
+                      {r.financialArrangement && (
+                        <span
+                          className="badge badge-finance"
+                          title={t('dashboard.financeTooltip', 'Shared finances')}
+                        >
+                          💰
+                        </span>
+                      )}
                     </div>
                   </div>
                 ))}

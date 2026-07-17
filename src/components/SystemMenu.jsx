@@ -5,6 +5,7 @@ import { getCurrentTimePerson } from '../logic/TimeProgression';
 import SimulationDashboard from './SimulationDashboard';
 import ContentStudio from './ContentStudio';
 import WorldSimulation2Dashboard from './WorldSimulation2Dashboard';
+import ArabicLocalizationDashboard from './ArabicLocalizationDashboard';
 import './Modal.css';
 
 export function SystemMenu({
@@ -44,6 +45,7 @@ export function SystemMenu({
   const [showSimulation, setShowSimulation] = useState(false);
   const [showContentStudio, setShowContentStudio] = useState(false);
   const [showWorldSimulation2, setShowWorldSimulation2] = useState(false);
+  const [showArabicAudit, setShowArabicAudit] = useState(false);
   const currentPerson = getCurrentTimePerson();
   const openSimulation = onSimulationDashboard || (() => setShowSimulation(true));
 
@@ -72,6 +74,12 @@ export function SystemMenu({
     );
   }
 
+  if (showArabicAudit) {
+    return (
+      <ArabicLocalizationDashboard onClose={() => setShowArabicAudit(false)} language={language} />
+    );
+  }
+
   const navigation = [
     [onStats, '📊', 'system.stats', 'Lifetime Stats'],
     [onHistory, '📈', 'system.history', 'Current Life Trends'],
@@ -87,6 +95,12 @@ export function SystemMenu({
       '🧰',
       'system.contentStudio',
       language === 'ar' ? 'استوديو المحتوى' : 'Content Studio',
+    ],
+    [
+      () => setShowArabicAudit(true),
+      '🌙',
+      'system.arabicAudit',
+      language === 'ar' ? 'تدقيق الترجمة العربية' : 'Arabic Localization Audit',
     ],
     [onFamilyTree, '🌳', 'system.familyTree', 'Family Dynasty'],
     [onWorldNews, '📰', 'system.worldNews', 'World News'],
@@ -262,7 +276,10 @@ export function SystemMenu({
                   key={option.id}
                   type="button"
                   className={`language-chip ${language === option.id ? 'active' : ''}`}
-                  onClick={() => onLanguageChange?.(option.id)}
+                  onClick={() => {
+                    onLanguageChange?.(option.id);
+                    window.dispatchEvent(new CustomEvent('pathbloom-language-changed'));
+                  }}
                 >
                   {option.nativeName}
                 </button>

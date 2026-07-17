@@ -1,0 +1,152 @@
+html[dir='rtl'],
+html[dir='rtl'] body,
+body.language-ar {
+  direction: rtl;
+  text-align: right;
+}
+
+html[dir='rtl'] *,
+body.language-ar * {
+  box-sizing: border-box;
+}
+
+html[dir='rtl'] .modal-content,
+html[dir='rtl'] .event-card,
+html[dir='rtl'] .list-item,
+html[dir='rtl'] .settings-language,
+html[dir='rtl'] .country-card,
+html[dir='rtl'] .relationship-card,
+html[dir='rtl'] .asset-card,
+html[dir='rtl'] .job-card,
+html[dir='rtl'] .activity-card {
+  text-align: right;
+}
+
+html[dir='rtl'] .modal-header,
+html[dir='rtl'] .hud-header,
+html[dir='rtl'] .menu-header,
+html[dir='rtl'] .section-header {
+  flex-direction: row-reverse;
+}
+
+html[dir='rtl'] .close-btn,
+html[dir='rtl'] .back-btn {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+html[dir='rtl'] .action-btn,
+html[dir='rtl'] .btn-primary,
+html[dir='rtl'] .btn-secondary,
+html[dir='rtl'] .btn-danger,
+html[dir='rtl'] .list-item,
+html[dir='rtl'] .language-chip {
+  direction: rtl;
+}
+
+html[dir='rtl'] .choice-emoji,
+html[dir='rtl'] .action-icon,
+html[dir='rtl'] .menu-icon {
+  margin-right: 0;
+  margin-left: 8px;
+}
+
+html[dir='rtl'] .event-text,
+html[dir='rtl'] .person-name,
+html[dir='rtl'] .relationship-name,
+html[dir='rtl'] .leader-name,
+html[dir='rtl'] [dir='auto'] {
+  unicode-bidi: plaintext;
+}
+
+html[dir='rtl'] .event-age-badge,
+html[dir='rtl'] .money-value,
+html[dir='rtl'] .percentage-value,
+html[dir='rtl'] .stat-value,
+html[dir='rtl'] code,
+html[dir='rtl'] pre,
+html[dir='rtl'] input[type='number'],
+html[dir='rtl'] input[type='range'] {
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: left;
+}
+
+html[dir='rtl'] input:not([type='range']):not([type='number']),
+html[dir='rtl'] textarea:not(.content-json-editor) {
+  direction: rtl;
+  text-align: right;
+}
+
+html[dir='rtl'] .content-json-editor,
+html[dir='rtl'] .code-editor,
+html[dir='rtl'] pre,
+html[dir='rtl'] code {
+  direction: ltr;
+  text-align: left;
+}
+
+html[dir='rtl'] .stat-row,
+html[dir='rtl'] .detail-row,
+html[dir='rtl'] .summary-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+html[dir='rtl'] .progress-bar,
+html[dir='rtl'] progress {
+  direction: ltr;
+}
+
+html[dir='rtl'] .toast,
+html[dir='rtl'] .notification-card {
+  inset-inline-start: auto;
+  inset-inline-end: 12px;
+  text-align: right;
+}
+
+html[dir='rtl'] .modal-body,
+html[dir='rtl'] .event-log,
+html[dir='rtl'] .menu-scroll,
+html[dir='rtl'] .content-studio-list {
+  scrollbar-gutter: stable both-edges;
+}
+
+html[dir='rtl'] ul,
+html[dir='rtl'] ol {
+  padding-left: 0;
+  padding-right: 1.25rem;
+}
+
+html[dir='rtl'] .arrow-icon,
+html[dir='rtl'] .chevron-icon,
+html[dir='rtl'] [data-directional-icon='true'] {
+  transform: scaleX(-1);
+}
+
+html[dir='rtl'] .world-timeline-item,
+html[dir='rtl'] .life-timeline-item {
+  border-left: 0;
+  border-right: 3px solid var(--accent-primary);
+  padding-left: 0;
+  padding-right: 12px;
+}
+
+html[dir='rtl'] .settings-language-options {
+  justify-content: flex-start;
+}
+
+html[dir='rtl'] .age-actions,
+html[dir='rtl'] .action-menu-grid {
+  direction: rtl;
+}
+
+@media (max-width: 480px) {
+  html[dir='rtl'] .modal-content {
+    padding-inline: 12px;
+  }
+
+  html[dir='rtl'] .event-card,
+  html[dir='rtl'] .list-item {
+    padding-inline: 12px;
+  }
+}

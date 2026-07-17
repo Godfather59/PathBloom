@@ -176,14 +176,17 @@ describe('physical Android RTL screenshot fixes', () => {
     expect(css).toContain('unicode-bidi: isolate');
   });
 
-  it('moves News and Event History below the compact identity row', () => {
+  it('keeps News and Event History compact beside the story heading', () => {
     const css = readComponentCss('HudSafeActions.css');
     const source = readComponentSource('Hud.jsx');
 
     expect(css).toContain('.hud-safe-actions');
-    expect(css).toContain('grid-auto-columns: minmax(0, 1fr)');
+    expect(css).toContain('position: absolute');
+    expect(css).toContain('bottom: -64px');
+    expect(css).toContain('padding-inline-end: 112px');
     expect(css).toContain('calc(env(safe-area-inset-top) + 10px)');
     expect(css).toContain('min-height: 48px');
+    expect(css).toContain('.hud-safe-action.is-menu');
     expect(source).toContain('className="hud-safe-actions"');
     expect(source).toContain("t('hud.news', 'World News')");
     expect(source).toContain("t('hud.eventHistory', 'Event History')");
